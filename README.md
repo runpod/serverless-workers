@@ -1,6 +1,6 @@
 <div align="center">
 
-<h1>Serverless AI | Workers</h1>
+<h1>Serverless | Workers</h1>
 
 </div>
 
