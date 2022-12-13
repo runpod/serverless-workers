@@ -1,0 +1,3 @@
+import runpod
+
+runpod.serverless.pod_worker.start_worker()
