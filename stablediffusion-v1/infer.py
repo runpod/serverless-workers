@@ -19,7 +19,7 @@ class Predictor:
         self.infer = predict.Predictor()
         self.infer.setup()
 
-    def predict(self, model_inputs):
+    def run(self, model_inputs):
         '''
         Run inference on the model
         '''
