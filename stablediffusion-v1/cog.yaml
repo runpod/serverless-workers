@@ -8,6 +8,6 @@ build:
     - "ftfy==6.1.1"
     - "scipy==1.9.0"
     - "transformers==4.21.1"
-    - "runpod==0.1.8"
+    - "runpod==0.1.9"
 
 predict: "predict.py:Predictor"
