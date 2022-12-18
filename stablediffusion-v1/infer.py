@@ -1,5 +1,6 @@
 ''' infer.py for runpod worker '''
 
+import os
 import predict
 
 
@@ -21,9 +22,12 @@ class Predictor:
 
     def run(self, model_inputs):
         '''
-        Run inference on the model
+        Run inference on the model.
+        Returns output path, with the seed used to generate the image.
         '''
-        return self.infer.predict(
+        model_inputs['seed'] = model_inputs.get('seed', int.from_bytes(os.urandom(2), "big"))
+
+        img_path = self.infer.predict(
             prompt=model_inputs["prompt"],
             width=model_inputs.get('width', 512),
             height=model_inputs.get('height', 512),
@@ -36,3 +40,8 @@ class Predictor:
             scheduler=model_inputs.get('scheduler', "K-LMS"),
             seed=model_inputs.get('seed', None)
         )
+
+        return {
+            "image": img_path,
+            "seed": model_inputs['seed']
+        }
