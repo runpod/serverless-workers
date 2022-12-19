@@ -20,10 +20,57 @@ class Predictor:
         self.infer = predict.Predictor()
         self.infer.setup()
 
+    def validator(self):
+        '''
+        Model input options and their validations.
+        '''
+        return {
+            'prompt': {
+                'type': str,
+                'required': True
+            },
+            'width': {
+                'type': int,
+                'required': False
+            },
+            'height': {
+                'type': int,
+                'required': False
+            },
+            'init_image': {
+                'type': str,
+                'required': False
+            },
+            'mask': {
+                'type': str,
+                'required': False
+            },
+            'prompt_strength': {
+                'type': float,
+                'required': False
+            },
+            'num_outputs': {
+                'type': int,
+                'required': False
+            },
+            'num_inference_steps': {
+                'type': int,
+                'required': False
+            },
+            'guidance_scale': {
+                'type': float,
+                'required': False
+            },
+            'scheduler': {
+                'type': str,
+                'required': False
+            },
+        }
+
     def run(self, model_inputs):
         '''
         Run inference on the model.
-        Returns output path, with the seed used to generate the image.
+        Returns output path, width the seed used to generate the image.
         '''
         model_inputs['seed'] = model_inputs.get('seed', int.from_bytes(os.urandom(2), "big"))
 
