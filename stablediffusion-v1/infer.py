@@ -55,28 +55,31 @@ def validator():
         },
     }
 
-def run(model_inputs):
+
+def run(job):
     '''
     Run inference on the model.
     Returns output path, width the seed used to generate the image.
     '''
-    model_inputs['seed'] = model_inputs.get('seed', int.from_bytes(os.urandom(2), "big"))
+    job_input = job['input']
+
+    job_input['seed'] = job_input.get('seed', int.from_bytes(os.urandom(2), "big"))
 
     img_path = MODEL.predict(
-        prompt=model_inputs["prompt"],
-        width=model_inputs.get('width', 512),
-        height=model_inputs.get('height', 512),
-        init_image=model_inputs.get('init_image', None),
-        mask=model_inputs.get('mask', None),
-        prompt_strength=model_inputs.get('prompt_strength', 0.8),
-        num_outputs=model_inputs.get('num_outputs', 1),
-        num_inference_steps=model_inputs.get('num_inference_steps', 50),
-        guidance_scale=model_inputs.get('guidance_scale', 7.5),
-        scheduler=model_inputs.get('scheduler', "K-LMS"),
-        seed=model_inputs.get('seed', None)
+        prompt=job_input["prompt"],
+        width=job_input.get('width', 512),
+        height=job_input.get('height', 512),
+        init_image=job_input.get('init_image', None),
+        mask=job_input.get('mask', None),
+        prompt_strength=job_input.get('prompt_strength', 0.8),
+        num_outputs=job_input.get('num_outputs', 1),
+        num_inference_steps=job_input.get('num_inference_steps', 50),
+        guidance_scale=job_input.get('guidance_scale', 7.5),
+        scheduler=job_input.get('scheduler', "K-LMS"),
+        seed=job_input.get('seed', None)
     )
 
     return {
-        "image": img_path,
-        "seed": model_inputs['seed']
+        "images": [img_path],
+        "seed": job_input['seed']
     }
