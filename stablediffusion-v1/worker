@@ -2,4 +2,4 @@
 
 import runpod
 
-runpod.serverless.pod_worker.start_worker()
+runpod.serverless.start_worker()
