@@ -80,6 +80,6 @@ def run(job):
     )
 
     return {
-        "images": [img_path],
+        "images": (img_path),
         "seed": job_input['seed']
     }
