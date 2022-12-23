@@ -5,7 +5,6 @@ import predict
 
 import runpod
 
-runpod.serverless.start()
 
 MODEL = predict.Predictor()
 MODEL.setup()
@@ -93,3 +92,6 @@ def run(job):
         })
 
     return job_output
+
+
+runpod.serverless.start({"handler": run})
