@@ -68,6 +68,28 @@ def run(job):
 
     job_input['seed'] = job_input.get('seed', int.from_bytes(os.urandom(2), "big"))
 
+    input_validations = validator()
+    input_errors = []
+
+    for key, value in input_validations.items():
+        if value['required'] and key not in job_input:
+            input_errors.append(f"{key} is a required input.")
+
+    for key, value in job_input.items():
+        if key not in input_validations:
+            input_errors.append(f"Unexpected input. {key} is not a valid input option.")
+
+        if not isinstance(value, input_validations[key]['type']):
+            input_errors.append(
+                f"{key} should be {input_validations[key]['type']} type, not {type(value)}.")
+
+    if input_errors:
+        return [
+            {
+                "error": input_errors
+            }
+        ]
+
     img_paths = MODEL.predict(
         prompt=job_input["prompt"],
         width=job_input.get('width', 512),
