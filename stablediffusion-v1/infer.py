@@ -80,12 +80,11 @@ def run(job):
     )
 
     job_output = []
-    seed_increment = 0
-    for img_path in img_paths:
+
+    for index, img_path in enumerate(img_paths):
         job_output.append({
             "image": img_path,
-            "seed": job_input['seed'] + seed_increment
+            "seed": job_input['seed'] + index
         })
-        seed_increment += 1
 
     return job_output
