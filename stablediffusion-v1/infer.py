@@ -79,7 +79,9 @@ def run(job):
         seed=job_input.get('seed', None)
     )
 
-    return {
-        "images": (img_path),
-        "seed": job_input['seed']
-    }
+    return [
+        {
+            "image": (img_path),
+            "seed": job_input['seed']
+        }
+    ]
