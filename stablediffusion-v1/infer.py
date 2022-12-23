@@ -3,6 +3,10 @@
 import os
 import predict
 
+import runpod
+from runpod.serverless.modules import upload
+
+runpod.serverless.start()
 
 MODEL = predict.Predictor()
 MODEL.setup()
@@ -82,8 +86,10 @@ def run(job):
     job_output = []
 
     for index, img_path in enumerate(img_paths):
+        image_url = upload(job['id'], img_path, index)
+
         job_output.append({
-            "image": img_path,
+            "image": image_url,
             "seed": job_input['seed'] + index
         })
 
