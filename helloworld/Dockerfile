@@ -5,6 +5,5 @@ WORKDIR /
 RUN pip install runpod
 
 ADD handler.py .
-RUN chmod a+x /handler.py
 
-CMD [ "/handler.py" ]
+CMD [ "python", "-u", "/handler.py" ]
