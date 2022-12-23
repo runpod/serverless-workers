@@ -65,7 +65,7 @@ def run(job):
 
     job_input['seed'] = job_input.get('seed', int.from_bytes(os.urandom(2), "big"))
 
-    img_path = MODEL.predict(
+    img_paths = MODEL.predict(
         prompt=job_input["prompt"],
         width=job_input.get('width', 512),
         height=job_input.get('height', 512),
@@ -79,9 +79,11 @@ def run(job):
         seed=job_input.get('seed', None)
     )
 
-    return [
-        {
+    job_output = []
+    for img_path in img_paths:
+        job_output.append({
             "image": img_path,
             "seed": job_input['seed']
-        }
-    ]
+        })
+
+    return job_output
