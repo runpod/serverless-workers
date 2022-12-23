@@ -66,8 +66,6 @@ def run(job):
     '''
     job_input = job['input']
 
-    job_input['seed'] = job_input.get('seed', int.from_bytes(os.urandom(2), "big"))
-
     input_validations = validator()
     input_errors = []
 
@@ -89,6 +87,8 @@ def run(job):
                 "error": input_errors
             }
         ]
+
+    job_input['seed'] = job_input.get('seed', int.from_bytes(os.urandom(2), "big"))
 
     img_paths = MODEL.predict(
         prompt=job_input["prompt"],
