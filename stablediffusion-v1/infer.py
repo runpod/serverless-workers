@@ -80,10 +80,12 @@ def run(job):
     )
 
     job_output = []
+    seed_increment = 0
     for img_path in img_paths:
         job_output.append({
             "image": img_path,
-            "seed": job_input['seed']
+            "seed": job_input['seed'] + seed_increment
         })
+        seed_increment += 1
 
     return job_output
