@@ -4,59 +4,55 @@ import os
 import predict
 
 import runpod
-from runpod.serverless.modules.upload import upload_image
+from runpod.serverless.utils import upload, validator
 
 
 MODEL = predict.Predictor()
 MODEL.setup()
 
 
-def validator():
-    '''
-    Model input options and their validations.
-    '''
-    return {
-        'prompt': {
-            'type': str,
-            'required': True
-        },
-        'width': {
-            'type': int,
-            'required': False
-        },
-        'height': {
-            'type': int,
-            'required': False
-        },
-        'init_image': {
-            'type': str,
-            'required': False
-        },
-        'mask': {
-            'type': str,
-            'required': False
-        },
-        'prompt_strength': {
-            'type': float,
-            'required': False
-        },
-        'num_outputs': {
-            'type': int,
-            'required': False
-        },
-        'num_inference_steps': {
-            'type': int,
-            'required': False
-        },
-        'guidance_scale': {
-            'type': float,
-            'required': False
-        },
-        'scheduler': {
-            'type': str,
-            'required': False
-        },
-    }
+INPUT_VALIDATIONS = {
+    'prompt': {
+        'type': str,
+        'required': True
+    },
+    'width': {
+        'type': int,
+        'required': False
+    },
+    'height': {
+        'type': int,
+        'required': False
+    },
+    'init_image': {
+        'type': str,
+        'required': False
+    },
+    'mask': {
+        'type': str,
+        'required': False
+    },
+    'prompt_strength': {
+        'type': float,
+        'required': False
+    },
+    'num_outputs': {
+        'type': int,
+        'required': False
+    },
+    'num_inference_steps': {
+        'type': int,
+        'required': False
+    },
+    'guidance_scale': {
+        'type': float,
+        'required': False
+    },
+    'scheduler': {
+        'type': str,
+        'required': False
+    },
+}
 
 
 def run(job):
@@ -66,21 +62,7 @@ def run(job):
     '''
     job_input = job['input']
 
-    input_validations = validator()
-    input_errors = []
-
-    for key, value in input_validations.items():
-        if value['required'] and key not in job_input:
-            input_errors.append(f"{key} is a required input.")
-
-    for key, value in job_input.items():
-        if key not in input_validations:
-            input_errors.append(f"Unexpected input. {key} is not a valid input option.")
-
-        if not isinstance(value, input_validations[key]['type']):
-            input_errors.append(
-                f"{key} should be {input_validations[key]['type']} type, not {type(value)}.")
-
+    input_errors = validator.validate(job_input, INPUT_VALIDATIONS)
     if input_errors:
         return [
             {
@@ -107,7 +89,7 @@ def run(job):
     job_output = []
 
     for index, img_path in enumerate(img_paths):
-        image_url = upload_image(job['id'], img_path, index)
+        image_url = upload.upload_image(job['id'], img_path, index)
 
         job_output.append({
             "image": image_url,
