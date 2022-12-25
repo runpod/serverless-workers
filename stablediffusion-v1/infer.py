@@ -52,6 +52,10 @@ INPUT_VALIDATIONS = {
         'type': str,
         'required': False
     },
+    'seed': {
+        'type': int,
+        'required': False
+    }
 }
 
 
