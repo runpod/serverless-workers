@@ -1,10 +1,11 @@
 ''' Inference for the DreamBooth model. '''
 
 import os
+import zipfile
 import predictor
 
 import runpod
-from runpod.serverless.utils import upload, validator
+from runpod.serverless.utils import download, upload, validator
 
 MODEL = predictor.Predictor()
 MODEL.setup()
@@ -41,6 +42,8 @@ def run(job):
     job_input = job['input']
 
     job_input['seed'] = job_input.get('seed', int.from_bytes(os.urandom(2), "big"))
+
+    job_input["instance_data"] = download.download_input_objects(job_input["instance_data"])[0]
 
     job_results = MODEL.predict(
         instance_prompt=job_input["instance_prompt"],

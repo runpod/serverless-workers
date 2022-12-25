@@ -137,7 +137,7 @@ class Predictor(BasePredictor):
             default=1,
         ),
         gradient_checkpointing: bool = Input(
-            description="Whether or not to use gradient checkpointing to save memory at the expense of slower backward pass.",
+            description="Whether or not to use gradient checkpoints to save memory at the expense of slower backward pass.",
             default=False,
         ),
         learning_rate: float = Input(
