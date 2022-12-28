@@ -68,11 +68,9 @@ def run(job):
 
     input_errors = validator.validate(job_input, INPUT_VALIDATIONS)
     if input_errors:
-        return [
-            {
-                "error": input_errors
-            }
-        ]
+        return {
+            "error": input_errors
+        }
 
     job_input['seed'] = job_input.get('seed', int.from_bytes(os.urandom(2), "big"))
 
