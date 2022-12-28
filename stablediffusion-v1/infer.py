@@ -16,6 +16,10 @@ INPUT_VALIDATIONS = {
         'type': str,
         'required': True
     },
+    'negative_prompt': {
+        'type': str,
+        'required': False
+    },
     'width': {
         'type': int,
         'required': False
@@ -76,6 +80,7 @@ def run(job):
 
     img_paths = MODEL.predict(
         prompt=job_input["prompt"],
+        negative_prompt=job_input.get("negative_prompt", None),
         width=job_input.get('width', 512),
         height=job_input.get('height', 512),
         init_image=job_input.get('init_image', None),
