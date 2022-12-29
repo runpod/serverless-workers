@@ -15,7 +15,7 @@ build:
     - pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
     - pip install -qq git+https://github.com/ShivamShrirao/diffusers
     - pip uninstall cog -y
-    - pip install git+https://github.com/justinmerrell/cog/archive/python.zip
+    - pip install https://github.com/justinmerrell/cog/archive/python.zip --upgrade
   #  - pip install -q https://github.com/metrolobo/xformers_wheels/releases/download/1d31a3ac_various_6/xformers-0.0.14.dev0-cp37-cp37m-linux_x86_64.whl
 
 predict: "predictor.py:Predictor"
