@@ -191,10 +191,10 @@ class Predictor(BasePredictor):
             default=1.0,
             description="Max gradient norm.",
         ),
-        samples: list = Input(
-            description="A list of samples to use for evaluation.",
-            default=None,
-        ),
+        # samples: list = Input(
+        #     description="A list of samples to use for evaluation.",
+        #     default=None,
+        # ),
         # save_interval: int = Input(
         #     default=10000,
         #     description="Save weights every N steps.",
