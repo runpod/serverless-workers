@@ -910,9 +910,9 @@ def main(args):
                         for i in tqdm(range(sample['n_save_sample']), desc="Generating samples"):
                             images = pipeline(
                                 sample['save_sample_prompt'],
-                                negative_prompt=sample['save_sample_negative_prompt'],
-                                guidance_scale=sample['save_guidance_scale'],
-                                num_inference_steps=sample['save_infer_steps'],
+                                negative_prompt=sample.get('save_sample_negative_prompt', None),
+                                guidance_scale=sample.get('save_guidance_scale', 7.5),
+                                num_inference_steps=sample.get('save_infer_steps', 50),
                                 generator=g_cuda,
                             ).images
                             images[0].save(os.path.join(sample_dir, f"{index}-{i}.png"))
