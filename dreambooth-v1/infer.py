@@ -5,7 +5,7 @@ import zipfile
 import predictor
 
 import runpod
-from runpod.serverless.utils import download, upload, validator
+from runpod.serverless.utils import download, upload, validator, rp_cleanup
 
 MODEL = predictor.Predictor()
 MODEL.setup()
@@ -101,6 +101,8 @@ def run(job):
             "image": image_url,
             "seed": job_input['seed'] + index
         })
+
+    cleanup.clean()
 
     return job_output
 
