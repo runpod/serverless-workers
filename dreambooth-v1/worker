@@ -1,5 +1,0 @@
-#!/usr/bin/env python
-
-import runpod
-
-runpod.serverless.pod_worker.start_worker()
