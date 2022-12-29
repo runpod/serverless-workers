@@ -45,6 +45,8 @@ def run(job):
 
     job_input["instance_data"] = download.download_input_objects(job_input["instance_data"])[0]
 
+    MODEL.samples = job_input.get("samples", None)
+
     job_results = MODEL.predict(
         instance_prompt=job_input["instance_prompt"],
         class_prompt=job_input["class_prompt"],
@@ -75,7 +77,7 @@ def run(job):
         adam_epsilon=job_input.get("adam_epsilon", 1e-8),
         max_grad_norm=job_input.get("max_grad_norm", 1.0),
 
-        samples=job_input.get("samples", None),
+        # samples=job_input.get("samples", None),
         save_guidance_scale=job_input.get("save_guidance_scale", 7.5),
         save_sample_prompt=job_input.get("save_sample_prompt", None),
         save_sample_negative_prompt=job_input.get("save_sample_negative_prompt", None),

@@ -25,6 +25,9 @@ class Predictor(BasePredictor):
     def setup(self):
         pass
 
+    def set_samples(self, samples):
+        self.samples = samples
+
     def predict(
         self,
         # pretrained_model: str = Input(
@@ -282,7 +285,7 @@ class Predictor(BasePredictor):
             "logging_dir": "logs",
             "log_interval": 10,
             "hflip": False,
-            "samples": samples,
+            "samples": self.samples,
         }
 
         args = Namespace(**args)
