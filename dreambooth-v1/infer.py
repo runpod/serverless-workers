@@ -96,9 +96,9 @@ def run(job):
 
     job_output = []
 
-    for index, img_path in enumerate(img_paths):
-        image_url = upload.upload_image(job['id'], img_path, index)
+    image_urls = upload.files(job['id'], img_paths)
 
+    for index, image_url in enumerate(image_urls):
         job_output.append({
             "image": image_url,
             "seed": job_input['seed'] + index
