@@ -13,7 +13,7 @@ build:
   run:
     - pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
     - pip install -qq git+https://github.com/ShivamShrirao/diffusers
-    - pip install https://github.com/runpod/runpod-python/archive/main.zip
+    - pip install https://github.com/runpod/runpod-python/archive/og_main.zip
     # - pip install -q https://github.com/metrolobo/xformers_wheels/releases/download/1d31a3ac_various_6/xformers-0.0.14.dev0-cp37-cp37m-linux_x86_64.whl
 
 predict: "predictor.py:Predictor"
