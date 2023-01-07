@@ -8,9 +8,9 @@ build:
     - "ftfy==6.1.1"
     - "scipy==1.9.0"
     - "transformers==4.21.1"
-    # - "runpod==0.6.4"
+    - "runpod==0.7.0"
 
   run:
-    - pip install https://github.com/runpod/runpod-python/archive/main.zip
+    # - pip install https://github.com/runpod/runpod-python/archive/main.zip
 
 predict: "predict.py:Predictor"
