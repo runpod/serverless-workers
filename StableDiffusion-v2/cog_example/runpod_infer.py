@@ -51,6 +51,10 @@ INPUT_VALIDATIONS = {
     'seed': {
         'type': int,
         'required': False
+    },
+    'nsfw': {
+        'type': bool,
+        'required': False
     }
 }
 
