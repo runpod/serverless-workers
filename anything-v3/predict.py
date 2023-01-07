@@ -24,6 +24,7 @@ class Predictor(BasePredictor):
 
         self.txt2img_pipe = StableDiffusionPipeline.from_pretrained(
             "Linaqruf/anything-v3.0",
+            safety_checker=None,
             cache_dir=MODEL_CACHE,
             local_files_only=True,
         ).to("cuda")
