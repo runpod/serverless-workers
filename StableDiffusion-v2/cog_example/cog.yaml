@@ -9,6 +9,10 @@ build:
     - 'scipy==1.9.3'
     - 'transformers==4.25.1'
     - 'accelerate==0.15.0'
-    - 'runpod==0.7.0'
+    # - 'runpod==0.7.0'
+
+  run:
+    - pip install https://github.com/runpod/runpod-python/archive/main.zip
+
 
 predict: 'predict.py:Predictor'
