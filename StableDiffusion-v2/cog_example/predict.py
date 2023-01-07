@@ -12,9 +12,9 @@ from diffusers import (
     EulerAncestralDiscreteScheduler,
     DPMSolverMultistepScheduler,
 )
-# from diffusers.pipelines.stable_diffusion.safety_checker import (
-#     StableDiffusionSafetyChecker,
-# )
+from diffusers.pipelines.stable_diffusion.safety_checker import (
+    StableDiffusionSafetyChecker,
+)
 
 
 MODEL_ID = "stabilityai/stable-diffusion-2-1"
@@ -26,15 +26,15 @@ class Predictor(BasePredictor):
     def setup(self):
         """Load the model into memory to make running multiple predictions efficient"""
         print("Loading pipeline...")
-        # safety_checker = StableDiffusionSafetyChecker.from_pretrained(
-        #     SAFETY_MODEL_ID,
-        #     cache_dir=MODEL_CACHE,
-        #     local_files_only=True,
-        # )
+        safety_checker = StableDiffusionSafetyChecker.from_pretrained(
+            SAFETY_MODEL_ID,
+            cache_dir=MODEL_CACHE,
+            local_files_only=True,
+        )
 
         self.pipe = StableDiffusionPipeline.from_pretrained(
             MODEL_ID,
-            safety_checker=None,
+            safety_checker=safety_checker,
             cache_dir=MODEL_CACHE,
             local_files_only=True,
         ).to("cuda")
