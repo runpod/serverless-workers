@@ -118,7 +118,7 @@ class Predictor(BasePredictor):
 
         output_paths = []
         for i, sample in enumerate(output.images):
-            if output.nsfw_content_detected and output.nsfw_content_detected[i]:
+            if output.nsfw_content_detected and output.nsfw_content_detected[i] and self.NSFW:
                 continue
 
             output_path = f"/tmp/out-{i}.png"
