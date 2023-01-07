@@ -142,6 +142,8 @@ class Predictor(BasePredictor):
             **extra_kwargs,
         )
 
+        print(output)
+
         output_paths = []
         for i, sample in enumerate(output.images):
             if output.nsfw_content_detected and output.nsfw_content_detected[i] and self.NSFW:
