@@ -28,14 +28,6 @@ INPUT_VALIDATIONS = {
         'type': int,
         'required': False
     },
-    'init_image': {
-        'type': str,
-        'required': False
-    },
-    'mask': {
-        'type': str,
-        'required': False
-    },
     'prompt_strength': {
         'type': float,
         'required': False
@@ -83,8 +75,6 @@ def run(job):
         negative_prompt=job_input.get("negative_prompt", None),
         width=job_input.get('width', 512),
         height=job_input.get('height', 512),
-        init_image=job_input.get('init_image', None),
-        mask=job_input.get('mask', None),
         prompt_strength=job_input.get('prompt_strength', 0.8),
         num_outputs=job_input.get('num_outputs', 1),
         num_inference_steps=job_input.get('num_inference_steps', 50),
