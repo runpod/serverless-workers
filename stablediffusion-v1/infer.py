@@ -59,6 +59,10 @@ INPUT_VALIDATIONS = {
     'seed': {
         'type': int,
         'required': False
+    },
+    'nsfw': {
+        'type': bool,
+        'required': False
     }
 }
 
@@ -77,6 +81,8 @@ def run(job):
         }
 
     job_input['seed'] = job_input.get('seed', int.from_bytes(os.urandom(2), "big"))
+
+    MODEL.NSFW = job_input.get('nsfw', True)
 
     img_paths = MODEL.predict(
         prompt=job_input["prompt"],
