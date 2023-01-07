@@ -19,3 +19,4 @@ Then, you can run predictions:
 These are the changes made to the base repo.
 
 - `cog.yaml` - Add `runpod` as a dependency
+- Add `runpod_infer.py` file - This defines how the worker interacts with your model, the file name is arbitrary.
