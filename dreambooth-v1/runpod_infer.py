@@ -63,8 +63,11 @@ def run(job):
 
     # Currently only supports one concept
     concept = job_input['concepts'][0]
-    concept["instance_data"] = download.download_input_objects(concept["instance_data"])
-    concept["class_data"] = download.download_input_objects(concept.get("class_data", None))
+
+    # Download input objects
+    concept["instance_data"], concept["class_data"] = download.download_input_objects(
+        [concept["instance_data"], concept.get("class_data", None)]
+    )
 
     job_input['seed'] = job_input.get('seed', int.from_bytes(os.urandom(2), "big"))
 
