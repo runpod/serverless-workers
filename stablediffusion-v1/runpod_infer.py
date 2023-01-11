@@ -74,12 +74,17 @@ def run(job):
     '''
     job_input = job['input']
 
-    input_errors = validator.validate(job_input, INPUT_VALIDATIONS)
-    if input_errors:
-        return {
-            "error": input_errors
-        }
+    # Convert prompt_strength and guidance_scale to float
+    job_input['prompt_strength'] = float(job_input.get('prompt_strength', 0.8))
+    job_input['guidance_scale'] = float(job_input.get('guidance_scale', 7.5))
 
+    # Input validation
+    input_errors = validator.validate(job_input, INPUT_VALIDATIONS)
+
+    if input_errors:
+        return {"error": input_errors}
+
+    # Set seed if not provided
     job_input['seed'] = job_input.get('seed', int.from_bytes(os.urandom(2), "big"))
 
     MODEL.NSFW = job_input.get('nsfw', True)
@@ -91,10 +96,10 @@ def run(job):
         height=job_input.get('height', 512),
         init_image=job_input.get('init_image', None),
         mask=job_input.get('mask', None),
-        prompt_strength=job_input.get('prompt_strength', 0.8),
+        prompt_strength=job_input['prompt_strength'],
         num_outputs=job_input.get('num_outputs', 1),
         num_inference_steps=job_input.get('num_inference_steps', 50),
-        guidance_scale=job_input.get('guidance_scale', 7.5),
+        guidance_scale=job_input['guidance_scale'],
         scheduler=job_input.get('scheduler', "K-LMS"),
         seed=job_input.get('seed', None)
     )
