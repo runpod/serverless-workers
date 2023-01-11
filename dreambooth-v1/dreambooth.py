@@ -907,7 +907,7 @@ def main(args):
                 os.makedirs(sample_dir, exist_ok=True)
                 with torch.autocast("cuda"), torch.inference_mode():
                     for index, sample in enumerate(args.samples):
-                        for i in tqdm(range(sample['num_output']), desc="Generating samples"):
+                        for i in tqdm(range(sample.get('num_output', 1)), desc="Generating samples"):
                             images = pipeline(
                                 sample['prompt'],
                                 negative_prompt=sample.get('negative_prompt', None),
