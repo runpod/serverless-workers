@@ -30,6 +30,88 @@ class Predictor(BasePredictor):
 
     def predict(
         self,
+        # ---------------------------------------------------------------------------- #
+        #                              Training Parameters                             #
+        # ---------------------------------------------------------------------------- #
+        # --------------------------------- Intervals -------------------------------- #
+        num_train_epochs: int = Input(default=1),
+        max_train_steps: int = Input(
+            description="Total number of training steps to perform.  If provided, overrides num_train_epochs.",
+            default=2000,
+        ),
+        # --------------------------------- Batching --------------------------------- #
+        train_batch_size: int = Input(
+            description="Batch size (per device) for the training dataloader.",
+            default=1,
+        ),
+        sample_batch_size: int = Input(
+            description="Batch size (per device) for sampling images.",
+            default=4,
+        ),
+        gradient_accumulation_steps: int = Input(
+            description="Number of updates steps to accumulate before performing a backward/update pass.",
+            default=1,
+        ),
+        gradient_checkpointing: bool = Input(
+            description="Whether or not to use gradient checkpoints to save memory at the expense of slower backward pass.",
+            default=False,
+        ),
+        # ------------------------------- Learning Rate ------------------------------ #
+        learning_rate: float = Input(
+            description="Initial learning rate (after the potential warmup period) to use.",
+            default=1e-6,
+        ),
+        scale_lr: bool = Input(
+            description="Scale the learning rate by the number of GPUs, gradient accumulation steps, and batch size.",
+            default=False,
+        ),
+        lr_scheduler: str = Input(
+            description="The scheduler type to use",
+            choices=[
+                "linear",
+                "cosine",
+                "cosine_with_restarts",
+                "polynomial",
+                "constant",
+                "constant_with_warmup",
+            ],
+            default="constant",
+        ),
+        lr_warmup_steps: int = Input(
+            description="Number of steps for the warmup in the lr scheduler.",
+            default=0,
+        ),
+        # ----------------------------- Image Processing ----------------------------- #
+        resolution: int = Input(
+            description="The resolution for input images. All the images in the train/validation dataset will be resized to this"
+            " resolution.",
+            default=512,
+        ),
+        center_crop: bool = Input(
+            description="Whether to center crop images before resizing to resolution",
+            default=False,
+        ),
+        # ---------------------------------- Tuning ---------------------------------- #
+        use_8bit_adam: bool = Input(
+            description="Whether or not to use 8-bit Adam from bitsandbytes.",
+            default=False,
+        ),
+        with_prior_preservation: bool = Input(
+            description="Flag to add prior preservation loss.",
+            default=True,
+        ),
+        prior_loss_weight: float = Input(
+            description="Weight of prior preservation loss.",
+            default=1.0,
+        ),
+        train_text_encoder: bool = Input(
+            description="Whether to train the text encoder",
+            default=True,
+        ),
+        pad_tokens: bool = Input(
+            description="Flag to pad tokens to length 77.",
+            default=False,
+        ),
         # pretrained_model: str = Input(
         #     description="Model identifier from huggingface.co/models",
         #     default="runwayml/stable-diffusion-v1-5",
@@ -96,81 +178,7 @@ class Predictor(BasePredictor):
             description="The number of inference steps for save sample.",
             default=50,
         ),
-        pad_tokens: bool = Input(
-            description="Flag to pad tokens to length 77.",
-            default=False,
-        ),
-        with_prior_preservation: bool = Input(
-            description="Flag to add prior preservation loss.",
-            default=True,
-        ),
-        prior_loss_weight: float = Input(
-            description="Weight of prior preservation loss.",
-            default=1.0,
-        ),
         seed: int = Input(description="A seed for reproducible training", default=1337),
-        resolution: int = Input(
-            description="The resolution for input images. All the images in the train/validation dataset will be resized to this"
-            " resolution.",
-            default=512,
-        ),
-        center_crop: bool = Input(
-            description="Whether to center crop images before resizing to resolution",
-            default=False,
-        ),
-        train_text_encoder: bool = Input(
-            description="Whether to train the text encoder",
-            default=True,
-        ),
-        train_batch_size: int = Input(
-            description="Batch size (per device) for the training dataloader.",
-            default=1,
-        ),
-        sample_batch_size: int = Input(
-            description="Batch size (per device) for sampling images.",
-            default=4,
-        ),
-        num_train_epochs: int = Input(default=1),
-        max_train_steps: int = Input(
-            description="Total number of training steps to perform.  If provided, overrides num_train_epochs.",
-            default=2000,
-        ),
-        gradient_accumulation_steps: int = Input(
-            description="Number of updates steps to accumulate before performing a backward/update pass.",
-            default=1,
-        ),
-        gradient_checkpointing: bool = Input(
-            description="Whether or not to use gradient checkpoints to save memory at the expense of slower backward pass.",
-            default=False,
-        ),
-        learning_rate: float = Input(
-            description="Initial learning rate (after the potential warmup period) to use.",
-            default=1e-6,
-        ),
-        scale_lr: bool = Input(
-            description="Scale the learning rate by the number of GPUs, gradient accumulation steps, and batch size.",
-            default=False,
-        ),
-        lr_scheduler: str = Input(
-            description="The scheduler type to use",
-            choices=[
-                "linear",
-                "cosine",
-                "cosine_with_restarts",
-                "polynomial",
-                "constant",
-                "constant_with_warmup",
-            ],
-            default="constant",
-        ),
-        lr_warmup_steps: int = Input(
-            description="Number of steps for the warmup in the lr scheduler.",
-            default=0,
-        ),
-        use_8bit_adam: bool = Input(
-            description="Whether or not to use 8-bit Adam from bitsandbytes.",
-            default=False,
-        ),
         adam_beta1: float = Input(
             default=0.9,
             description="The beta1 parameter for the Adam optimizer.",
@@ -235,6 +243,9 @@ class Predictor(BasePredictor):
 
         # some settings are fixed for the replicate model
         args = {
+            "num_train_epochs": num_train_epochs,
+            "max_train_steps": max_train_steps,
+
             "pretrained_model_name_or_path": "runwayml/stable-diffusion-v1-5",
             "pretrained_vae_name_or_path": "stabilityai/sd-vae-ft-mse",
             "revision": "fp16",
@@ -258,8 +269,7 @@ class Predictor(BasePredictor):
             "train_text_encoder": train_text_encoder,
             "train_batch_size": train_batch_size,
             "sample_batch_size": sample_batch_size,
-            "num_train_epochs": num_train_epochs,
-            "max_train_steps": max_train_steps,
+
             "gradient_accumulation_steps": gradient_accumulation_steps,
             "gradient_checkpointing": gradient_checkpointing,
             "learning_rate": learning_rate,

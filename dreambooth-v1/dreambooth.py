@@ -907,24 +907,19 @@ def main(args):
                 os.makedirs(sample_dir, exist_ok=True)
                 with torch.autocast("cuda"), torch.inference_mode():
                     for index, sample in enumerate(args.samples):
-                        for i in tqdm(range(sample['n_save_sample']), desc="Generating samples"):
+                        for i in tqdm(range(sample['num_output']), desc="Generating samples"):
                             images = pipeline(
-                                sample['save_sample_prompt'],
-                                negative_prompt=sample.get('save_sample_negative_prompt', None),
-                                guidance_scale=sample.get('save_guidance_scale', 7.5),
-                                num_inference_steps=sample.get('save_infer_steps', 50),
+                                sample['prompt'],
+                                negative_prompt=sample.get('negative_prompt', None),
+                                guidance_scale=sample.get('guidance_scale', 7.5),
+                                num_inference_steps=sample.get('num_inference_steps', 50),
                                 generator=g_cuda,
                             ).images
                             images[0].save(os.path.join(sample_dir, f"{index}-{i}.png"))
                 del pipeline
-                # if torch.cuda.is_available():
-                #     torch.cuda.empty_cache()
-
-                # print("deleting pipeline 22")
 
                 gc.collect()
                 torch.cuda.empty_cache()
-                # call("nvidia-smi")
 
             print(f"[*] Weights saved at {save_dir}")
             unet.to(torch.float32)

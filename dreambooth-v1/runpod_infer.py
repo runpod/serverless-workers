@@ -1,0 +1,144 @@
+''' Inference for the DreamBooth model. '''
+
+import os
+import zipfile
+import predictor
+
+import runpod
+from runpod.serverless.utils import download, upload, validator, rp_cleanup
+
+MODEL = predictor.Predictor()
+MODEL.setup()
+
+
+def run(job):
+    '''
+    Run inference using the dreambooth model.
+
+    Job input:
+    {
+        "id": str,
+        "input": {
+            "num_train_epochs": int,
+            "max_train_steps": int,
+            "train_batch_size": int,
+            "sample_batch_size": int,
+            "gradient_accumulation_steps": int,
+            "gradient_checkpointing": bool,
+            "learning_rate": float,
+            "scale_lr": bool,
+            "lr_scheduler": str,
+            "lr_warmup_steps": int,
+            "resolution": int,
+            "center_crop": bool,
+            "use_8bit_adam": bool,
+            "with_prior_preservation": bool,
+            "prior_loss_weight": float,
+            "train_text_encoder": bool,
+            "pad_tokens": bool,
+            "concepts": [
+                {
+                    "instance_data": str,
+                    "class_data": str,
+                    "instance_prompt": str,
+                    "class_prompt": str,
+                    "num_class_images": int,
+                    "seed": int,
+                }
+            ],
+            "samples":[
+                {
+                    "prompt": str,
+                    "negative_prompt": str,
+                    "guidance_scale": float,
+                    "num_inference_steps": int,
+                    "num_output": int,
+                }
+            ]
+        }
+    }
+
+    '''
+    job_input = job['input']
+
+    # Currently only supports one concept
+    concept = job_input['concepts'][0]
+    concept["instance_data"] = download.download_input_objects(concept["instance_data"])
+    concept["class_data"] = download.download_input_objects(concept.get("class_data", None))
+
+    job_input['seed'] = job_input.get('seed', int.from_bytes(os.urandom(2), "big"))
+
+    MODEL.samples = job_input.get("samples", None)
+
+    job_results = MODEL.predict(
+        # ---------------------------- Training Parameters --------------------------- #
+        # Intervals
+        num_train_epochs=job_input.get("num_train_epochs", 1),
+        max_train_steps=job_input.get("max_train_steps", 2000),
+        # Batching
+        train_batch_size=job_input.get("train_batch_size", 1),
+        sample_batch_size=job_input.get("sample_batch_size", 2),
+        gradient_accumulation_steps=job_input.get("gradient_accumulation_steps", 1),
+        gradient_checkpointing=job_input.get("gradient_checkpointing", False),
+        # Learning Rate
+        learning_rate=job_input.get("learning_rate", 1e-6),
+        scale_lr=job_input.get("scale_lr", False),
+        lr_scheduler=job_input.get("lr_scheduler", "constant"),
+        lr_warmup_steps=job_input.get("lr_warmup_steps", 0),
+        # Image Processing
+        resolution=job_input.get("resolution", 512),
+        center_crop=job_input.get("center_crop", False),
+        # Tuning
+        use_8bit_adam=job_input.get("use_8bit_adam", True),
+        with_prior_preservation=concept.get("with_prior_preservation", True),
+        prior_loss_weight=concept.get("prior_loss_weight", 1.0),
+        train_text_encoder=job_input.get("train_text_encoder", True),
+        pad_tokens=job_input.get("pad_tokens", False),
+
+        adam_beta1=job_input.get("adam_beta1", 0.9),
+        adam_beta2=job_input.get("adam_beta2", 0.999),
+        adam_weight_decay=job_input.get("adam_weight_decay", 1e-2),
+        adam_epsilon=job_input.get("adam_epsilon", 1e-8),
+        max_grad_norm=job_input.get("max_grad_norm", 1.0),
+
+        # --------------------------------- Concepts --------------------------------- #
+        instance_data=concept["instance_data"],
+        class_data=concept.get("class_data", None),
+        instance_prompt=concept["instance_prompt"],
+        class_prompt=concept["class_prompt"],
+        num_class_images=concept.get("num_class_images", 50),
+        seed=concept.get("seed", 512),
+
+        # ---------------------------------- Samples --------------------------------- #
+        save_guidance_scale=job_input.get("save_guidance_scale", 7.5),
+        save_sample_prompt=job_input.get("save_sample_prompt", None),
+        save_sample_negative_prompt=job_input.get("save_sample_negative_prompt", None),
+        n_save_sample=job_input.get("n_save_sample", 1),
+        save_infer_steps=job_input.get("save_infer_steps", 50),
+    )
+
+    os.makedirs("output_objects", exist_ok=True)
+
+    with zipfile.ZipFile(job_results, 'r') as zip_ref:
+        zip_ref.extractall("output_objects")
+
+    img_paths = []
+    for file in os.listdir("output_objects/samples"):
+        img_paths.append(os.path.join("output_objects/samples", file))
+
+    job_output = []
+
+    image_urls = upload.files(job['id'], img_paths)
+
+    for index, image_url in enumerate(image_urls):
+        job_output.append({
+            "image": image_url,
+            "seed": job_input['seed'] + index
+        })
+
+    rp_cleanup.clean(['cog_class_data', 'cog_instance_data', 'checkpoints'])
+
+    return job_output
+
+
+runpod.serverless.start({"handler": run})
