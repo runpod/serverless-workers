@@ -75,6 +75,9 @@ def run(job):
     job_input = job['input']
 
     input_errors = validator.validate(job_input, INPUT_VALIDATIONS)
+
+    print("Input errors: ", input_errors)
+
     if input_errors:
         return {
             "error": input_errors
@@ -94,7 +97,7 @@ def run(job):
         prompt_strength=job_input.get('prompt_strength', 0.8),
         num_outputs=job_input.get('num_outputs', 1),
         num_inference_steps=job_input.get('num_inference_steps', 50),
-        guidance_scale=job_input.get('guidance_scale', 7.5),
+        guidance_scale=float(job_input.get('guidance_scale', 7.5)),
         scheduler=job_input.get('scheduler', "K-LMS"),
         seed=job_input.get('seed', None)
     )
