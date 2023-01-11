@@ -76,9 +76,8 @@ def run(job):
 
     input_errors = validator.validate(job_input, INPUT_VALIDATIONS)
 
-    print("Input errors: ", input_errors)
-
     if input_errors:
+        print("Input errors: ", input_errors)
         return {
             "error": input_errors
         }
