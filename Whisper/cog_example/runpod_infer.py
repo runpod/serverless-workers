@@ -4,7 +4,7 @@ import os
 import predict
 
 import runpod
-from runpod.serverless.utils import upload, validator
+from runpod.serverless.utils import download, validator
 
 
 MODEL = predict.Predictor()
@@ -94,6 +94,8 @@ def run(job):
 
     if input_errors:
         return {"error": input_errors}
+
+    job_input['audio'] = download.download_input_objects([job_input['audio']])
 
     whisper_results = MODEL.predict(
         audio=job_input["audio"],
