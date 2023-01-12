@@ -114,7 +114,7 @@ def run(job):
         no_speech_threshold=job_input["no_speech_threshold"],
     )
 
-    rp_cleanup.cleanup(['input_objects'])
+    rp_cleanup.clean(['input_objects'])
 
     return {
         'segments': whisper_results.segments,
