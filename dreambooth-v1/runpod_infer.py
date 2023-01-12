@@ -139,7 +139,7 @@ def run(job):
             "seed": job_input['seed'] + index
         })
 
-    rp_cleanup.clean(['cog_class_data', 'cog_instance_data', 'checkpoints'])
+    rp_cleanup.clean(['cog_class_data', 'cog_instance_data', 'checkpoints', 'input_objects'])
 
     return job_output
 

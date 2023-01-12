@@ -4,7 +4,7 @@ import os
 import predict
 
 import runpod
-from runpod.serverless.utils import download, validator
+from runpod.serverless.utils import download, validator,
 
 
 MODEL = predict.Predictor()
