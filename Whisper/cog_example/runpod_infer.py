@@ -95,7 +95,7 @@ def run(job):
     if input_errors:
         return {"error": input_errors}
 
-    job_input['audio'] = download.download_input_objects([job_input['audio']])
+    job_input['audio'] = download.download_input_objects([job_input['audio']])[0]
 
     whisper_results = MODEL.predict(
         audio=job_input["audio"],
