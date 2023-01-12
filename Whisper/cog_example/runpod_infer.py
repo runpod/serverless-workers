@@ -112,9 +112,12 @@ def run(job):
         no_speech_threshold=job_input["no_speech_threshold"],
     )
 
-    print(whisper_results)
-
-    return whisper_results
+    return {
+        'segments': whisper_results['segments'],
+        'detected_language': whisper_results['detected_language'],
+        'transcription': whisper_results['transcription'],
+        'translation': whisper_results['translation']
+    }
 
 
 runpod.serverless.start({"handler": run})
