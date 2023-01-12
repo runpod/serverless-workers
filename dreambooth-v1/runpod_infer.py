@@ -61,6 +61,16 @@ def run(job):
     '''
     job_input = job['input']
 
+    # Set float inputs
+    job_input['learning_rate'] = float(job_input.get("learning_rate", 1e-6))
+    job_input['prior_loss_weight'] = float(job_input.get("prior_loss_weight", 1.0))
+    job_input['save_guidance_scale'] = float(job_input.get("save_guidance_scale", 7.5))
+    job_input['adam_beta1'] = float(job_input.get("adam_beta1", 0.9))
+    job_input['adam_beta2'] = float(job_input.get("adam_beta2", 0.999))
+    job_input['adam_weight_decay'] = float(job_input.get("adam_weight_decay", 1e-2))
+    job_input['adam_epsilon'] = float(job_input.get("adam_epsilon", 1e-8))
+    job_input['max_grad_norm'] = float(job_input.get("max_grad_norm", 1.0))
+
     # Currently only supports one concept
     concept = job_input['concepts'][0]
 
@@ -84,7 +94,7 @@ def run(job):
         gradient_accumulation_steps=job_input.get("gradient_accumulation_steps", 1),
         gradient_checkpointing=job_input.get("gradient_checkpointing", False),
         # Learning Rate
-        learning_rate=job_input.get("learning_rate", 1e-6),
+        learning_rate=job_input['learning_rate'],
         scale_lr=job_input.get("scale_lr", False),
         lr_scheduler=job_input.get("lr_scheduler", "constant"),
         lr_warmup_steps=job_input.get("lr_warmup_steps", 0),
@@ -94,15 +104,15 @@ def run(job):
         # Tuning
         use_8bit_adam=job_input.get("use_8bit_adam", True),
         with_prior_preservation=concept.get("with_prior_preservation", True),
-        prior_loss_weight=concept.get("prior_loss_weight", 1.0),
+        prior_loss_weight=job_input['prior_loss_weight'],
         train_text_encoder=job_input.get("train_text_encoder", True),
         pad_tokens=job_input.get("pad_tokens", False),
 
-        adam_beta1=job_input.get("adam_beta1", 0.9),
-        adam_beta2=job_input.get("adam_beta2", 0.999),
-        adam_weight_decay=job_input.get("adam_weight_decay", 1e-2),
-        adam_epsilon=job_input.get("adam_epsilon", 1e-8),
-        max_grad_norm=job_input.get("max_grad_norm", 1.0),
+        adam_beta1=job_input['adam_beta1'],
+        adam_beta2=job_input['adam_beta2'],
+        adam_weight_decay=job_input['adam_weight_decay'],
+        adam_epsilon=job_input['adam_epsilon'],
+        max_grad_norm=job_input['max_grad_norm'],
 
         # --------------------------------- Concepts --------------------------------- #
         instance_data=concept["instance_data"],
@@ -113,7 +123,7 @@ def run(job):
         seed=concept.get("seed", 512),
 
         # ---------------------------------- Samples --------------------------------- #
-        save_guidance_scale=job_input.get("save_guidance_scale", 7.5),
+        save_guidance_scale=job_input['save_guidance_scale'],
         save_sample_prompt=job_input.get("save_sample_prompt", None),
         save_sample_negative_prompt=job_input.get("save_sample_negative_prompt", None),
         n_save_sample=job_input.get("n_save_sample", 1),
