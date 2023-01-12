@@ -113,10 +113,10 @@ def run(job):
     )
 
     return {
-        'segments': whisper_results['segments'],
-        'detected_language': whisper_results['detected_language'],
-        'transcription': whisper_results['transcription'],
-        'translation': whisper_results['translation']
+        'segments': whisper_results.segments,
+        'detected_language': whisper_results.detected_language,
+        'transcription': whisper_results.transcription,
+        'translation': whisper_results.translation
     }
 
 
