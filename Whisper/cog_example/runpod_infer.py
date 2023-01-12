@@ -4,7 +4,7 @@ import os
 import predict
 
 import runpod
-from runpod.serverless.utils import download, validator,
+from runpod.serverless.utils import download, validator, rp_cleanup
 
 
 MODEL = predict.Predictor()
@@ -113,6 +113,8 @@ def run(job):
         logprob_threshold=job_input["logprob_threshold"],
         no_speech_threshold=job_input["no_speech_threshold"],
     )
+
+    rp_cleanup.cleanup(['input_objects'])
 
     return {
         'segments': whisper_results.segments,
