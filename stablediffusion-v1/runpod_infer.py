@@ -86,7 +86,7 @@ def run(job):
 
     # Download input objects
     job_input['init_image'], job_input['mask'] = download.download_input_objects(
-        job_input.get('init_image', None), job_input.get('mask', None)
+        [job_input.get('init_image', None), job_input.get('mask', None)]
     )
 
     # Set seed if not provided
