@@ -5,7 +5,7 @@ import zipfile
 import predictor
 
 import runpod
-from runpod.serverless.utils import download, upload, validator, rp_cleanup
+from runpod.serverless.utils import download, upload, rp_cleanup
 
 MODEL = predictor.Predictor()
 MODEL.setup()

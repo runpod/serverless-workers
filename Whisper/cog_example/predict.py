@@ -31,6 +31,8 @@ class ModelOutput(BaseModel):
 
 
 class Predictor(BasePredictor):
+    ''' A Predictor class for the Whisper model '''
+
     def setup(self):
         """Load the model into memory to make running multiple predictions efficient"""
 
