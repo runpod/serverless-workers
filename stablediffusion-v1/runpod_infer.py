@@ -119,7 +119,7 @@ def run(job):
         })
 
     # Remove downloaded input objects
-    rp_cleanup.cleanup(['input_objects'])
+    rp_cleanup.clean(['input_objects'])
 
     return job_output
 
