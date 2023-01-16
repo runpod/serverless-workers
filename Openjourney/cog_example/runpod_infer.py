@@ -4,7 +4,7 @@ import os
 import predict
 
 import runpod
-from runpod.serverless.utils import upload, validator
+from runpod.serverless.utils import upload, validator, download, rp_cleanup
 
 
 MODEL = predict.Predictor()
@@ -84,6 +84,11 @@ def run(job):
     if input_errors:
         return {"error": input_errors}
 
+    # Download input objects
+    job_input['init_image'], job_input['mask'] = download.download_input_objects(
+        [job_input.get('init_image', None), job_input.get('mask', None)]
+    )
+
     # Set seed if not provided
     job_input['seed'] = job_input.get('seed', int.from_bytes(os.urandom(2), "big"))
 
@@ -94,8 +99,8 @@ def run(job):
         negative_prompt=job_input.get("negative_prompt", None),
         width=job_input.get('width', 512),
         height=job_input.get('height', 512),
-        init_image=job_input.get('init_image', None),
-        mask=job_input.get('mask', None),
+        init_image=job_input['init_image'],
+        mask=job_input['mask'],
         prompt_strength=job_input['prompt_strength'],
         num_outputs=job_input.get('num_outputs', 1),
         num_inference_steps=job_input.get('num_inference_steps', 50),
@@ -112,6 +117,9 @@ def run(job):
             "image": image_url,
             "seed": job_input['seed'] + index
         })
+
+    # Remove downloaded input objects
+    rp_cleanup.clean(['input_objects'])
 
     return job_output
 
