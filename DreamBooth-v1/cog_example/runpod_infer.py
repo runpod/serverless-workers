@@ -107,7 +107,7 @@ def run(job):
         prior_loss_weight=job_input['prior_loss_weight'],
         train_text_encoder=job_input.get("train_text_encoder", True),
         pad_tokens=job_input.get("pad_tokens", False),
-        scheduler=job_input.get('scheduler', "DDIM"),
+        # scheduler=job_input.get('scheduler', "DDIM"),
 
         adam_beta1=job_input['adam_beta1'],
         adam_beta2=job_input['adam_beta2'],

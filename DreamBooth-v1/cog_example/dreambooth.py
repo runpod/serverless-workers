@@ -904,13 +904,19 @@ def main(args):
 
             if args.samples is not None:
                 pipeline = pipeline.to(accelerator.device)
-                pipeline.scheduler = make_scheduler(args.scheduler, pipeline.scheduler.config)
+                # pipeline.scheduler = make_scheduler(args.scheduler, pipeline.scheduler.config)
                 g_cuda = torch.Generator(device=accelerator.device).manual_seed(args.seed)
                 pipeline.set_progress_bar_config(disable=True)
                 sample_dir = os.path.join(save_dir, "samples")
                 os.makedirs(sample_dir, exist_ok=True)
                 with torch.autocast("cuda"), torch.inference_mode():
                     for index, sample in enumerate(args.samples):
+
+                        pipeline.scheduler = make_scheduler(
+                            sample.get('scheduler', 'DDIM'),
+                            pipeline.scheduler.config
+                        )
+
                         for i in tqdm(range(sample.get('num_output', 1)), desc="Generating samples"):
                             images = pipeline(
                                 sample['prompt'],
