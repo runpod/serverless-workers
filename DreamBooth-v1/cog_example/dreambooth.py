@@ -21,6 +21,11 @@ from accelerate import Accelerator
 from accelerate.logging import get_logger
 from accelerate.utils import set_seed
 from diffusers import (
+    PNDMScheduler,
+    LMSDiscreteScheduler,
+    EulerDiscreteScheduler,
+    EulerAncestralDiscreteScheduler,
+    DPMSolverMultistepScheduler,
     AutoencoderKL,
     DDIMScheduler,
     DDPMScheduler,
@@ -863,13 +868,13 @@ def main(args):
                     cache_dir=cache_dir,
                     local_files_only=True,
                 )
-            scheduler = DDIMScheduler(
-                beta_start=0.00085,
-                beta_end=0.012,
-                beta_schedule="scaled_linear",
-                clip_sample=False,
-                set_alpha_to_one=False,
-            )
+            # scheduler = DDIMScheduler(
+            #     beta_start=0.00085,
+            #     beta_end=0.012,
+            #     beta_schedule="scaled_linear",
+            #     clip_sample=False,
+            #     set_alpha_to_one=False,
+            # )
             pipeline = StableDiffusionPipeline.from_pretrained(
                 args.pretrained_model_name_or_path,
                 unet=accelerator.unwrap_model(unet).to(torch.float16),
@@ -885,7 +890,7 @@ def main(args):
                     local_files_only=True,
                 ),
                 safety_checker=None,
-                scheduler=scheduler,
+                scheduler=make_scheduler(args.scheduler, pipeline.scheduler.config),
                 torch_dtype=torch.float16,
                 revision=args.revision,
                 cache_dir=cache_dir,
@@ -899,9 +904,7 @@ def main(args):
 
             if args.samples is not None:
                 pipeline = pipeline.to(accelerator.device)
-                g_cuda = torch.Generator(device=accelerator.device).manual_seed(
-                    args.seed
-                )
+                g_cuda = torch.Generator(device=accelerator.device).manual_seed(args.seed)
                 pipeline.set_progress_bar_config(disable=True)
                 sample_dir = os.path.join(save_dir, "samples")
                 os.makedirs(sample_dir, exist_ok=True)
@@ -1044,3 +1047,14 @@ def main(args):
     save_weights(global_step)
 
     accelerator.end_training()
+
+
+def make_scheduler(name, config):
+    return {
+        "PNDM": PNDMScheduler.from_config(config),
+        "KLMS": LMSDiscreteScheduler.from_config(config),
+        "DDIM": DDIMScheduler.from_config(config),
+        "K_EULER": EulerDiscreteScheduler.from_config(config),
+        "K_EULER_ANCESTRAL": EulerAncestralDiscreteScheduler.from_config(config),
+        "DPMSolverMultistep": DPMSolverMultistepScheduler.from_config(config),
+    }[name]

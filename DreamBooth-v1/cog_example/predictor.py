@@ -178,6 +178,18 @@ class Predictor(BasePredictor):
             description="The number of inference steps for save sample.",
             default=50,
         ),
+        scheduler: str = Input(
+            default="DDIM",
+            choices=[
+                "DDIM",
+                "K_EULER",
+                "DPMSolverMultistep",
+                "K_EULER_ANCESTRAL",
+                "PNDM",
+                "KLMS",
+            ],
+            description="Choose a scheduler.",
+        ),
         seed: int = Input(description="A seed for reproducible training", default=1337),
         adam_beta1: float = Input(
             default=0.9,
@@ -263,6 +275,7 @@ class Predictor(BasePredictor):
             "with_prior_preservation": with_prior_preservation,
             "prior_loss_weight": prior_loss_weight,
             "num_class_images": num_class_images,
+            "scheduler": scheduler,
             "seed": seed,
             "resolution": resolution,
             "center_crop": center_crop,
