@@ -129,7 +129,7 @@ class Predictor(BasePredictor):
             pipe = self.txt2img_pipe
 
         pipe.scheduler = make_scheduler(scheduler)
-        pipe.enable_xformers_memory_efficient_attention()
+        # pipe.enable_xformers_memory_efficient_attention()
 
         generator = torch.Generator("cuda").manual_seed(seed)
         output = pipe(
