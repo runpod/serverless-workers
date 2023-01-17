@@ -16,7 +16,8 @@ Official set of serverless AI workers provided by RunPod.
 
 ## Pod Worker Functionality
 
-All the workers us the [RunPod Python Package](https://github.com/runpod/runpod-python) to implement the work functions, see the [serverless-worker docs](https://github.com/runpod/runpod-python/blob/master/docs/serverless-worker.md) for more information.
+All the workers us the [RunPod Python Package](https://github.com/runpod/runpod-python) to implement the work functions, see the [serverless-worker docs](https://github.com/runpod/runpod-python/blob/main/docs/serverless/worker.md) for more information.
+
 
 ## Cog
 
