@@ -14,8 +14,11 @@ build:
     - "runpod==0.7.5"
 
   run:
-    - pip install pyre-extensions==0.0.23
-    - pip install -i https://test.pypi.org/simple/ formers==0.0.15.dev376
+    # - pip install pyre-extensions==0.0.23
+    # - pip install -i https://test.pypi.org/simple/ formers==0.0.15.dev376
+    - pip install ninja
+    - pip install -v -U git+https://github.com/facebookresearch/xformers.git@main#egg=xformers
+
 
     # - pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
     # - pip install -qq git+https://github.com/ShivamShrirao/diffusers
