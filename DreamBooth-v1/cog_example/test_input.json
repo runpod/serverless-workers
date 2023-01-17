@@ -2,7 +2,7 @@
     "input": {
         "concepts": [
             {
-                "instance_data": "https://github.com/runpod/serverless-workers/blob/main/Input-Samples/cat_pictures.zip",
+                "instance_data": "https://github.com/runpod/serverless-workers/blob/main/Input-Samples/cat_pictures.zip?raw=true",
                 "instance_prompt": "a runpod cat",
                 "class_prompt": "a cat"
             }
