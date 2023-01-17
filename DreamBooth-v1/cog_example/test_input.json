@@ -1,0 +1,16 @@
+{
+    "input": {
+        "concepts": [
+            {
+                "instance_data": "https://LINK_TO_ZIP.FILE",
+                "instance_prompt": "a runpod cat",
+                "class_prompt": "a cat"
+            }
+        ],
+        "samples": [
+            {
+                "prompt": "a runpod cat stuck in a tree"
+            }
+        ]
+    }
+}

@@ -52,7 +52,7 @@ def run(job):
                     "negative_prompt": str,
                     "guidance_scale": float,
                     "num_inference_steps": int,
-                    "num_output": int,
+                    "num_outputs": int,
                 }
             ]
         }
