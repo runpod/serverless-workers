@@ -4,6 +4,8 @@ It can be named anything you want, but needs to have the following:
 
 - import runpod
 - start function
+
+To return an error, return a dictionary with the key "error" and the value being the error message.
 '''
 
 import runpod  # Required
@@ -26,10 +28,13 @@ def is_even(job_input):
     job_input = job_input["input"]
     the_number = job_input["number"]
 
+    if not isinstance(the_number, int):
+        return {"error": "Silly human, you need to pass an integer."}
+
     if the_number % 2 == 0:
         return True
-    else:
-        return False
+
+    return False
 
 
 # This must be included for the serverless to work.
