@@ -764,8 +764,7 @@ def main(args):
         latents_cache = []
         text_encoder_cache = []
         for batch in tqdm(train_dataloader, desc="Caching latents"):
-            # with torch.no_grad():
-            with torch.inference_mode():
+            with torch.no_grad():
                 batch["pixel_values"] = batch["pixel_values"].to(
                     accelerator.device, non_blocking=True, dtype=weight_dtype
                 )
@@ -897,6 +896,7 @@ def main(args):
                 cache_dir=cache_dir,
                 local_files_only=True,
             )
+            pipeline.enable_xformers_memory_efficient_attention()  # Testing memory efficient attention
             # save_dir = os.path.join(args.output_dir, f"{step}")
             save_dir = args.output_dir
             pipeline.save_pretrained(save_dir)
@@ -905,7 +905,6 @@ def main(args):
 
             if args.samples is not None:
                 pipeline = pipeline.to(accelerator.device)
-                pipeline.enable_xformers_memory_efficient_attention()  # Testing memory efficient attention
                 # pipeline.scheduler = make_scheduler(args.scheduler, pipeline.scheduler.config)
                 # g_cuda = torch.Generator(device=accelerator.device).manual_seed(args.seed)
                 pipeline.set_progress_bar_config(disable=True)
