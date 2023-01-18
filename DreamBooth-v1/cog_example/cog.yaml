@@ -14,7 +14,7 @@ build:
     - "runpod==0.7.5"
 
   run:
-    - pip install pyre-extensions==0.0.30
+    - pip install pyre-extensions==0.0.23
     - pip install -i https://test.pypi.org/simple/ formers==0.0.15.dev376
     # - pip install ninja
     # - pip install -v -U git+https://github.com/facebookresearch/xformers.git@main#egg=xformers
