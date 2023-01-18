@@ -764,7 +764,8 @@ def main(args):
         latents_cache = []
         text_encoder_cache = []
         for batch in tqdm(train_dataloader, desc="Caching latents"):
-            with torch.no_grad():
+            # with torch.no_grad():
+            with torch.inference_mode():
                 batch["pixel_values"] = batch["pixel_values"].to(
                     accelerator.device, non_blocking=True, dtype=weight_dtype
                 )
