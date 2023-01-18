@@ -576,6 +576,7 @@ def main(args):
                     )
                     pipeline.set_progress_bar_config(disable=True)
                     pipeline.to(accelerator.device)
+                    pipeline.enable_xformers_memory_efficient_attention()  # Testing memory efficient attention
 
                 num_new_images = args.num_class_images - cur_class_images
                 logger.info(f"Number of class images to sample: {num_new_images}.")
