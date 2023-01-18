@@ -53,6 +53,7 @@ def run(job):
                     "guidance_scale": float,
                     "num_inference_steps": int,
                     "num_outputs": int,
+                    "seed": int,
                 }
             ]
         }
@@ -150,6 +151,11 @@ def run(job):
             "seed": job_input['seed'] + index
         })
 
+    # Upload trained model weights to user's bucket
+    if job.get('s3Config', False):
+        upload.bucket_upload(job['id'], job_results, job['s3Config'])
+
+    # Cleanup
     rp_cleanup.clean(['cog_class_data', 'cog_instance_data', 'checkpoints', 'input_objects'])
 
     return job_output

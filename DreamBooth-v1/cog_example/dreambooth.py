@@ -896,7 +896,7 @@ def main(args):
                 cache_dir=cache_dir,
                 local_files_only=True,
             )
-            pipeline.enable_xformers_memory_efficient_attention()  # Testing memory efficient attention
+            # pipeline.enable_xformers_memory_efficient_attention()  # Testing memory efficient attention
             # save_dir = os.path.join(args.output_dir, f"{step}")
             save_dir = args.output_dir
             pipeline.save_pretrained(save_dir)
