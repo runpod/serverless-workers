@@ -154,7 +154,8 @@ def run(job):
     # Upload trained model weights to user's bucket
     if job.get('s3Config', False):
         print("Uploading model to S3...")
-        upload.bucket_upload(job['id'], [job_results], job['s3Config'])
+        model_url = upload.bucket_upload(job['id'], [job_results], job['s3Config'])
+        job_output.append({"tuned_model": model_url[0]})
     else:
         print("No S3 config provided. Skipping model upload.")
 
