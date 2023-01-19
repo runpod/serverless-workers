@@ -141,21 +141,25 @@ def run(job):
     for file in os.listdir("output_objects/samples"):
         img_paths.append(os.path.join("output_objects/samples", file))
 
-    job_output = []
+    job_output = {}
+
+    samples_output = []
 
     image_urls = upload.files(job['id'], img_paths)
 
     for index, image_url in enumerate(image_urls):
-        job_output.append({
+        samples_output.append({
             "image": image_url,
             "seed": job_input['seed'] + index
         })
+
+    job_output["samples"] = samples_output
 
     # Upload trained model weights to user's bucket
     if job.get('s3Config', False):
         print("Uploading model to S3...")
         model_url = upload.bucket_upload(job['id'], [job_results], job['s3Config'])
-        job_output.append({"tuned_model": model_url[0]})
+        job_output["tuned_model"] = model_url[0]
     else:
         print("No S3 config provided. Skipping model upload.")
 
