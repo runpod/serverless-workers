@@ -944,6 +944,11 @@ def main(args):
                             samples_output.append(sample_output)
 
                             images[0].save(os.path.join(sample_dir, f"{index}-{i}.png"))
+
+                            # Increase sample seed
+                            sample_seed = + 1
+                            g_cuda = torch.Generator(
+                                device=accelerator.device).manual_seed(sample_seed)
                 del pipeline
 
                 gc.collect()
