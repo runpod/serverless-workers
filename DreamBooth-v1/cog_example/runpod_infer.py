@@ -152,9 +152,9 @@ def run(job):
     #         "seed": job_input['seed'] + index
     #     })
 
-    for sample in job_results['samples']:
+    for index, sample in enumerate(job_results['samples']):
         sample['image'] = upload.upload_image(
-            job['id'], f"output_objects/samples/{sample['image']}")
+            job['id'], f"output_objects/samples/{sample['image']}", index)
 
     # job_output["samples"] = samples_output
     job_output["samples"] = job_results['samples']
