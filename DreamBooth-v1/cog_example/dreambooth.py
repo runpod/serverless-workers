@@ -502,6 +502,7 @@ class AverageMeter:
 
 def main(args):
     logging_dir = Path(args.output_dir, "0", args.logging_dir)
+    samples_output = []
 
     accelerator = Accelerator(
         gradient_accumulation_steps=args.gradient_accumulation_steps,
@@ -911,17 +912,18 @@ def main(args):
                 sample_dir = os.path.join(save_dir, "samples")
                 os.makedirs(sample_dir, exist_ok=True)
                 with torch.autocast("cuda"), torch.inference_mode():
+
                     for index, sample in enumerate(args.samples):
 
-                        g_cuda = torch.Generator(device=accelerator.device).manual_seed(
-                            sample.get('seed', int.from_bytes(os.urandom(2), "big"))
-                        )
+                        sample_seed = sample.get('seed', int.from_bytes(os.urandom(2), "big"))
+                        g_cuda = torch.Generator(device=accelerator.device).manual_seed(sample_seed)
                         pipeline.scheduler = make_scheduler(
                             sample.get('scheduler', 'DDIM'),
                             pipeline.scheduler.config
                         )
 
                         for i in tqdm(range(sample.get('num_outputs', 1)), desc="Generating samples"):
+                            sample_output = {}
                             images = pipeline(
                                 sample['prompt'],
                                 negative_prompt=sample.get('negative_prompt', None),
@@ -929,6 +931,18 @@ def main(args):
                                 num_inference_steps=sample.get('num_inference_steps', 50),
                                 generator=g_cuda,
                             ).images
+
+                            sample_output['prompt'] = sample['prompt']
+                            sample_output['negative_prompt'] = sample.get('negative_prompt', None)
+                            sample_output['guidance_scale'] = sample.get('guidance_scale', 7.5)
+                            sample_output['num_inference_steps'] = sample.get(
+                                'num_inference_steps', 50)
+                            sample_output['seed'] = sample_seed
+                            sample_output['scheduler'] = sample.get('scheduler', 'DDIM')
+                            sample_output['image'] = f"{index}_{i}.png"
+
+                            samples_output.append(sample_output)
+
                             images[0].save(os.path.join(sample_dir, f"{index}-{i}.png"))
                 del pipeline
 
@@ -1058,6 +1072,8 @@ def main(args):
     save_weights(global_step)
 
     accelerator.end_training()
+
+    return samples_output
 
 
 def make_scheduler(name, config):

@@ -313,7 +313,7 @@ class Predictor(BasePredictor):
 
         args = Namespace(**args)
 
-        main(args)
+        samples = main(args)
 
         gc.collect()
         torch.cuda.empty_cache()
@@ -327,4 +327,4 @@ class Predictor(BasePredictor):
                 print(file_path)
                 zip.write(file_path, arcname=file_path.relative_to(directory))
 
-        return Path(out_path)
+        return {"zip": Path(out_path), "samples": samples}

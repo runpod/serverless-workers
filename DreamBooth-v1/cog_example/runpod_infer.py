@@ -134,31 +134,35 @@ def run(job):
 
     os.makedirs("output_objects", exist_ok=True)
 
-    with zipfile.ZipFile(job_results, 'r') as zip_ref:
+    with zipfile.ZipFile(job_results['zip'], 'r') as zip_ref:
         zip_ref.extractall("output_objects")
-
-    img_paths = []
-    for file in os.listdir("output_objects/samples"):
-        img_paths.append(os.path.join("output_objects/samples", file))
 
     job_output = {}
 
-    samples_output = []
+    # img_paths = []
+    # for file in os.listdir("output_objects/samples"):
+    #     img_paths.append(os.path.join("output_objects/samples", file))
 
-    image_urls = upload.files(job['id'], img_paths)
+    # image_urls = upload.files(job['id'], img_paths)
 
-    for index, image_url in enumerate(image_urls):
-        samples_output.append({
-            "image": image_url,
-            "seed": job_input['seed'] + index
-        })
+    # samples_output = []
+    # for index, image_url in enumerate(image_urls):
+    #     samples_output.append({
+    #         "image": image_url,
+    #         "seed": job_input['seed'] + index
+    #     })
 
-    job_output["samples"] = samples_output
+    for sample in job_results['samples']:
+        sample['image'] = upload.upload_image(
+            job['id'], f"output_objects/samples/{sample['image']}")
+
+    # job_output["samples"] = samples_output
+    job_output["samples"] = job_results['samples']
 
     # Upload trained model weights to user's bucket
     if job.get('s3Config', False):
         print("Uploading model to S3...")
-        model_url = upload.bucket_upload(job['id'], [job_results], job['s3Config'])
+        model_url = upload.bucket_upload(job['id'], [job_results['zip']], job['s3Config'])
         job_output["tuned_model"] = model_url[0]
     else:
         print("No S3 config provided. Skipping model upload.")
