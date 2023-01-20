@@ -939,7 +939,7 @@ def main(args):
                                 'num_inference_steps', 50)
                             sample_output['seed'] = sample_seed
                             sample_output['scheduler'] = sample.get('scheduler', 'DDIM')
-                            sample_output['image'] = f"{index}_{i}.png"
+                            sample_output['image'] = f"{index}-{i}.png"
 
                             samples_output.append(sample_output)
 
