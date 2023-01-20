@@ -947,8 +947,7 @@ def main(args):
 
                             # Increase sample seed
                             sample_seed = + 1
-                            g_cuda = torch.Generator(
-                                device=accelerator.device).manual_seed(sample_seed)
+
                 del pipeline
 
                 gc.collect()
