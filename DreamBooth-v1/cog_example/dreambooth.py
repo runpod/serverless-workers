@@ -946,7 +946,7 @@ def main(args):
                             images[0].save(os.path.join(sample_dir, f"{index}-{i}.png"))
 
                             # Increase sample seed
-                            sample_seed = + 1
+                            sample_seed += 1
 
                 del pipeline
 
