@@ -78,7 +78,7 @@ def run(job):
     job_input = job['input']
 
     # Setting the float parameters
-    job_input['temperature'] = float(job_input.get('temperature', 1))
+    job_input['temperature'] = float(job_input.get('temperature', 0))
     job_input['patience'] = float(job_input.get('patience', 1))
     job_input['temperature_increment_on_fallback'] = float(
         job_input.get('temperature_increment_on_fallback', 0.2)

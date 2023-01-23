@@ -11,7 +11,7 @@ To return an error, return a dictionary with the key "error" and the value being
 import runpod  # Required
 
 
-def is_even(job_input):
+def is_even(job):
     '''
     Example function that returns True if the input is even, False otherwise.
 
@@ -25,7 +25,7 @@ def is_even(job_input):
     Whatever is returned from this function will be returned to the user as the output.
     '''
 
-    job_input = job_input["input"]
+    job_input = job["input"]
     the_number = job_input["number"]
 
     if not isinstance(the_number, int):
