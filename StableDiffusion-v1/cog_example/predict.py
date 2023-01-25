@@ -9,7 +9,7 @@ from diffusers import (
 
     DDIMScheduler,
     DDPMScheduler,
-    DEISMultistepScheduler,
+    # DEISMultistepScheduler,
     DPMSolverMultistepScheduler,
     DPMSolverSinglestepScheduler,
     EulerAncestralDiscreteScheduler,
@@ -183,7 +183,7 @@ def make_scheduler(name, config):
     return {
         "DDIM": DDIMScheduler.from_config(config),
         "DDPM": DDPMScheduler.from_config(config),
-        "DEIS": DEISMultistepScheduler.from_config(config),
+        # "DEIS": DEISMultistepScheduler.from_config(config),
         "DPM-M": DPMSolverMultistepScheduler.from_config(config),
         "DPM-S": DPMSolverSinglestepScheduler.from_config(config),
         "EULER-A": EulerAncestralDiscreteScheduler.from_config(config),
