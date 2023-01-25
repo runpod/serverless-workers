@@ -3,13 +3,31 @@ from typing import List
 
 import torch
 from diffusers import (
-    PNDMScheduler,
-    LMSDiscreteScheduler,
-    DDIMScheduler,
     StableDiffusionPipeline,
     StableDiffusionImg2ImgPipeline,
     StableDiffusionInpaintPipelineLegacy,
+
+    DDIMScheduler,
+    DDPMScheduler,
+    DEISMultistepScheduler,
+    DPMSolverMultistepScheduler,
+    DPMSolverSinglestepScheduler,
+    EulerAncestralDiscreteScheduler,
+    EulerDiscreteScheduler,
+    HeunDiscreteScheduler,
+    IPNDMScheduler,
+    KDPM2AncestralDiscreteScheduler,
+    KDPM2DiscreteScheduler,
+    KarrasVeScheduler,
+    PNDMScheduler,
+    RePaintScheduler,
+    ScoreSdeVeScheduler,
+    ScoreSdeVpScheduler,
+    UnCLIPScheduler,
+    VQDiffusionScheduler,
+    LMSDiscreteScheduler
 )
+
 from PIL import Image
 from cog import BasePredictor, Input, Path
 
@@ -91,7 +109,8 @@ class Predictor(BasePredictor):
         ),
         scheduler: str = Input(
             default="K-LMS",
-            choices=["DDIM", "K-LMS", "PNDM"],
+            choices=["DDIM", "DDPM", "DEIS", "DPM-M", "DPM-S", "EULER-A", "EULER-D", "HEUN", "IPNDM", "KDPM2-A",
+                     "KDPM2-D", "KARRAS-VE", "PNDM", "RE-PAINT", "SCORE-VE", "SCORE-VP", "UN-CLIPS", "VQD", "K-LMS"],
             description="Choose a scheduler. If you use an init image, PNDM will be used",
         ),
         seed: int = Input(
@@ -128,7 +147,7 @@ class Predictor(BasePredictor):
         else:
             pipe = self.txt2img_pipe
 
-        pipe.scheduler = make_scheduler(scheduler)
+        pipe.scheduler = make_scheduler(scheduler, pipe.scheduler.config)
         # pipe.enable_xformers_memory_efficient_attention()
 
         generator = torch.Generator("cuda").manual_seed(seed)
@@ -160,19 +179,25 @@ class Predictor(BasePredictor):
         return output_paths
 
 
-def make_scheduler(name):
+def make_scheduler(name, config):
     return {
-        "PNDM": PNDMScheduler(
-            beta_start=0.00085, beta_end=0.012, beta_schedule="scaled_linear"
-        ),
-        "K-LMS": LMSDiscreteScheduler(
-            beta_start=0.00085, beta_end=0.012, beta_schedule="scaled_linear"
-        ),
-        "DDIM": DDIMScheduler(
-            beta_start=0.00085,
-            beta_end=0.012,
-            beta_schedule="scaled_linear",
-            clip_sample=False,
-            set_alpha_to_one=False,
-        ),
+        "DDIM": DDIMScheduler.from_config(config),
+        "DDPM": DDPMScheduler.from_config(config),
+        "DEIS": DEISMultistepScheduler.from_config(config),
+        "DPM-M": DPMSolverMultistepScheduler.from_config(config),
+        "DPM-S": DPMSolverSinglestepScheduler.from_config(config),
+        "EULER-A": EulerAncestralDiscreteScheduler.from_config(config),
+        "EULER-D": EulerDiscreteScheduler.from_config(config),
+        "HEUN": HeunDiscreteScheduler.from_config(config),
+        "IPNDM": IPNDMScheduler.from_config(config),
+        "KDPM2-A": KDPM2AncestralDiscreteScheduler.from_config(config),
+        "KDPM2-D": KDPM2DiscreteScheduler.from_config(config),
+        "KARRAS-VE": KarrasVeScheduler.from_config(config),
+        "PNDM": PNDMScheduler.from_config(config),
+        "RE-PAINT": RePaintScheduler.from_config(config),
+        "SCORE-VE": ScoreSdeVeScheduler.from_config(config),
+        "SCORE-VP": ScoreSdeVpScheduler.from_config(config),
+        "UN-CLIPS": UnCLIPScheduler.from_config(config),
+        "VQD": VQDiffusionScheduler.from_config(config),
+        "K-LMS": LMSDiscreteScheduler.from_config(config)
     }[name]
