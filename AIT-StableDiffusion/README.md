@@ -1,3 +1,5 @@
+# AI Template
+
 1. I first used the default docker scripts given by docker to build the container (which is available here https://github.com/facebookincubator/AITemplate/tree/main/docker)
 
 tag the container as merrell/ait-sd-1-runpod or merrell/ait-sd-2-runpod
@@ -13,3 +15,24 @@ I've created 3 scripts called compile.sh, compile-v1.5.sh and compile-anything.s
 4. you can modify the files and call the update.sh or test.sh scripts and it'll automatically modify the containers to have the updated sd scripts
 
 building the stable diffusion from scratch takes about 10 - 15 minutes (or longer), and I'd recommend using the scripts I created for updating the files in the container
+
+## Getting Started
+
+```bash
+git clone --recursive https://github.com/facebookincubator/AITemplate
+cd AITemplate
+./docker/build.sh cuda
+
+docker tag ait:latest merrell/ait-sd-1-runpod:latest
+```
+
+merrell/ait-sd-1-runpod:latest
+or
+merrell/ait-sd-2-runpod:latest
+
+For v1 run compile-v1.5.sh
+For v2 run compile.sh
+
+Note: Tests are needed to run for the model weights to download.
+test.sh
+test-v1.5.sh

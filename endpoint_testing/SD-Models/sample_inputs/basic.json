@@ -1,0 +1,7 @@
+{
+    "prompt": "The quick brown fox jumps over the lazy dog.",
+    "negative_prompt": "Eggs and bacon.",
+    "width": 640,
+    "height": 480,
+    "guidance_scale": 1.0
+}
