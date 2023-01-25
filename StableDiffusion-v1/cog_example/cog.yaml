@@ -10,7 +10,7 @@ build:
     - "transformers==4.21.1"
     # - "pyre-extensions==0.0.23"
     # - "--extra-index-url=https://test.pypi.org/simple/ formers==0.0.15.dev376"
-    - "runpod==0.7.4"
+    - "runpod==0.8.0"
 
   run:
   #   - pip install https://github.com/runpod/runpod-python/archive/main.zip
