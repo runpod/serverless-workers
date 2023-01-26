@@ -1,7 +1,0 @@
-{
-    "prompt": "angry godzilla",
-    "scheduler": "RE-PAINT",
-    "num_inference_steps": 100,
-    "init_image": "https://github.com/runpod/serverless-workers/raw/main/Input-Samples/nyc_skyline.png",
-    "mask": "https://github.com/runpod/serverless-workers/raw/main/Input-Samples/nyc-mask.png"
-}
