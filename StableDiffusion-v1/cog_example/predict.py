@@ -138,7 +138,7 @@ class Predictor(BasePredictor):
             init_image = Image.open(init_image).convert("RGB")
             extra_kwargs = {
                 "mask_image": Image.open(mask).convert("RGB").resize(init_image.size),
-                "init_image": init_image,
+                "image": init_image,
                 "strength": prompt_strength,
             }
         elif init_image:
@@ -147,8 +147,16 @@ class Predictor(BasePredictor):
                 "init_image": Image.open(init_image).convert("RGB"),
                 "strength": prompt_strength,
             }
+            extra_kwargs = {
+                "width": width,
+                "height": height,
+            }
         else:
             pipe = self.txt2img_pipe
+            extra_kwargs = {
+                "width": width,
+                "height": height,
+            }
 
         pipe.scheduler = make_scheduler(scheduler, pipe.scheduler.config)
 
@@ -156,8 +164,8 @@ class Predictor(BasePredictor):
         output = pipe(
             prompt=[prompt] * num_outputs if prompt is not None else None,
             negative_prompt=[negative_prompt]*num_outputs if negative_prompt is not None else None,
-            width=width,
-            height=height,
+            # width=width,
+            # height=height,
             guidance_scale=guidance_scale,
             generator=generator,
             num_inference_steps=num_inference_steps,
