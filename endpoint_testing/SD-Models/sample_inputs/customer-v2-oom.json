@@ -1,0 +1,7 @@
+{
+    "height": 768,
+    "num_inference_steps": 20,
+    "prompt": "a kite",
+    "num_outputs": 3,
+    "width": 768
+}
