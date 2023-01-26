@@ -139,7 +139,7 @@ class Predictor(BasePredictor):
             extra_kwargs = {
                 "mask_image": Image.open(mask).convert("RGB").resize(init_image.size),
                 "image": init_image,
-                "strength": prompt_strength,
+                # "strength": prompt_strength,
             }
         elif init_image:
             pipe = self.img2img_pipe
