@@ -23,7 +23,7 @@ from diffusers import (
     # RePaintScheduler,
     # ScoreSdeVeScheduler,
     # ScoreSdeVpScheduler,
-    UnCLIPScheduler,
+    # UnCLIPScheduler,
     # VQDiffusionScheduler,
     LMSDiscreteScheduler
 )
@@ -197,7 +197,7 @@ def make_scheduler(name, config):
         # "RE-PAINT": RePaintScheduler.from_config(config),
         # "SCORE-VE": ScoreSdeVeScheduler.from_config(config),
         # "SCORE-VP": ScoreSdeVpScheduler.from_config(config),
-        "UN-CLIPS": UnCLIPScheduler.from_config(config),
+        # "UN-CLIPS": UnCLIPScheduler.from_config(config),
         # "VQD": VQDiffusionScheduler.from_config(config),
         "K-LMS": LMSDiscreteScheduler.from_config(config)
     }[name]
