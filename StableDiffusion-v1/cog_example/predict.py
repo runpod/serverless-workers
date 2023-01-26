@@ -113,8 +113,8 @@ class Predictor(BasePredictor):
         ),
         scheduler: str = Input(
             default="K-LMS",
-            choices=["DDIM", "DDPM", "DEIS", "DPM-M", "DPM-S", "EULER-A", "EULER-D", "HEUN", "IPNDM", "KDPM2-A",
-                     "KDPM2-D", "KARRAS-VE", "PNDM", "RE-PAINT", "SCORE-VE", "SCORE-VP", "UN-CLIPS", "VQD", "K-LMS"],
+            choices=["DDIM", "DDPM", "DPM-M", "DPM-S", "EULER-A", "EULER-D",
+                     "HEUN", "IPNDM", "KDPM2-A", "KDPM2-D", "PNDM",  "K-LMS"],
             description="Choose a scheduler. If you use an init image, PNDM will be used",
         ),
         seed: int = Input(
@@ -149,10 +149,6 @@ class Predictor(BasePredictor):
             extra_kwargs = {
                 "init_image": Image.open(init_image).convert("RGB"),
                 "strength": prompt_strength,
-            }
-            extra_kwargs = {
-                "width": width,
-                "height": height,
             }
         else:
             pipe = self.txt2img_pipe
