@@ -117,10 +117,11 @@ class Predictor(BasePredictor):
             description="Random seed. Leave blank to randomize the seed", default=None
         ),
     ) -> List[Path]:
-        """Run a single prediction on the model"""
+        '''
+        Run a single prediction on the model
+        '''
         if seed is None:
             seed = int.from_bytes(os.urandom(2), "big")
-        print(f"Using seed: {seed}")
 
         if width * height > 786432:
             raise ValueError(
@@ -148,7 +149,6 @@ class Predictor(BasePredictor):
             pipe = self.txt2img_pipe
 
         pipe.scheduler = make_scheduler(scheduler, pipe.scheduler.config)
-        # pipe.enable_xformers_memory_efficient_attention()
 
         generator = torch.Generator("cuda").manual_seed(seed)
         output = pipe(
@@ -180,6 +180,9 @@ class Predictor(BasePredictor):
 
 
 def make_scheduler(name, config):
+    '''
+    Returns a scheduler from a name and config.
+    '''
     return {
         "DDIM": DDIMScheduler.from_config(config),
         "DDPM": DDPMScheduler.from_config(config),
