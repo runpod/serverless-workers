@@ -43,6 +43,7 @@ class Predictor(BasePredictor):
 
         self.txt2img_pipe = StableDiffusionPipeline.from_pretrained(
             "runwayml/stable-diffusion-v1-5",
+            safety_checker=None,
             cache_dir=MODEL_CACHE,
             local_files_only=True,
         ).to("cuda")
@@ -52,7 +53,7 @@ class Predictor(BasePredictor):
             tokenizer=self.txt2img_pipe.tokenizer,
             unet=self.txt2img_pipe.unet,
             scheduler=self.txt2img_pipe.scheduler,
-            safety_checker=self.txt2img_pipe.safety_checker,
+            # safety_checker=self.txt2img_pipe.safety_checker,
             feature_extractor=self.txt2img_pipe.feature_extractor,
         ).to("cuda")
         self.inpaint_pipe = StableDiffusionInpaintPipelineLegacy(
@@ -61,7 +62,7 @@ class Predictor(BasePredictor):
             tokenizer=self.txt2img_pipe.tokenizer,
             unet=self.txt2img_pipe.unet,
             scheduler=self.txt2img_pipe.scheduler,
-            safety_checker=self.txt2img_pipe.safety_checker,
+            # safety_checker=self.txt2img_pipe.safety_checker,
             feature_extractor=self.txt2img_pipe.feature_extractor,
         ).to("cuda")
 
