@@ -5,7 +5,8 @@ import torch
 from diffusers import (
     StableDiffusionPipeline,
     StableDiffusionImg2ImgPipeline,
-    StableDiffusionInpaintPipelineLegacy,
+    StableDiffusionInpaintPipeline,
+    # StableDiffusionInpaintPipelineLegacy,
 
     DDIMScheduler,
     DDPMScheduler,
@@ -54,7 +55,7 @@ class Predictor(BasePredictor):
             safety_checker=self.txt2img_pipe.safety_checker,
             feature_extractor=self.txt2img_pipe.feature_extractor,
         ).to("cuda")
-        self.inpaint_pipe = StableDiffusionInpaintPipelineLegacy(
+        self.inpaint_pipe = StableDiffusionInpaintPipeline(
             vae=self.txt2img_pipe.vae,
             text_encoder=self.txt2img_pipe.text_encoder,
             tokenizer=self.txt2img_pipe.tokenizer,
@@ -132,6 +133,7 @@ class Predictor(BasePredictor):
         if mask:
             if not init_image:
                 raise ValueError("mask was provided without init_image")
+
             pipe = self.inpaint_pipe
             init_image = Image.open(init_image).convert("RGB")
             extra_kwargs = {
