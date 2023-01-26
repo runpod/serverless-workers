@@ -53,6 +53,7 @@ class Predictor(BasePredictor):
             tokenizer=self.txt2img_pipe.tokenizer,
             unet=self.txt2img_pipe.unet,
             scheduler=self.txt2img_pipe.scheduler,
+            safety_checker=None,
             # safety_checker=self.txt2img_pipe.safety_checker,
             feature_extractor=self.txt2img_pipe.feature_extractor,
         ).to("cuda")
@@ -62,6 +63,7 @@ class Predictor(BasePredictor):
             tokenizer=self.txt2img_pipe.tokenizer,
             unet=self.txt2img_pipe.unet,
             scheduler=self.txt2img_pipe.scheduler,
+            safety_checker=None,
             # safety_checker=self.txt2img_pipe.safety_checker,
             feature_extractor=self.txt2img_pipe.feature_extractor,
         ).to("cuda")
