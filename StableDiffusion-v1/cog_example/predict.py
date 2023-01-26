@@ -137,7 +137,7 @@ class Predictor(BasePredictor):
             pipe = self.inpaint_pipe
             init_image = Image.open(init_image).convert("RGB")
             extra_kwargs = {
-                "mask": Image.open(mask).convert("RGB").resize(init_image.size),
+                "mask_image": Image.open(mask).convert("RGB").resize(init_image.size),
                 "image": init_image,
                 "strength": prompt_strength,
             }
