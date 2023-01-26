@@ -5,8 +5,8 @@ import torch
 from diffusers import (
     StableDiffusionPipeline,
     StableDiffusionImg2ImgPipeline,
-    StableDiffusionInpaintPipeline,
-    # StableDiffusionInpaintPipelineLegacy,
+    # StableDiffusionInpaintPipeline,
+    StableDiffusionInpaintPipelineLegacy,
 
     DDIMScheduler,
     DDPMScheduler,
@@ -21,7 +21,7 @@ from diffusers import (
     KDPM2DiscreteScheduler,
     # KarrasVeScheduler,
     PNDMScheduler,
-    RePaintScheduler,
+    # RePaintScheduler,
     # ScoreSdeVeScheduler,
     # ScoreSdeVpScheduler,
     # UnCLIPScheduler,
@@ -55,7 +55,7 @@ class Predictor(BasePredictor):
             safety_checker=self.txt2img_pipe.safety_checker,
             feature_extractor=self.txt2img_pipe.feature_extractor,
         ).to("cuda")
-        self.inpaint_pipe = StableDiffusionInpaintPipeline(
+        self.inpaint_pipe = StableDiffusionInpaintPipelineLegacy(
             vae=self.txt2img_pipe.vae,
             text_encoder=self.txt2img_pipe.text_encoder,
             tokenizer=self.txt2img_pipe.tokenizer,
@@ -138,8 +138,8 @@ class Predictor(BasePredictor):
             init_image = Image.open(init_image).convert("RGB")
             extra_kwargs = {
                 "mask_image": Image.open(mask).convert("RGB").resize(init_image.size),
-                "image": init_image,
-                # "strength": prompt_strength,
+                "init_image": init_image,
+                "strength": prompt_strength,
             }
         elif init_image:
             pipe = self.img2img_pipe
@@ -199,7 +199,7 @@ def make_scheduler(name, config):
         "KDPM2-D": KDPM2DiscreteScheduler.from_config(config),
         # "KARRAS-VE": KarrasVeScheduler.from_config(config),
         "PNDM": PNDMScheduler.from_config(config),
-        "RE-PAINT": RePaintScheduler.from_config(config),
+        # "RE-PAINT": RePaintScheduler.from_config(config),
         # "SCORE-VE": ScoreSdeVeScheduler.from_config(config),
         # "SCORE-VP": ScoreSdeVpScheduler.from_config(config),
         # "UN-CLIPS": UnCLIPScheduler.from_config(config),
