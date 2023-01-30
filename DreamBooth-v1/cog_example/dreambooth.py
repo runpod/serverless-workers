@@ -11,7 +11,6 @@ import gc
 
 from contextlib import nullcontext
 from pathlib import Path
-from typing import Optional
 
 import torch
 import torch.nn.functional as F
@@ -176,21 +175,6 @@ VAE_CACHE_DIR = "sd-vae-ft-mse-cache"
 #         type=int,
 #         default=1,
 #         help="Number of updates steps to accumulate before performing a backward/update pass.",
-#     )
-#     parser.add_argument(
-#         "--scale_lr",
-#         action="store_true",
-#         default=False,
-#         help="Scale the learning rate by the number of GPUs, gradient accumulation steps, and batch size.",
-#     )
-#     parser.add_argument(
-#         "--lr_scheduler",
-#         type=str,
-#         default="constant",
-#         help=(
-#             'The scheduler type to use. Choose between ["linear", "cosine", "cosine_with_restarts", "polynomial",'
-#             ' "constant", "constant_with_warmup"]'
-#         ),
 #     )
 #     parser.add_argument(
 #         "--lr_warmup_steps",
@@ -473,7 +457,7 @@ def main(args):
             }
         ]
     else:
-        with open(args.concepts_list, "r") as f:
+        with open(args.concepts_list, "r", encoding="UTF-8") as f:
             args.concepts_list = json.load(f)
 
     if args.with_prior_preservation:
