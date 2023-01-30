@@ -1,4 +1,5 @@
-import argparse
+''' DreamBooth v1.5'''
+
 import hashlib
 import itertools
 import random
@@ -7,7 +8,7 @@ import math
 import os
 import gc
 
-# from subprocess import call
+import bitsandbytes as bnb
 from contextlib import nullcontext
 from pathlib import Path
 from typing import Optional
@@ -38,14 +39,6 @@ from PIL import Image
 from torchvision import transforms
 from tqdm.auto import tqdm
 from transformers import CLIPTextModel, CLIPTokenizer
-
-
-# def run_cmd(command):
-#     try:
-#         call(command, shell=True)
-#     except KeyboardInterrupt:
-#         print("Process interrupted")
-#         sys.exit(1)
 
 
 torch.backends.cudnn.benchmark = True
@@ -134,12 +127,6 @@ vae_cache_dir = "sd-vae-ft-mse-cache"
 #         help="CFG for save sample.",
 #     )
 #     parser.add_argument(
-#         "--save_infer_steps",
-#         type=int,
-#         default=50,
-#         help="The number of inference steps for save sample.",
-#     )
-#     parser.add_argument(
 #         "--pad_tokens",
 #         default=False,
 #         action="store_true",
@@ -150,12 +137,6 @@ vae_cache_dir = "sd-vae-ft-mse-cache"
 #         default=False,
 #         action="store_true",
 #         help="Flag to add prior preservation loss.",
-#     )
-#     parser.add_argument(
-#         "--prior_loss_weight",
-#         type=float,
-#         default=1.0,
-#         help="The weight of prior preservation loss.",
 #     )
 #     parser.add_argument(
 #         "--num_class_images",
@@ -225,12 +206,6 @@ vae_cache_dir = "sd-vae-ft-mse-cache"
 #         help="Whether or not to use gradient checkpointing to save memory at the expense of slower backward pass.",
 #     )
 #     parser.add_argument(
-#         "--learning_rate",
-#         type=float,
-#         default=5e-6,
-#         help="Initial learning rate (after the potential warmup period) to use.",
-#     )
-#     parser.add_argument(
 #         "--scale_lr",
 #         action="store_true",
 #         default=False,
@@ -250,11 +225,6 @@ vae_cache_dir = "sd-vae-ft-mse-cache"
 #         type=int,
 #         default=500,
 #         help="Number of steps for the warmup in the lr scheduler.",
-#     )
-#     parser.add_argument(
-#         "--use_8bit_adam",
-#         action="store_true",
-#         help="Whether or not to use 8-bit Adam from bitsandbytes.",
 #     )
 #     parser.add_argument(
 #         "--adam_beta1",
@@ -673,13 +643,6 @@ def main(args):
 
     # Use 8-bit Adam for lower memory usage or to fine-tune the model in 16GB GPUs
     if args.use_8bit_adam:
-        try:
-            import bitsandbytes as bnb
-        except ImportError:
-            raise ImportError(
-                "To use 8-bit Adam, please install the bitsandbytes library: `pip install bitsandbytes`."
-            )
-
         optimizer_class = bnb.optim.AdamW8bit
     else:
         optimizer_class = torch.optim.AdamW
@@ -897,7 +860,7 @@ def main(args):
                 cache_dir=cache_dir,
                 local_files_only=True,
             )
-            # pipeline.enable_xformers_memory_efficient_attention()  # Testing memory efficient attention
+
             # save_dir = os.path.join(args.output_dir, f"{step}")
             save_dir = args.output_dir
             pipeline.save_pretrained(save_dir)
@@ -906,8 +869,6 @@ def main(args):
 
             if args.samples is not None:
                 pipeline = pipeline.to(accelerator.device)
-                # pipeline.scheduler = make_scheduler(args.scheduler, pipeline.scheduler.config)
-                # g_cuda = torch.Generator(device=accelerator.device).manual_seed(args.seed)
                 pipeline.set_progress_bar_config(disable=True)
                 sample_dir = os.path.join(save_dir, "samples")
                 os.makedirs(sample_dir, exist_ok=True)
@@ -928,15 +889,14 @@ def main(args):
                                 sample['prompt'],
                                 negative_prompt=sample.get('negative_prompt', None),
                                 guidance_scale=sample.get('guidance_scale', 7.5),
-                                num_inference_steps=sample.get('num_inference_steps', 50),
+                                num_inference_steps=sample.get('inference_steps', 50),
                                 generator=g_cuda,
                             ).images
 
                             sample_output['prompt'] = sample['prompt']
                             sample_output['negative_prompt'] = sample.get('negative_prompt', None)
                             sample_output['guidance_scale'] = sample.get('guidance_scale', 7.5)
-                            sample_output['num_inference_steps'] = sample.get(
-                                'num_inference_steps', 50)
+                            sample_output['inference_steps'] = sample.get('inference_steps', 50)
                             sample_output['seed'] = sample_seed
                             sample_output['scheduler'] = sample.get('scheduler', 'DDIM')
                             sample_output['image'] = f"{index}-{i}.png"

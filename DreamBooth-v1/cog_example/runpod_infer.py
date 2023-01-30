@@ -51,7 +51,7 @@ def run(job):
                     "prompt": str,
                     "negative_prompt": str,
                     "guidance_scale": float,
-                    "num_inference_steps": int,
+                    "inference_steps": int,
                     "num_outputs": int,
                     "seed": int,
                 }
@@ -103,7 +103,7 @@ def run(job):
         resolution=job_input.get("resolution", 512),
         center_crop=job_input.get("center_crop", False),
         # Tuning
-        use_8bit_adam=job_input.get("use_8bit_adam", True),
+        use_8bit_adam=job_input.get("use_8bit_adam", False),
         with_prior_preservation=concept.get("with_prior_preservation", True),
         prior_loss_weight=job_input['prior_loss_weight'],
         train_text_encoder=job_input.get("train_text_encoder", True),

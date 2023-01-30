@@ -1,8 +1,9 @@
 import os
 import gc
+import sys
 import mimetypes
 import shutil
-import tempfile
+
 from zipfile import ZipFile
 from subprocess import call
 from argparse import Namespace
@@ -94,7 +95,7 @@ class Predictor(BasePredictor):
         # ---------------------------------- Tuning ---------------------------------- #
         use_8bit_adam: bool = Input(
             description="Whether or not to use 8-bit Adam from bitsandbytes.",
-            default=True,
+            default=False,
         ),
         with_prior_preservation: bool = Input(
             description="Flag to add prior preservation loss.",
