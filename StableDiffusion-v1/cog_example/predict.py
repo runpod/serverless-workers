@@ -1,3 +1,5 @@
+''' StableDiffusion-v1 Predict Module '''
+
 import os
 from typing import List
 
@@ -37,8 +39,12 @@ MODEL_CACHE = "diffusers-cache"
 
 
 class Predictor(BasePredictor):
+    '''Predictor class for StableDiffusion-v1'''
+
     def setup(self):
-        """Load the model into memory to make running multiple predictions efficient"""
+        '''
+        Load the model into memory to make running multiple predictions efficient
+        '''
         print("Loading pipeline...")
 
         self.txt2img_pipe = StableDiffusionPipeline.from_pretrained(

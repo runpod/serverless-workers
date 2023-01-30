@@ -239,17 +239,6 @@ VAE_CACHE_DIR = "sd-vae-ft-mse-cache"
 #         help="Start saving weights after N steps.",
 #     )
 #     parser.add_argument(
-#         "--mixed_precision",
-#         type=str,
-#         default="no",
-#         choices=["no", "fp16", "bf16"],
-#         help=(
-#             "Whether to use mixed precision. Choose"
-#             "between fp16 and bf16 (bfloat16). Bf16 requires PyTorch >= 1.10."
-#             "and an Nvidia Ampere GPU."
-#         ),
-#     )
-#     parser.add_argument(
 #         "--not_cache_latents",
 #         action="store_true",
 #         help="Do not precompute and cache latents from VAE.",

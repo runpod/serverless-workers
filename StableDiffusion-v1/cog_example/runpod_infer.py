@@ -87,7 +87,7 @@ def run(job):
     # Download input objects
     job_input['init_image'], job_input['mask'] = download.download_input_objects(
         [job_input.get('init_image', None), job_input.get('mask', None)]
-    )
+    )  # pylint: disable=unbalanced-tuple-unpacking
 
     # Set seed if not provided
     job_input['seed'] = job_input.get('seed', int.from_bytes(os.urandom(2), "big"))
