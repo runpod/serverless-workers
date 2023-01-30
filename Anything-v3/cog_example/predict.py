@@ -1,3 +1,5 @@
+''' Anything v3 | predict.py '''
+
 import os
 from typing import List
 
@@ -18,8 +20,12 @@ MODEL_CACHE = "diffusers-cache"
 
 
 class Predictor(BasePredictor):
+    '''Predictor class for Anything v3'''
+
     def setup(self):
-        """Load the model into memory to make running multiple predictions efficient"""
+        '''
+        Load the model into memory to make running multiple predictions efficient
+        '''
         print("Loading pipeline...")
 
         self.txt2img_pipe = StableDiffusionPipeline.from_pretrained(
@@ -79,11 +85,11 @@ class Predictor(BasePredictor):
             default=None,
         ),
         prompt_strength: float = Input(
-            description="Prompt strength when using init image. 1.0 corresponds to full destruction of information in init image",
+            description="Prompt strength when using init image, 1.0 destruction of init image",
             default=0.8,
         ),
         num_outputs: int = Input(
-            description="Number of images to output. If the NSFW filter is triggered, you may get fewer outputs than this.",
+            description="Number of images to output.",
             ge=1,
             le=10,
             default=1
@@ -158,7 +164,7 @@ class Predictor(BasePredictor):
 
         if len(output_paths) == 0:
             raise Exception(
-                f"NSFW content detected. Try running it again, or try a different prompt."
+                "NSFW content detected. Try running it again, or try a different prompt."
             )
 
         return output_paths
