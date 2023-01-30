@@ -63,7 +63,7 @@ class Predictor(BasePredictor):
             default=1e-6,
         ),
         scale_lr: bool = Input(
-            description="Scale the learning rate by the number of GPUs, gradient accumulation steps, and batch size.",
+            description="Scale learning rate by GPUs, gradient steps, and batch size.",
             default=False,
         ),
         lr_scheduler: str = Input(
@@ -84,7 +84,7 @@ class Predictor(BasePredictor):
         ),
         # ----------------------------- Image Processing ----------------------------- #
         resolution: int = Input(
-            description="The resolution for input images. All the images in the train/validation dataset will be resized to this"
+            description="Resolution for input images, train/validation dataset will be resized."
             " resolution.",
             default=512,
         ),
@@ -145,18 +145,20 @@ class Predictor(BasePredictor):
             description="The prompt with identifier specifying the instance",
         ),
         class_prompt: str = Input(
-            description="The prompt to specify images in the same class as provided instance images.",
+            description="Prompt to specify images in the same class as provided instance images.",
         ),
         instance_data: Path = Input(
             description="A ZIP file containing the training data of instance images",
         ),
         class_data: Path = Input(
-            description="A ZIP file containing the training data of class images. Images will be generated if you do not provide.",
+            description="""A ZIP file containing the training data of class images.
+                        Images will be generated if you do not provide.""",
             default=None,
         ),
         num_class_images: int = Input(
-            description="Minimal class images for prior preservation loss. If not enough images are provided in class_data, additional images will be"
-            " sampled with class_prompt.",
+            description="""Minimal class images for prior preservation loss.
+                        If not enough images are provided in class_data,
+                        additional images will be sampled with class_prompt.""",
             default=50,
         ),
         save_sample_prompt: str = Input(
@@ -212,14 +214,6 @@ class Predictor(BasePredictor):
             default=1.0,
             description="Max gradient norm.",
         ),
-        # samples: list = Input(
-        #     description="A list of samples to use for evaluation.",
-        #     default=None,
-        # ),
-        # save_interval: int = Input(
-        #     default=10000,
-        #     description="Save weights every N steps.",
-        # ),
     ) -> Path:
 
         cog_instance_data = "cog_instance_data"

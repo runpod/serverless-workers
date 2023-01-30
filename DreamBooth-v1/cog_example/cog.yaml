@@ -15,7 +15,6 @@ build:
 
   run:
     - pip install pyre-extensions==0.0.23
-    - pip install -i https://test.pypi.org/simple/ formers==0.0.15.dev376
 
 
 predict: "predictor.py:Predictor"
