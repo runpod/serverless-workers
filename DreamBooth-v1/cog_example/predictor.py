@@ -37,7 +37,7 @@ class Predictor(BasePredictor):
         # --------------------------------- Intervals -------------------------------- #
         num_train_epochs: int = Input(default=1),
         max_train_steps: int = Input(
-            description="Total number of training steps to perform.  If provided, overrides num_train_epochs.",
+            description="Total number of training steps to perform. Overrides num_train_epochs.",
             default=2000,
         ),
         # --------------------------------- Batching --------------------------------- #
@@ -50,11 +50,11 @@ class Predictor(BasePredictor):
             default=4,
         ),
         gradient_accumulation_steps: int = Input(
-            description="Number of updates steps to accumulate before performing a backward/update pass.",
+            description="Updates steps to accumulate before performing a backward/update pass.",
             default=1,
         ),
         gradient_checkpointing: bool = Input(
-            description="Whether or not to use gradient checkpoints to save memory at the expense of slower backward pass.",
+            description="Use gradient checkpoints to save memory, slower backward pass.",
             default=False,
         ),
         # ------------------------------- Learning Rate ------------------------------ #

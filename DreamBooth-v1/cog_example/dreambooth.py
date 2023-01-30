@@ -47,8 +47,8 @@ torch.backends.cudnn.benchmark = True
 
 logger = get_logger(__name__)
 
-cache_dir = "stable-diffusion-v1-5-cache"
-vae_cache_dir = "sd-vae-ft-mse-cache"
+CACHE_DIR = "stable-diffusion-v1-5-cache"
+VAE_CACHE_DIR = "sd-vae-ft-mse-cache"
 
 
 # def parse_args(input_args=None):
@@ -176,11 +176,6 @@ vae_cache_dir = "sd-vae-ft-mse-cache"
 #         type=int,
 #         default=1,
 #         help="Number of updates steps to accumulate before performing a backward/update pass.",
-#     )
-#     parser.add_argument(
-#         "--gradient_checkpointing",
-#         action="store_true",
-#         help="Whether or not to use gradient checkpointing to save memory at the expense of slower backward pass.",
 #     )
 #     parser.add_argument(
 #         "--scale_lr",
@@ -506,14 +501,14 @@ def main(args):
                             revision=None
                             if args.pretrained_vae_name_or_path
                             else args.revision,
-                            cache_dir=vae_cache_dir,
+                            cache_dir=VAE_CACHE_DIR,
                             local_files_only=True,
                             torch_dtype=torch_dtype,
                         ),
                         torch_dtype=torch_dtype,
                         safety_checker=None,
                         revision=args.revision,
-                        cache_dir=cache_dir,
+                        cache_dir=CACHE_DIR,
                         local_files_only=True,
                     )
                     pipeline.set_progress_bar_config(disable=True)
@@ -547,8 +542,6 @@ def main(args):
 
         del pipeline
 
-        # print("deleting pipeline")
-
         gc.collect()
         torch.cuda.empty_cache()
 
@@ -567,7 +560,7 @@ def main(args):
             args.pretrained_model_name_or_path,
             subfolder="tokenizer",
             revision=args.revision,
-            cache_dir=cache_dir,
+            cache_dir=CACHE_DIR,
             local_files_only=True,
         )
 
@@ -576,14 +569,14 @@ def main(args):
         args.pretrained_model_name_or_path,
         subfolder="text_encoder",
         revision=args.revision,
-        cache_dir=cache_dir,
+        cache_dir=CACHE_DIR,
         local_files_only=True,
     )
     vae = AutoencoderKL.from_pretrained(
         args.pretrained_model_name_or_path,
         subfolder="vae",
         revision=args.revision,
-        cache_dir=cache_dir,
+        cache_dir=CACHE_DIR,
         local_files_only=True,
     )
     unet = UNet2DConditionModel.from_pretrained(
@@ -591,7 +584,7 @@ def main(args):
         subfolder="unet",
         revision=args.revision,
         torch_dtype=torch.float32,
-        cache_dir=cache_dir,
+        cache_dir=CACHE_DIR,
         local_files_only=True,
     )
 
@@ -634,7 +627,7 @@ def main(args):
     noise_scheduler = DDPMScheduler.from_config(
         args.pretrained_model_name_or_path,
         subfolder="scheduler",
-        cache_dir=cache_dir,
+        cache_dir=CACHE_DIR,
         local_files_only=True,
     )
 
@@ -800,7 +793,7 @@ def main(args):
                     args.pretrained_model_name_or_path,
                     subfolder="text_encoder",
                     revision=args.revision,
-                    cache_dir=cache_dir,
+                    cache_dir=CACHE_DIR,
                     local_files_only=True,
                 )
             # scheduler = DDIMScheduler(
@@ -821,14 +814,14 @@ def main(args):
                     revision=None
                     if args.pretrained_vae_name_or_path
                     else args.revision,
-                    cache_dir=vae_cache_dir,
+                    cache_dir=VAE_CACHE_DIR,
                     local_files_only=True,
                 ),
                 safety_checker=None,
                 # scheduler=make_scheduler(args.scheduler, pipeline.scheduler.config),
                 torch_dtype=torch.float16,
                 revision=args.revision,
-                cache_dir=cache_dir,
+                cache_dir=CACHE_DIR,
                 local_files_only=True,
             )
 
