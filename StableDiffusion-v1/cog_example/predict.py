@@ -78,29 +78,31 @@ class Predictor(BasePredictor):
             default=None,
         ),
         width: int = Input(
-            description="Width of output image. Maximum size is 1024x768 or 768x1024 because of memory limits",
+            description="Output image width; max 1024x768 or 768x1024 due to memory limits",
             choices=[128, 256, 384, 448, 512, 576, 640, 704, 768, 832, 896, 960, 1024],
             default=512,
         ),
         height: int = Input(
-            description="Height of output image. Maximum size is 1024x768 or 768x1024 because of memory limits",
+            description="Output image height; max 1024x768 or 768x1024 due to memory limits",
             choices=[128, 256, 384, 448, 512, 576, 640, 704, 768, 832, 896, 960, 1024],
             default=512,
         ),
         init_image: Path = Input(
-            description="Initial image to generate variations of. Will be resized to the specified width and height",
+            description="Initial image to generate variations of, resized to the specified WxH.",
             default=None,
         ),
         mask: Path = Input(
-            description="Black and white image to use as mask for inpainting over init_image. Black pixels are inpainted and white pixels are preserved. Tends to work better with prompt strength of 0.5-0.7. Consider using https://replicate.com/andreasjansson/stable-diffusion-inpainting instead.",
+            description="""Black and white image to use as mask for inpainting over init_image.
+                        Black pixels are inpainted and white pixels are preserved.
+                        Tends to work better with prompt strength of 0.5-0.7""",
             default=None,
         ),
         prompt_strength: float = Input(
-            description="Prompt strength when using init image. 1.0 corresponds to full destruction of information in init image",
+            description="Prompt strength init image. 1.0 full destruction of init image",
             default=0.8,
         ),
         num_outputs: int = Input(
-            description="Number of images to output. If the NSFW filter is triggered, you may get fewer outputs than this.",
+            description="Number of images to output.",
             ge=1,
             le=10,
             default=1
@@ -129,7 +131,7 @@ class Predictor(BasePredictor):
 
         if width * height > 786432:
             raise ValueError(
-                "Maximum size is 1024x768 or 768x1024 pixels, because of memory limits. Please select a lower width or height."
+                "Maximum size is 1024x768 or 768x1024 pixels, because of memory limits."
             )
 
         extra_kwargs = {}
@@ -182,7 +184,7 @@ class Predictor(BasePredictor):
 
         if len(output_paths) == 0:
             raise Exception(
-                f"NSFW content detected. Try running it again, or try a different prompt."
+                "NSFW content detected. Try running it again, or try a different prompt."
             )
 
         return output_paths

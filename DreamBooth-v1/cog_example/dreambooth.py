@@ -8,7 +8,7 @@ import math
 import os
 import gc
 
-import bitsandbytes as bnb
+
 from contextlib import nullcontext
 from pathlib import Path
 from typing import Optional
@@ -17,6 +17,8 @@ import torch
 import torch.nn.functional as F
 import torch.utils.checkpoint
 from torch.utils.data import Dataset
+
+import bitsandbytes as bnb
 
 from accelerate import Accelerator
 from accelerate.logging import get_logger
@@ -34,7 +36,6 @@ from diffusers import (
     UNet2DConditionModel,
 )
 from diffusers.optimization import get_scheduler
-from huggingface_hub import HfFolder, Repository, whoami
 from PIL import Image
 from torchvision import transforms
 from tqdm.auto import tqdm
@@ -139,15 +140,6 @@ vae_cache_dir = "sd-vae-ft-mse-cache"
 #         help="Flag to add prior preservation loss.",
 #     )
 #     parser.add_argument(
-#         "--num_class_images",
-#         type=int,
-#         default=50,
-#         help=(
-#             "Minimal class images for prior preservation loss. If not have enough images, additional images will be"
-#             " sampled with class_prompt."
-#         ),
-#     )
-#     parser.add_argument(
 #         "--output_dir",
 #         type=str,
 #         default="text-inversion-model",
@@ -155,15 +147,6 @@ vae_cache_dir = "sd-vae-ft-mse-cache"
 #     )
 #     parser.add_argument(
 #         "--seed", type=int, default=None, help="A seed for reproducible training."
-#     )
-#     parser.add_argument(
-#         "--resolution",
-#         type=int,
-#         default=512,
-#         help=(
-#             "The resolution for input images, all the images in the train/validation dataset will be resized to this"
-#             " resolution"
-#         ),
 #     )
 #     parser.add_argument(
 #         "--center_crop",
@@ -188,12 +171,6 @@ vae_cache_dir = "sd-vae-ft-mse-cache"
 #         help="Batch size (per device) for sampling images.",
 #     )
 #     parser.add_argument("--num_train_epochs", type=int, default=1)
-#     parser.add_argument(
-#         "--max_train_steps",
-#         type=int,
-#         default=None,
-#         help="Total number of training steps to perform.  If provided, overrides num_train_epochs.",
-#     )
 #     parser.add_argument(
 #         "--gradient_accumulation_steps",
 #         type=int,
@@ -260,12 +237,6 @@ vae_cache_dir = "sd-vae-ft-mse-cache"
 #         type=str,
 #         default=None,
 #         help="The token to use to push to the Model Hub.",
-#     )
-#     parser.add_argument(
-#         "--hub_model_id",
-#         type=str,
-#         default=None,
-#         help="The name of the repository to keep in sync with the local `output_dir`.",
 #     )
 #     parser.add_argument(
 #         "--logging_dir",

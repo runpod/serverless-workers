@@ -1,8 +1,10 @@
 #!/usr/bin/env python
+''' Contains the handler function that will be called by the serverless. '''
 
 import runpod
 
-## Load models into VRAM here so they can be warm between requests
+# Load models into VRAM here so they can be warm between requests
+
 
 def handler(event):
     '''
