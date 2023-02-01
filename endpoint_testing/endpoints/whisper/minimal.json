@@ -1,8 +1,7 @@
 {
     "TestInput": {
         "input": {
-            "param1": "value1",
-            "param2": "value2"
+            "audio": "https://github.com/runpod/serverless-workers/raw/main/Input-Samples/gettysburg.wav"
         }
     },
     "TestOutput": {
