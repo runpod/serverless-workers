@@ -1,0 +1,14 @@
+{
+    "TestInput": {
+        "input": {
+            "param1": "value1",
+            "param2": "value2"
+        }
+    },
+    "TestOutput": {
+        "output": {
+            "param1": "value1",
+            "param2": "value2"
+        }
+    }
+}

@@ -2,6 +2,8 @@
 
 <h1>Serverless | Workers</h1>
 
+[![CI | Code Quality](https://github.com/runpod/serverless-workers/actions/workflows/CI_pylint.yml/badge.svg)](https://github.com/runpod/serverless-workers/actions/workflows/CI_pylint.yml)
+
 </div>
 
 Official set of serverless AI workers provided by RunPod.
