@@ -83,12 +83,7 @@ def run(job):
 
     # Setting the float parameters
     job_input['temperature'] = float(job_input.get('temperature', 0))
-
-    try:
-        job_input['patience'] = float(job_input.get('patience', None))
-    except TypeError:
-        job_input['patience'] = None
-
+    job_input['patience'] = float(job_input.get('patience', 0))
     job_input['temperature_increment_on_fallback'] = float(
         job_input.get('temperature_increment_on_fallback', 0.2)
     )
