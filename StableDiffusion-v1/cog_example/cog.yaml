@@ -9,7 +9,7 @@ build:
     - "scipy==1.9.3"
     - "transformers==4.25.1"
     - "accelerate==0.14.0"
-    - "xfomers==0.0.16"
+    - "xformers==0.0.16"
     - "triton==1.1.1"
     - 'runpod==0.8.4'
 
