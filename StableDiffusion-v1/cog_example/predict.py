@@ -33,7 +33,7 @@ from diffusers import (
 
 from PIL import Image
 from cog import BasePredictor, Input, Path
-
+from xformers.ops import MemoryEfficientAttentionFlashAttentionOp
 
 MODEL_CACHE = "diffusers-cache"
 
@@ -73,6 +73,10 @@ class Predictor(BasePredictor):
             # safety_checker=self.txt2img_pipe.safety_checker,
             feature_extractor=self.txt2img_pipe.feature_extractor,
         ).to("cuda")
+
+        self.txt2img_pipe.enable_xformers_memory_efficient_attention()
+        self.img2img_pipe.enable_xformers_memory_efficient_attention()
+        self.inpaint_pipe.enable_xformers_memory_efficient_attention()
 
     @torch.inference_mode()
     @torch.cuda.amp.autocast()
