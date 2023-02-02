@@ -35,6 +35,10 @@ INPUT_VALIDATIONS = {
         'type': float,
         'required': False
     },
+    'beam_size': {
+        'type': int,
+        'required': False
+    },
     'patience': {
         'type': float,
         'required': False
@@ -79,7 +83,12 @@ def run(job):
 
     # Setting the float parameters
     job_input['temperature'] = float(job_input.get('temperature', 0))
-    job_input['patience'] = float(job_input.get('patience', 0))
+
+    try:
+        job_input['patience'] = float(job_input.get('patience', None))
+    except TypeError:
+        job_input['patience'] = None
+
     job_input['temperature_increment_on_fallback'] = float(
         job_input.get('temperature_increment_on_fallback', 0.2)
     )
@@ -104,6 +113,7 @@ def run(job):
         translate=job_input.get('translate', False),
         language=job_input.get('language', None),
         temperature=job_input["temperature"],
+        beam_size=job_input.get("beam_size", 5),
         patience=job_input["patience"],
         suppress_tokens=job_input.get("suppress_tokens", "-1"),
         initial_prompt=job_input.get('initial_prompt', None),

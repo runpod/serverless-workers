@@ -71,6 +71,10 @@ class Predictor(BasePredictor):
             default=0,
             description="temperature to use for sampling",
         ),
+        beam_size: int = Input(
+            default=5,
+            description="Number of beams in beam search, only applicable when temperature is zero",
+        ),
         patience: float = Input(
             default=None,
             description="optional patience value to use in beam decoding, as in https://arxiv.org/abs/2204.05424, the default (1.0) is equivalent to conventional beam search",
@@ -117,6 +121,7 @@ class Predictor(BasePredictor):
 
         args = {
             "language": language,
+            "beam_size": beam_size,
             "patience": patience,
             "suppress_tokens": suppress_tokens,
             "initial_prompt": initial_prompt,
