@@ -1,1 +1,7 @@
-{"input": {"data_url": "https://github.com/runpod/serverless-workers/blob/main/Input-Samples/cat_pictures.zip?raw=true"}}
+{
+    "input": {
+        "train": {
+            "data_url": "https://github.com/runpod/serverless-workers/blob/main/Input-Samples/cat_pictures.zip?raw=true"
+        }
+    }
+}

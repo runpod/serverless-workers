@@ -208,6 +208,9 @@ def everydream_runner(job):
 
     # -------------------------------- Validation -------------------------------- #
     # Validate the training input
+    if 'train' not in job_input:
+        return {"error": "No training input provided."}
+
     validated_train_input = rp_validator(job_input['train'], TRAIN_SCHEMA)
     if 'errors' in validated_train_input:
         return {"error": validated_train_input['errors']}
