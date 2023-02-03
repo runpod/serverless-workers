@@ -24,5 +24,6 @@ build:
     # - "runpod==0.9.0"
 
   run:
+    - pip install triton
     - git clone https://github.com/DeXtmL/bitsandbytes-win-prebuilt tmp/bnb_cache
     - pip install https://github.com/runpod/runpod-python/archive/main.zip
