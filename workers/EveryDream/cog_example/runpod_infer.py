@@ -6,8 +6,14 @@ It will take the input from the API call, and prepare it for the model.
 It will then call the model, and return the results.
 '''
 
+import os
+import re
+
+from EveryDream2trainer import train
+
 import runpod
 from runpod.serverless.utils import rp_validator, rp_download
+
 
 TRAIN_SCHEMA = {
     'amp': {
@@ -224,15 +230,26 @@ def everydream_runner(job):
 
     # Download the resume checkpoint, if provided
     if train_input['resume_ckpt_url'] != "sd_v1-5_vae.ckpt":
-
         # Check if the URL is from huggingface.co, if so, grab the model repo id.
-
-        resume_ckpt = rp_download.file(train_input['resume_ckpt_url'])
-
-        train_input['resume_ckpt'] = resume_ckpt['downloaded_path']
+        if re.match(r"huggingface.co", train_input['resume_ckpt_url']):
+            url_parts = train_input['resume_ckpt_url'].split("/")
+            train_input['resume_ckpt'] = f"{url_parts[-2]}/{url_parts[-1]}"
+        else:
+            train_input['resume_ckpt'] = rp_download.file(train_input['resume_ckpt_url'])
+    else:
+        train_input['resume_ckpt'] = train_input['resume_ckpt_url']
 
     # ------------------------------- Format Inputs ------------------------------ #
+    # train_input['sample_prompts'] -> sample_prompts.txt
+    if train_input['sample_prompts']:
+        os.makedirs("sample_prompts.txt", exist_ok=True)
+        with open(os.path.join("sample_prompts.txt"), "w", encoding="UTF-8") as sample_file:
+            for prompt in train_input['sample_prompts']:
+                sample_file.write(f"{prompt}\n")
 
     # ------------------------------- Set Defaults ------------------------------- #
     # Set default values for optional parameters
     train_input['project_name'] = job['id']
+
+    # ------------------------------- Run Training ------------------------------- #
+    train(train_input)

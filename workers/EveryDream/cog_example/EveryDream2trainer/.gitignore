@@ -1,0 +1,12 @@
+/venv
+**/__pycache__
+**/*.ckpt
+/input/**
+/output/**
+/ckpt_cache/**
+**/.pytest_cache
+/logs/**
+/tmp/**
+**/.ipynb_checkpoints
+/wandb/**
+/mycfgs/**
