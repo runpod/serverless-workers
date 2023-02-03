@@ -217,7 +217,7 @@ def everydream_runner(job):
     train_input = validated_train_input['validated_input']
 
     # Validate the S3 config, if provided
-    if job['s3Config']:
+    if 's3Config' in job:
         validated_s3_config = validate(job['s3Config'], S3_SCHEMA)
         if 'errors' in validated_s3_config:
             return {"error": validated_s3_config['errors']}
