@@ -9,7 +9,7 @@ It will then call the model, and return the results.
 import os
 import re
 
-from bunch import bunchify
+from munch import DefaultMunch
 
 import train
 
@@ -267,7 +267,7 @@ def everydream_runner(job):
     train_input['write_schedule'] = False
 
     # ------------------------------- Run Training ------------------------------- #
-    train_input = bunchify(train_input)
+    train_input = DefaultMunch.fromDict(train_input)
     train.main(train_input)
 
 
