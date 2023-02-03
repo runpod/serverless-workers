@@ -12,8 +12,8 @@ import re
 import train
 
 import runpod
-from runpod.serverless.utils import rp_validator, rp_download
-
+from runpod.serverless.utils import rp_download
+from runpod.serverless.utils.rp_validator import validate
 
 TRAIN_SCHEMA = {
     'amp': {
@@ -211,14 +211,14 @@ def everydream_runner(job):
     if 'train' not in job_input:
         return {"error": "No training input provided."}
 
-    validated_train_input = rp_validator(job_input['train'], TRAIN_SCHEMA)
+    validated_train_input = validate(job_input['train'], TRAIN_SCHEMA)
     if 'errors' in validated_train_input:
         return {"error": validated_train_input['errors']}
     train_input = validated_train_input['validated_input']
 
     # Validate the S3 config, if provided
     if job['s3Config']:
-        validated_s3_config = rp_validator(job['s3Config'], S3_SCHEMA)
+        validated_s3_config = validate(job['s3Config'], S3_SCHEMA)
         if 'errors' in validated_s3_config:
             return {"error": validated_s3_config['errors']}
         s3_config = validated_s3_config['validated_input']
