@@ -255,7 +255,7 @@ def everydream_runner(job):
     train_input['project_name'] = job['id']
 
     # ------------------------------- Run Training ------------------------------- #
-    train(train_input)
+    train.main(train_input)
 
 
 runpod.serverless.start({"handler": everydream_runner})
