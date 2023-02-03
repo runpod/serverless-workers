@@ -22,3 +22,9 @@ Create a directory under `endpoints` that has the same ID of the endpoint you wi
     }
 }
 ```
+
+## Running Endpoint Tests
+
+```BASH
+python test_endpoint.py --endpoint_id={endpoint_id} --key={api_key}
+```

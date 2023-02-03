@@ -1,0 +1,12 @@
+{
+    "TestInput": {
+        "input": {
+            "audio": "https://github.com/runpod/serverless-workers/raw/main/Input-Samples/gettysburg.wav",
+            "model": "large-v1",
+            "temperature": 0
+        }
+    },
+    "TestOutput": {
+        "output": {}
+    }
+}

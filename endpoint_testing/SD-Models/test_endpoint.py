@@ -11,8 +11,8 @@ from argparse import ArgumentParser
 
 # ------------------------------ Parse Arguments ----------------------------- #
 parser = ArgumentParser()
+parser.add_argument('--endpoint_id', type=str, help='The endpoint id')
 parser.add_argument('--key', type=str, help='RunPod API key')
-parser.add_argument('--model', type=str, help='SD API Model name')
 parser.add_argument('--dev', type=bool, help='Use dev API', default=False)
 
 parser.add_argument('--input', type=str, help='Optional JSON input to test',
@@ -26,17 +26,17 @@ headers = {
 }
 
 if args.dev:
-    POST_URL = f'https://dev-api.runpod.ai/v1/{args.model}/run'
+    POST_URL = f'https://dev-api.runpod.ai/v1/{args.endpoint_id}/run'
 else:
-    POST_URL = f'https://api.runpod.ai/v1/{args.model}/run'
+    POST_URL = f'https://api.runpod.ai/v1/{args.endpoint_id}/run'
 
 if args.dev:
-    GET_URL = f'https://dev-api.runpod.ai/v1/{args.model}/status'
+    GET_URL = f'https://dev-api.runpod.ai/v1/{args.endpoint_id}/status'
 else:
-    GET_URL = f'https://api.runpod.ai/v1/{args.model}/status'
+    GET_URL = f'https://api.runpod.ai/v1/{args.endpoint_id}/status'
 
 print()
-print("Testing SD Model | " + args.model)
+print("Testing SD Model | " + args.endpoint_id)
 print("POST URL    | " + POST_URL)
 print("GET URL     | " + GET_URL)
 

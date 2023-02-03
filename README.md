@@ -20,7 +20,6 @@ Official set of serverless AI workers provided by RunPod.
 
 All the workers us the [RunPod Python Package](https://github.com/runpod/runpod-python) to implement the work functions, see the [serverless-worker docs](https://github.com/runpod/runpod-python/blob/main/docs/serverless/worker.md) for more information.
 
-
 ## Cog
 
 To aid in packaging, these workers referenced the [Cog](https://github.com/replicate/cog) package to build the containers. See [cog_setup.md](docs/cog_setup.md) for more information on how to install Cog.
@@ -34,6 +33,7 @@ To aid in packaging, these workers referenced the [Cog](https://github.com/repli
 | [Dream Booth v1](dreambooth-v1/)           | [runpod/ai-api-dream-booth-v1](https://hub.docker.com/r/runpod/ai-api-dream-booth-v1)           |
 | [Anything v3](anything-v3/)                | [runpod/ai-api-anything-v3](https://hub.docker.com/r/runpod/ai-api-anything-v3)                 |
 | [Openjourney](Openjourney/)                | [runpod/ai-api-openjourney](https://hub.docker.com/r/runpod/ai-api-openjourney)                 |
+| [Whisper](Whisper/)                        | [runpod/ai-api-whisper](https://hub.docker.com/r/runpod/ai-api-whisper)                         |
 | [helloworld](helloworld/)                  |                                                                                                 |
 
 ## Directory Structure
