@@ -24,5 +24,4 @@ build:
 
   run:
     - git clone https://github.com/DeXtmL/bitsandbytes-win-prebuilt tmp/bnb_cache
-    - python utils/get_yamls.py
     - pip install https://github.com/runpod/runpod-python/archive/main.zip
