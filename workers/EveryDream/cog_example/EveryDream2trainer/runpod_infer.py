@@ -9,7 +9,7 @@ It will then call the model, and return the results.
 import os
 import re
 
-from EveryDream2trainer import train
+import train
 
 import runpod
 from runpod.serverless.utils import rp_validator, rp_download
