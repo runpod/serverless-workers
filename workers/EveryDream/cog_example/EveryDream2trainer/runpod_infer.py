@@ -253,6 +253,16 @@ def everydream_runner(job):
     # ------------------------------- Set Defaults ------------------------------- #
     # Set default values for optional parameters
     train_input['project_name'] = job['id']
+    train_input['gpuid'] = 0
+    train_input['logdir'] = "logs"
+    train_input['log_step'] = 25
+    train_input['lowvram'] = False
+    train_input['notebook'] = False
+    train_input['num_workers'] = 0
+    train_input['save_ckpt_dir'] = None
+    train_input['save_every_n_epochs'] = None
+    train_input['wandb'] = False
+    train_input['write_schedule'] = False
 
     # ------------------------------- Run Training ------------------------------- #
     train.main(train_input)
