@@ -253,3 +253,6 @@ def everydream_runner(job):
 
     # ------------------------------- Run Training ------------------------------- #
     train(train_input)
+
+
+runpod.serverless.start({"handler": everydream_runner})
