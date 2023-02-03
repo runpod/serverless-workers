@@ -130,7 +130,7 @@ TRAIN_SCHEMA = {
     'sample_prompts': {
         'type': list,
         'required': False,
-        'default': None
+        'default': []
     },
     'sample_steps': {
         'type': int,
@@ -251,6 +251,8 @@ def everydream_runner(job):
         with open(os.path.join("sample_prompts.txt"), "w", encoding="UTF-8") as sample_file:
             for prompt in train_input['sample_prompts']:
                 sample_file.write(f"{prompt}\n")
+    else:
+        train_input['sample_prompts'] = "sample_prompts.txt"
 
     # ------------------------------- Set Defaults ------------------------------- #
     # Set default values for optional parameters
