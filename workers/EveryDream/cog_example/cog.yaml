@@ -3,7 +3,8 @@ build:
   cuda: "11.6"
   python_version: "3.10.9"
   python_packages:
-    - "torch==1.12.1+cu116 torchvision==0.13.1+cu116 --extra-index-url=https://download.pytorch.org/whl/cu116"
+    - "torch==1.12.1+cu116  --extra-index-url=https://download.pytorch.org/whl/cu116"
+    - "torchvision==0.13.1+cu116"
     - "transformers==4.25.1"
     - "diffusers[torch]==0.10.2"
     - "pynvml==11.4.1"
@@ -24,6 +25,5 @@ build:
 
   run:
     - git clone https://github.com/DeXtmL/bitsandbytes-win-prebuilt tmp/bnb_cache
-    - python utils/patch_bnb.py
     - python utils/get_yamls.py
     - pip install https://github.com/runpod/runpod-python/archive/main.zip
