@@ -17,6 +17,10 @@ import runpod
 from runpod.serverless.utils import rp_download, rp_cleanup, rp_upload
 from runpod.serverless.utils.rp_validator import validate
 
+
+# ---------------------------------------------------------------------------- #
+#                                    Schemas                                   #
+# ---------------------------------------------------------------------------- #
 TRAIN_SCHEMA = {
     'amp': {
         'type': bool,
@@ -180,6 +184,59 @@ TRAIN_SCHEMA = {
     }
 }
 
+INFERENCE_SCHEMA = {
+    'prompt': {
+        'type': str,
+        'required': True
+    },
+    'negative_prompt': {
+        'type': str,
+        'required': False,
+        'default': None
+    },
+    'width': {
+        'type': int,
+        'required': False,
+        'default': 512,
+        'constraints': lambda width: width in [128, 256, 384, 448, 512, 576, 640, 704, 768, 832, 896, 960, 1024]
+    },
+    'height': {
+        'type': int,
+        'required': False,
+        'default': 512,
+        'constraints': lambda height: height in [128, 256, 384, 448, 512, 576, 640, 704, 768, 832, 896, 960, 1024]
+    },
+    'num_outputs': {
+        'type': int,
+        'required': False,
+        'default': 1,
+        'constraints': lambda num_outputs: 1 <= num_outputs <= 10
+    },
+    'num_inference_steps': {
+        'type': int,
+        'required': False,
+        'default': 50,
+        'constraints': lambda num_inference_steps: 1 <= num_inference_steps <= 500
+    },
+    'guidance_scale': {
+        'type': float,
+        'required': False,
+        'default': 7.5,
+        'constraints': lambda guidance_scale: 0 <= guidance_scale <= 20
+    },
+    'scheduler': {
+        'type': str,
+        'required': False,
+        'default': 'K-LMS',
+        'constraints': lambda scheduler: scheduler in ["DDIM", "DDPM", "DPM-M", "DPM-S",  "EULER-A", "EULER-D", "HEUN", "IPNDM", "KDPM2-A", "KDPM2-D", "PNDM", "K-LMS"]
+    },
+    'seed': {
+        'type': int,
+        'required': False,
+        'default': 555
+    },
+}
+
 S3_SCHEMA = {
     'accessId': {
         'type': str,
@@ -200,6 +257,9 @@ S3_SCHEMA = {
 }
 
 
+# ---------------------------------------------------------------------------- #
+#                           Define the Runner Handler                          #
+# ---------------------------------------------------------------------------- #
 def everydream_runner(job):
     '''
     Takes in raw data from the API call, and prepares it for the model.
@@ -217,6 +277,15 @@ def everydream_runner(job):
     if 'errors' in validated_train_input:
         return {"error": validated_train_input['errors']}
     train_input = validated_train_input['validated_input']
+
+    # Validate the inference input
+    if 's3Config' not in job_input and 'inference' not in job_input:
+        return {"error": "Please provide either an inference input or an S3 config."}
+    for index, inference_input in enumerate(job_input['inference']):
+        validated_inf_input = validate(inference_input, INFERENCE_SCHEMA)
+        if 'errors' in validated_inf_input:
+            return {"error": validated_inf_input['errors']}
+        job_input['inference'][index] = validated_inf_input['validated_input']
 
     # Validate the S3 config, if provided
     s3_config = None
@@ -274,16 +343,38 @@ def everydream_runner(job):
     # ------------------------------- Run Training ------------------------------- #
     train_input = DefaultMunch.fromDict(train_input)
     train.main(train_input)
+    job_output = {}
+    job_output['train'] = {}
 
     # ------------------------------- Upload Files ------------------------------- #
     if 's3Config' in job:
+
+        # Upload the sample images
+        if os.path.exists(f"job_files/{job['id']}/logs/samples"):
+            sample_images = os.listdir(f"job_files/{job['id']}/logs/samples")
+            sample_urls = []
+            for sample_image in sample_images:
+                if sample_image.endswith(".jpg"):
+                    sample_url = rp_upload.file(
+                        f"{job['id']}/{sample_image}", f"job_files/{job['id']}/logs/samples/{sample_image}", s3_config)
+                    sample_urls.append(sample_url)
+            job_output['train']['samples'] = sample_urls
+
+        # Upload the checkpoint file
         job_output_files = os.listdir(f"job_files/{job['id']}")
         for file in job_output_files:
             if file.endswith(".ckpt"):
-                rp_upload.file(f"{job['id']}.ckpt", f"job_files/{job['id']}/{file}", s3_config)
+                ckpt_url = rp_upload.file(
+                    f"{job['id']}.ckpt", f"job_files/{job['id']}/{file}", s3_config)
+                job_output['train']['checkpoint_url'] = ckpt_url
 
     # --------------------------------- Clean Up --------------------------------- #
     rp_cleanup.clean(['job_files'])
 
+    return job_output
 
+
+# ---------------------------------------------------------------------------- #
+#                               Start the Worker                               #
+# ---------------------------------------------------------------------------- #
 runpod.serverless.start({"handler": everydream_runner})
