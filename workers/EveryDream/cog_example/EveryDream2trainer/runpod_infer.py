@@ -14,7 +14,7 @@ from munch import DefaultMunch
 import train
 
 import runpod
-from runpod.serverless.utils import rp_download
+from runpod.serverless.utils import rp_download, rp_cleanup, rp_upload
 from runpod.serverless.utils.rp_validator import validate
 
 TRAIN_SCHEMA = {
@@ -219,6 +219,7 @@ def everydream_runner(job):
     train_input = validated_train_input['validated_input']
 
     # Validate the S3 config, if provided
+    s3_config = None
     if 's3Config' in job:
         validated_s3_config = validate(job['s3Config'], S3_SCHEMA)
         if 'errors' in validated_s3_config:
@@ -258,19 +259,31 @@ def everydream_runner(job):
     # Set default values for optional parameters
     train_input['project_name'] = job['id']
     train_input['gpuid'] = 0
-    train_input['logdir'] = "logs"
+    train_input['logdir'] = "job_files/logs"
     train_input['log_step'] = 25
     train_input['lowvram'] = False
     train_input['notebook'] = False
     train_input['num_workers'] = 0
-    train_input['save_ckpt_dir'] = None
+    train_input['save_ckpt_dir'] = f"job_files/{job['id']}"
     train_input['save_every_n_epochs'] = None
     train_input['wandb'] = False
     train_input['write_schedule'] = False
 
+    os.makedirs(f"job_files/{job['id']}", exist_ok=True)
+
     # ------------------------------- Run Training ------------------------------- #
     train_input = DefaultMunch.fromDict(train_input)
     train.main(train_input)
+
+    # ------------------------------- Upload Files ------------------------------- #
+    if 's3Config' in job:
+        job_output_files = os.listdir(f"job_files/{job['id']}")
+        for file in job_output_files:
+            if file.endswith(".ckpt"):
+                rp_upload.file(f"{job['id']}.ckpt", f"job_files/{job['id']}/{file}", s3_config)
+
+    # --------------------------------- Clean Up --------------------------------- #
+    rp_cleanup.clean(['job_files'])
 
 
 runpod.serverless.start({"handler": everydream_runner})
