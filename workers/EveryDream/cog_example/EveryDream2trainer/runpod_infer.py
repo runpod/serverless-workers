@@ -12,7 +12,7 @@ import re
 from munch import DefaultMunch
 
 import train
-from .utils import convert_original_stable_diffusion_to_diffusers
+from utils import convert_original_stable_diffusion_to_diffusers
 
 import runpod
 from runpod.serverless.utils import rp_download, rp_cleanup, rp_upload
