@@ -280,7 +280,7 @@ def everydream_runner(job):
     train_input = validated_train_input['validated_input']
 
     # Validate the inference input
-    if 's3Config' not in job_input or 'inference' not in job_input:
+    if 's3Config' not in job and 'inference' not in job_input:
         return {"error": "Please provide either an inference input or an S3 config."}
     for index, inference_input in enumerate(job_input['inference']):
         validated_inf_input = validate(inference_input, INFERENCE_SCHEMA)
