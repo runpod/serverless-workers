@@ -12,6 +12,7 @@ import re
 from munch import DefaultMunch
 
 import train
+from .utils import convert_original_stable_diffusion_to_diffusers
 
 import runpod
 from runpod.serverless.utils import rp_download, rp_cleanup, rp_upload
@@ -343,6 +344,17 @@ def everydream_runner(job):
     # ------------------------------- Run Training ------------------------------- #
     train_input = DefaultMunch.fromDict(train_input)
     train.main(train_input)
+
+    job_output_files = os.listdir(f"job_files/{job['id']}")
+    for file in job_output_files:
+        if file.endswith(".ckpt"):
+            trained_ckpt_file = file
+    trained_ckpt = f"job_files/{job['id']}/{trained_ckpt_file}"
+
+    # ------------------------------- Run Inference ------------------------------ #
+    # if 'inference' in job_input:
+    #     # Convert .ckpt to Diffusers
+
     job_output = {}
     job_output['train'] = {}
 
@@ -361,15 +373,11 @@ def everydream_runner(job):
             job_output['train']['samples'] = sample_urls
 
         # Upload the checkpoint file
-        job_output_files = os.listdir(f"job_files/{job['id']}")
-        for file in job_output_files:
-            if file.endswith(".ckpt"):
-                ckpt_url = rp_upload.file(
-                    f"{job['id']}.ckpt", f"job_files/{job['id']}/{file}", s3_config)
-                job_output['train']['checkpoint_url'] = ckpt_url
+        ckpt_url = rp_upload.file(f"{job['id']}.ckpt", trained_ckpt, s3_config)
+        job_output['train']['checkpoint_url'] = ckpt_url
 
     # --------------------------------- Clean Up --------------------------------- #
-    rp_cleanup.clean(['job_files'])
+    # rp_cleanup.clean(['job_files'])
 
     return job_output
 

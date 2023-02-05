@@ -11,6 +11,13 @@ from diffusers import (
     EulerDiscreteScheduler,
     EulerAncestralDiscreteScheduler,
     DPMSolverMultistepScheduler,
+
+    DDPMScheduler,
+    DPMSolverSinglestepScheduler,
+    HeunDiscreteScheduler,
+    IPNDMScheduler,
+    KDPM2AncestralDiscreteScheduler,
+    KDPM2DiscreteScheduler,
 )
 from diffusers.pipelines.stable_diffusion.safety_checker import (
     StableDiffusionSafetyChecker,
@@ -134,11 +141,20 @@ class Predictor(BasePredictor):
 
 
 def make_scheduler(name, config):
+    '''
+    Returns a scheduler from a name and config.
+    '''
     return {
-        "PNDM": PNDMScheduler.from_config(config),
-        "KLMS": LMSDiscreteScheduler.from_config(config),
         "DDIM": DDIMScheduler.from_config(config),
-        "K_EULER": EulerDiscreteScheduler.from_config(config),
-        "K_EULER_ANCESTRAL": EulerAncestralDiscreteScheduler.from_config(config),
-        "DPMSolverMultistep": DPMSolverMultistepScheduler.from_config(config),
+        "DDPM": DDPMScheduler.from_config(config),
+        "DPM-M": DPMSolverMultistepScheduler.from_config(config),
+        "DPM-S": DPMSolverSinglestepScheduler.from_config(config),
+        "EULER-A": EulerAncestralDiscreteScheduler.from_config(config),
+        "EULER-D": EulerDiscreteScheduler.from_config(config),
+        "HEUN": HeunDiscreteScheduler.from_config(config),
+        "IPNDM": IPNDMScheduler.from_config(config),
+        "KDPM2-A": KDPM2AncestralDiscreteScheduler.from_config(config),
+        "KDPM2-D": KDPM2DiscreteScheduler.from_config(config),
+        "PNDM": PNDMScheduler.from_config(config),
+        "K-LMS": LMSDiscreteScheduler.from_config(config)
     }[name]
