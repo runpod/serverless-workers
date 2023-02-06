@@ -364,21 +364,23 @@ def everydream_runner(job):
 
     # ------------------------------- Run Inference ------------------------------ #
     if 'inference' in job_input:
-        # Convert .ckpt to Diffusers
-        # os.makedirs(f"job_files/{job['id']}/converted_diffuser", exist_ok=True)
-        # subprocess.call([
-        #     "python3", "utils/convert_original_stable_diffusion_to_diffusers.py",
-        #     "--scheduler_type=ddim",
-        #     "--original_config_file=v1-inference.yaml",
-        #     "--image_size=512",
-        #     f"--checkpoint_path={trained_ckpt}",
-        #     "--prediction_type=epsilon",
-        #     "--upcast_attn=False",
-        #     f"--dump_path=job_files/{job['id']}/converted_diffuser"
-        # ])
-        ckpt_dir = f"{next(os.walk('job_files/logs'))[1][0]}/ckpts"
-        ckpt_name = next(os.walk(f"job_files/logs/{ckpt_dir}"))[1][0]
-        ckpt_path = f"job_files/logs/{ckpt_dir}/{ckpt_name}"
+        Convert .ckpt to Diffusers
+        os.makedirs(f"job_files/{job['id']}/converted_diffuser", exist_ok=True)
+        subprocess.call([
+            "python3", "utils/convert_original_stable_diffusion_to_diffusers.py",
+            "--scheduler_type=ddim",
+            "--original_config_file=v1-inference.yaml",
+            "--image_size=512",
+            f"--checkpoint_path={trained_ckpt}",
+            "--prediction_type=epsilon",
+            "--upcast_attn=False",
+            f"--dump_path=job_files/{job['id']}/converted_diffuser"
+        ])
+        ckpt_path = f"job_files/{job['id']}/converted_diffuser"
+
+        # ckpt_dir = f"{next(os.walk('job_files/logs'))[1][0]}/ckpts"
+        # ckpt_name = next(os.walk(f"job_files/logs/{ckpt_dir}"))[1][0]
+        # ckpt_path = f"job_files/logs/{ckpt_dir}/{ckpt_name}"
 
         infer_model = inference.Predictor(ckpt_path)
         infer_model.setup()
