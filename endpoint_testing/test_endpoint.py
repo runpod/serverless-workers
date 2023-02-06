@@ -100,10 +100,11 @@ def run_test(job_in):
 if args.input:
     run_test(args.input)
 else:
-    sample_inputs = os.listdir("sample_inputs")
+    sample_inputs = os.listdir(f"endpoints/{args.endpoint_id}")
     for index, sample_input in enumerate(sample_inputs):
         print()
         print(f"Running Test {index + 1} of {len(sample_inputs)}")
         print("Test Input  | " + sample_input)
-        with open(f'sample_inputs/{sample_input}', 'r', encoding="UTF-8") as sample_file:
-            run_test(json.load(sample_file))
+        with open(f'endpoints/{args.endpoint_id}/{sample_input}', 'r', encoding="UTF-8") as sample_file:
+            sample_input = json.load(sample_file)
+            run_test(sample_input['TestInput'])

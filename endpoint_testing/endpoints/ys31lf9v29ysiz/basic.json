@@ -1,0 +1,15 @@
+{
+    "TestInput": {
+        "train": {
+            "data_url": "https://github.com/runpod/serverless-workers/blob/main/Input-Samples/cat_pictures.zip?raw=true"
+        },
+        "inference": [
+            {
+                "prompt": "runpod_cat stuck in a tree"
+            }
+        ]
+    },
+    "TestOutput": {
+        "output": {}
+    }
+}
