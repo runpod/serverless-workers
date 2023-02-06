@@ -30,18 +30,15 @@ from diffusers.pipelines.stable_diffusion.safety_checker import (
 
 
 class Predictor(BasePredictor):
-    def __init__(self, model_id, model_cache):
-        self.model_id = model_id
-        self.model_cache = model_cache
+    def __init__(self, model_path):
+        self.model_path = model_path
 
     def setup(self):
         """Load the model into memory to make running multiple predictions efficient"""
         print("Loading pipeline...")
         self.pipe = StableDiffusionPipeline.from_pretrained(
-            self.model_id,
+            self.model_path,
             safety_checker=None,
-            # safety_checker=safety_checker,
-            cache_dir=self.model_cache,
             local_files_only=True,
         ).to("cuda")
 

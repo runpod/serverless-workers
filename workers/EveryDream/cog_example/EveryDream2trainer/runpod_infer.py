@@ -343,6 +343,10 @@ def everydream_runner(job):
 
     os.makedirs(f"job_files/{job['id']}", exist_ok=True)
 
+    job_output = {}
+    job_output['train'] = {}
+    job_output['inference'] = []
+
     # ------------------------------- Run Training ------------------------------- #
     train_input = DefaultMunch.fromDict(train_input)
     train.main(train_input)
@@ -370,8 +374,33 @@ def everydream_runner(job):
         infer_model = inference.Predictor("converted_diffuser", f"job_files/{job['id']}")
         infer_model.setup()
 
-    job_output = {}
-    job_output['train'] = {}
+        for inference_input in job_input['inference']:
+            img_paths = infer_model.predict(
+                prompt=inference_input["prompt"],
+                negative_prompt=inference_input["negative_prompt"],
+                width=inference_input['width'],
+                height=inference_input['height'],
+                num_outputs=inference_input['num_outputs'],
+                num_inference_steps=inference_input['num_inference_steps'],
+                guidance_scale=inference_input['guidance_scale'],
+                scheduler=inference_input['scheduler'],
+                seed=inference_input['seed']
+            )
+
+            for index, img_path in enumerate(img_paths):
+                image_url = rp_upload.upload_image(job['id'], img_path, index)
+
+                job_output['inference'].append({
+                    "image": image_url,
+                    "prompt": inference_input["prompt"],
+                    "negative_prompt": inference_input["negative_prompt"],
+                    "width": inference_input['width'],
+                    "height": inference_input['height'],
+                    "num_inference_steps": inference_input['num_inference_steps'],
+                    "guidance_scale": inference_input['guidance_scale'],
+                    "scheduler": inference_input['scheduler'],
+                    "seed": inference_input['seed'] + index
+                })
 
     # ------------------------------- Upload Files ------------------------------- #
     if 's3Config' in job:
