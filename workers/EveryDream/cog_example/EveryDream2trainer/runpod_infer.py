@@ -427,7 +427,7 @@ def everydream_runner(job):
         job_output['train']['checkpoint_url'] = ckpt_url
 
     # --------------------------------- Clean Up --------------------------------- #
-    rp_cleanup.clean(['job_files'])
+    # rp_cleanup.clean(['job_files'])
 
     return job_output
 
