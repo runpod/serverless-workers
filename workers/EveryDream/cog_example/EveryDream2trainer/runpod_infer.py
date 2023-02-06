@@ -365,7 +365,7 @@ def everydream_runner(job):
             f"--checkpoint_path={trained_ckpt}",
             "--prediction_type=epsilon",
             "--upcast_attn=False",
-            f"--dump_path=\"job_files/{job['id']}/converted_diffuser\""
+            f"--dump_path=job_files/{job['id']}/converted_diffuser"
         ])
         infer_model = inference.Predictor("converted_diffuser", f"job_files/{job['id']}")
         infer_model.setup()
