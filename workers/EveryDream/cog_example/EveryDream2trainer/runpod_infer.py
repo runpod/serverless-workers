@@ -364,7 +364,7 @@ def everydream_runner(job):
 
     # ------------------------------- Run Inference ------------------------------ #
     if 'inference' in job_input:
-        Convert .ckpt to Diffusers
+        # Convert .ckpt to Diffusers
         os.makedirs(f"job_files/{job['id']}/converted_diffuser", exist_ok=True)
         subprocess.call([
             "python3", "utils/convert_original_stable_diffusion_to_diffusers.py",
