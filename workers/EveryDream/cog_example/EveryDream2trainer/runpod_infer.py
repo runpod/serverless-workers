@@ -13,7 +13,7 @@ import subprocess
 from munch import DefaultMunch
 
 import train
-from utils import convert_original_stable_diffusion_to_diffusers
+import inference
 
 import runpod
 from runpod.serverless.utils import rp_download, rp_cleanup, rp_upload
@@ -365,8 +365,10 @@ def everydream_runner(job):
             f"--checkpoint_path={trained_ckpt}",
             "--prediction_type=epsilon",
             "--upcast_attn=False",
-            f"--dump_path='job_files/{job['id']}/converted_diffuser'"
+            f"--dump_path=\"job_files/{job['id']}/converted_diffuser\""
         ])
+        infer_model = inference.Predictor("converted_diffuser", f"job_files/{job['id']}")
+        infer_model.setup()
 
     job_output = {}
     job_output['train'] = {}
