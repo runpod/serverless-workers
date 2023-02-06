@@ -378,7 +378,7 @@ def everydream_runner(job):
         # ])
         ckpt_dir = f"{next(os.walk('job_files/logs'))[1][0]}/ckpts"
         ckpt_name = next(os.walk(f"job_files/logs/{ckpt_dir}"))[1][0]
-        ckpt_path = f"job_files/logs/{ckpt_dir}/{ckpt_name}/model.ckpt"
+        ckpt_path = f"job_files/logs/{ckpt_dir}/{ckpt_name}"
 
         infer_model = inference.Predictor(ckpt_path)
         infer_model.setup()
