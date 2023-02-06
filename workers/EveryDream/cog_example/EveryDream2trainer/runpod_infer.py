@@ -8,6 +8,7 @@ It will then call the model, and return the results.
 
 import os
 import re
+import subprocess
 
 from munch import DefaultMunch
 
@@ -353,8 +354,18 @@ def everydream_runner(job):
     trained_ckpt = f"job_files/{job['id']}/{trained_ckpt_file}"
 
     # ------------------------------- Run Inference ------------------------------ #
-    # if 'inference' in job_input:
-    #     # Convert .ckpt to Diffusers
+    if 'inference' in job_input:
+        # Convert .ckpt to Diffusers
+        subprocess.call([
+            "python3", "utils/convert_original_stable_diffusion_to_diffusers.py",
+            "--scheduler_type=ddim",
+            "--original_config_file=v1-inference.yaml",
+            "--image_size=512",
+            f"--checkpoint_path={trained_ckpt}",
+            "--prediction_type=epsilon",
+            "--upcast_attn=False",
+            f"--dump_path='job_files/{job['id']}/converted_diffuser'"
+        ])
 
     job_output = {}
     job_output['train'] = {}
