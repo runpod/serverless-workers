@@ -371,7 +371,7 @@ def everydream_runner(job):
             "--upcast_attn=False",
             f"--dump_path=job_files/{job['id']}/converted_diffuser"
         ])
-        infer_model = inference.Predictor("converted_diffuser", f"job_files/{job['id']}")
+        infer_model = inference.Predictor(f"job_files/{job['id']}/converted_diffuser")
         infer_model.setup()
 
         for inference_input in job_input['inference']:
