@@ -237,6 +237,11 @@ INFERENCE_SCHEMA = {
         'required': False,
         'default': 555
     },
+    'passback': {
+        'type': str,
+        'required': False,
+        'default': None
+    }
 }
 
 S3_SCHEMA = {
@@ -399,7 +404,8 @@ def everydream_runner(job):
                     "num_inference_steps": inference_input['num_inference_steps'],
                     "guidance_scale": inference_input['guidance_scale'],
                     "scheduler": inference_input['scheduler'],
-                    "seed": inference_input['seed'] + index
+                    "seed": inference_input['seed'] + index,
+                    "passback": inference_input["passback"]
                 })
 
     # ------------------------------- Upload Files ------------------------------- #
@@ -421,7 +427,7 @@ def everydream_runner(job):
         job_output['train']['checkpoint_url'] = ckpt_url
 
     # --------------------------------- Clean Up --------------------------------- #
-    # rp_cleanup.clean(['job_files'])
+    rp_cleanup.clean(['job_files'])
 
     return job_output
 
