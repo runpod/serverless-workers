@@ -235,7 +235,7 @@ INFERENCE_SCHEMA = {
     'seed': {
         'type': int,
         'required': False,
-        'default': 555
+        'default': int.from_bytes(os.urandom(2), "big")
     },
     'passback': {
         'type': str,
@@ -399,7 +399,7 @@ def everydream_runner(job):
             )
 
             for index, img_path in enumerate(img_paths):
-                image_url = rp_upload.upload_image(job['id'], img_path, index)
+                image_url = rp_upload.upload_image(job['id'], img_path)
 
                 job_output['inference'].append({
                     "image": image_url,
