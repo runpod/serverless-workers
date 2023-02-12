@@ -363,14 +363,14 @@ def everydream_runner(job):
             for index, image in enumerate(concept_images):
                 file_type = image.split(".")[-1]
 
-                if job_input['concept']['autocaption']:
+                if concept_input['autocaption']:
                     img = Image.open(os.path.join(train_input['data_root'], image)).convert("RGB")
                     ci = Interrogator(Config(clip_model_name="ViT-L-14/openai"))
                     caption = ci.interrogate(img)
 
                     caption_tokenized = caption.replace(
-                        job_input['concept']['alias'],
-                        f"{job_input['concept']['token_name']} {job_input['concept']['alias']}"
+                        concept_input['alias'],
+                        f"{concept_input['token_name']} {concept_input['alias']}"
                     )
 
                     os.rename(
@@ -381,7 +381,7 @@ def everydream_runner(job):
                     os.rename(
                         os.path.join(train_input['data_root'], image),
                         os.path.join(
-                            train_input['data_root'], f"{job_input['concept']['token_name']}_{index}.{file_type}")
+                            train_input['data_root'], f"{concept_input['token_name']}_{index}.{file_type}")
                     )
 
         # ------------------------------- Format Inputs ------------------------------ #
