@@ -3,7 +3,7 @@
         "concept": {
             "token_name": "abc123zeref",
             "alias": "dog",
-            "autocaption": "true"
+            "autocaption": true
         },
         "train": {
             "data_url": "https://github.com/runpod/serverless-workers/blob/main/Input-Samples/runpod_dog.zip?raw=true"
