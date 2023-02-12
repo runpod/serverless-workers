@@ -306,26 +306,26 @@ def everydream_runner(job):
     if 'concept' in job_input:
         validated_concept_input = validate(job_input['concept'], CONCEPT_SCHEMA)
         if 'errors' in validated_concept_input:
-            job_output = {"error": validated_concept_input['errors']}
+            return {"error": validated_concept_input['errors']}
     concept_input = validated_concept_input['validated_input']
 
     # Validate the training input
     if 'train' not in job_input:
-        job_output = {"error": "No training input provided."}
+        return {"error": "No training input provided."}
 
     validated_train_input = validate(job_input['train'], TRAIN_SCHEMA)
     if 'errors' in validated_train_input:
-        job_output = {"error": validated_train_input['errors']}
+        return {"error": validated_train_input['errors']}
     train_input = validated_train_input['validated_input']
 
     # Validate the inference input
     if 's3Config' not in job and 'inference' not in job_input:
-        job_output = {"error": "Please provide either an inference input or an S3 config."}
+        return {"error": "Please provide either an inference input or an S3 config."}
     if 'inference' in job_input:
         for index, inference_input in enumerate(job_input['inference']):
             validated_inf_input = validate(inference_input, INFERENCE_SCHEMA)
             if 'errors' in validated_inf_input:
-                job_output = {"error": validated_inf_input['errors']}
+                return {"error": validated_inf_input['errors']}
             job_input['inference'][index] = validated_inf_input['validated_input']
 
     # Validate the S3 config, if provided
@@ -333,7 +333,7 @@ def everydream_runner(job):
     if 's3Config' in job:
         validated_s3_config = validate(job['s3Config'], S3_SCHEMA)
         if 'errors' in validated_s3_config:
-            job_output = {"error": validated_s3_config['errors']}
+            return {"error": validated_s3_config['errors']}
         s3_config = validated_s3_config['validated_input']
 
     try:
