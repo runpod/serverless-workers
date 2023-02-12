@@ -1,7 +1,20 @@
 {
     "input": {
+        "concept": {
+            "token_name": "abc123zeref",
+            "alias": "dog",
+            "autocaption": "true"
+        },
         "train": {
-            "data_url": "https://github.com/runpod/serverless-workers/blob/main/Input-Samples/cat_pictures.zip?raw=true"
-        }
+            "data_url": "https://github.com/runpod/serverless-workers/blob/main/Input-Samples/runpod_dog.zip?raw=true"
+        },
+        "inference": [
+            {
+                "prompt": "abc123zeref as a super dog flying in the sky"
+            },
+            {
+                "prompt": "abc123zeref visiting the great wall of china"
+            }
+        ]
     }
 }

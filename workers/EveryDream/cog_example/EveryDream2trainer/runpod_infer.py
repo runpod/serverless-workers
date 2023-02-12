@@ -11,7 +11,9 @@ import re
 import subprocess
 from importlib import reload
 
+from PIL import Image
 from munch import DefaultMunch
+from clip_interrogator import Config, Interrogator
 
 import train
 import inference
@@ -24,6 +26,23 @@ from runpod.serverless.utils.rp_validator import validate
 # ---------------------------------------------------------------------------- #
 #                                    Schemas                                   #
 # ---------------------------------------------------------------------------- #
+CONCEPT_SCHEMA = {
+    'token_name': {
+        'type': str,
+        'required': True
+    },
+    'alias': {
+        'type': str,
+        'required': True,
+        'constraints': lambda concept_description: concept_description in ["man", "woman", "boy", "girl", "cat", "dog", "person", "guy"]
+    },
+    'autocaption': {
+        'type': bool,
+        'required': False,
+        'default': False
+    }
+}
+
 TRAIN_SCHEMA = {
     'amp': {
         'type': bool,
@@ -283,6 +302,13 @@ def everydream_runner(job):
     job_output['inference'] = []
 
     # -------------------------------- Validation -------------------------------- #
+    # Validate optional concept input
+    if 'concept' in job_input:
+        validated_concept_input = validate(job_input['concept'], CONCEPT_SCHEMA)
+        if 'errors' in validated_concept_input:
+            job_output = {"error": validated_concept_input['errors']}
+    concept_input = validated_concept_input['validated_input']
+
     # Validate the training input
     if 'train' not in job_input:
         job_output = {"error": "No training input provided."}
@@ -329,6 +355,34 @@ def everydream_runner(job):
                 train_input['resume_ckpt'] = rp_download.file(train_input['resume_ckpt_url'])
         else:
             train_input['resume_ckpt'] = train_input['resume_ckpt_url']
+
+        # ---------------------------- Concept Preparation --------------------------- #
+        if 'concept' in job_input:
+            concept_images = os.listdir(train_input['data_root'])
+
+            for index, image in enumerate(concept_images):
+                file_type = image.split(".")[-1]
+
+                if job_input['concept']['autocaption']:
+                    img = Image.open(os.path.join(train_input['data_root'], image)).convert("RGB")
+                    ci = Interrogator(Config(clip_model_name="ViT-L-14/openai"))
+                    caption = ci.interrogate(img)
+
+                    caption_tokenized = caption.replace(
+                        job_input['concept']['alias'],
+                        f"{job_input['concept']['token_name']} {job_input['concept']['alias']}"
+                    )
+
+                    os.rename(
+                        os.path.join(train_input['data_root'], image),
+                        os.path.join(train_input['data_root'], f"{caption_tokenized}.{file_type}")
+                    )
+                else:
+                    os.rename(
+                        os.path.join(train_input['data_root'], image),
+                        os.path.join(
+                            train_input['data_root'], f"{job_input['concept']['token_name']}_{index}.{file_type}")
+                    )
 
         # ------------------------------- Format Inputs ------------------------------ #
         # train_input['sample_prompts'] -> sample_prompts.txt

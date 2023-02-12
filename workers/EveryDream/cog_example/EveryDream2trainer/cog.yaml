@@ -24,6 +24,7 @@ build:
     - "munch==2.5.0"
     - "numpy==1.23.5"
     - "keyboard"
+    - clip-interrogator==0.4.3
     # - "runpod==0.9.0"
 
   run:
