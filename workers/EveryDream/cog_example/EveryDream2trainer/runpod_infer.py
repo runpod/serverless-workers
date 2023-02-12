@@ -9,6 +9,7 @@ It will then call the model, and return the results.
 import os
 import re
 import subprocess
+from importlib import reload
 
 from munch import DefaultMunch
 
@@ -273,7 +274,10 @@ def everydream_runner(job):
     Passes the data to the model to get the results.
     Prepares the resulting output to be returned.
     '''
+    reload(train)
+
     job_input = job['input']
+
     job_output = {}
     job_output['train'] = {}
     job_output['inference'] = []
