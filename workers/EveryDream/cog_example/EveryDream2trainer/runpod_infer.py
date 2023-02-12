@@ -360,29 +360,33 @@ def everydream_runner(job):
         if 'concept' in job_input:
             concept_images = os.listdir(train_input['data_root'])
 
-            for index, image in enumerate(concept_images):
-                file_type = image.split(".")[-1]
+            with Interrogator(Config(clip_model_name="ViT-L-14/openai")) as ci:
+                for index, image in enumerate(concept_images):
+                    file_type = image.split(".")[-1]
 
-                if concept_input['autocaption']:
-                    img = Image.open(os.path.join(train_input['data_root'], image)).convert("RGB")
-                    ci = Interrogator(Config(clip_model_name="ViT-L-14/openai"))
-                    caption = ci.interrogate(img)
+                    if concept_input['autocaption']:
+                        img = Image.open(os.path.join(
+                            train_input['data_root'], image)).convert("RGB")
 
-                    caption_tokenized = caption.replace(
-                        concept_input['alias'],
-                        f"{concept_input['token_name']} {concept_input['alias']}"
-                    )
+                        caption = ci.interrogate(img)
+                        caption = caption.split(",")[0]
 
-                    os.rename(
-                        os.path.join(train_input['data_root'], image),
-                        os.path.join(train_input['data_root'], f"{caption_tokenized}.{file_type}")
-                    )
-                else:
-                    os.rename(
-                        os.path.join(train_input['data_root'], image),
-                        os.path.join(
-                            train_input['data_root'], f"{concept_input['token_name']}_{index}.{file_type}")
-                    )
+                        caption_tokenized = caption.replace(
+                            concept_input['alias'],
+                            f"{concept_input['token_name']} {concept_input['alias']}"
+                        )
+
+                        os.rename(
+                            os.path.join(train_input['data_root'], image),
+                            os.path.join(train_input['data_root'],
+                                         f"{caption_tokenized}.{file_type}")
+                        )
+                    else:
+                        os.rename(
+                            os.path.join(train_input['data_root'], image),
+                            os.path.join(
+                                train_input['data_root'], f"{concept_input['token_name']}_{index}.{file_type}")
+                        )
 
         # ------------------------------- Format Inputs ------------------------------ #
         # train_input['sample_prompts'] -> sample_prompts.txt
