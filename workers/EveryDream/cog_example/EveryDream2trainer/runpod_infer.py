@@ -274,25 +274,28 @@ def everydream_runner(job):
     Prepares the resulting output to be returned.
     '''
     job_input = job['input']
+    job_output = {}
+    job_output['train'] = {}
+    job_output['inference'] = []
 
     # -------------------------------- Validation -------------------------------- #
     # Validate the training input
     if 'train' not in job_input:
-        return {"error": "No training input provided."}
+        job_output = {"error": "No training input provided."}
 
     validated_train_input = validate(job_input['train'], TRAIN_SCHEMA)
     if 'errors' in validated_train_input:
-        return {"error": validated_train_input['errors']}
+        job_output = {"error": validated_train_input['errors']}
     train_input = validated_train_input['validated_input']
 
     # Validate the inference input
     if 's3Config' not in job and 'inference' not in job_input:
-        return {"error": "Please provide either an inference input or an S3 config."}
+        job_output = {"error": "Please provide either an inference input or an S3 config."}
     if 'inference' in job_input:
         for index, inference_input in enumerate(job_input['inference']):
             validated_inf_input = validate(inference_input, INFERENCE_SCHEMA)
             if 'errors' in validated_inf_input:
-                return {"error": validated_inf_input['errors']}
+                job_output = {"error": validated_inf_input['errors']}
             job_input['inference'][index] = validated_inf_input['validated_input']
 
     # Validate the S3 config, if provided
@@ -300,59 +303,54 @@ def everydream_runner(job):
     if 's3Config' in job:
         validated_s3_config = validate(job['s3Config'], S3_SCHEMA)
         if 'errors' in validated_s3_config:
-            return {"error": validated_s3_config['errors']}
+            job_output = {"error": validated_s3_config['errors']}
         s3_config = validated_s3_config['validated_input']
 
-    # --------------------------------- Downloads -------------------------------- #
-    # Convert 'data_url' to 'data_root'
-    downloaded_input = rp_download.file(train_input['data_url'])
-    if downloaded_input['type'] != "zip":
-        return {"error": "data_url must be a zip file"}
-
-    train_input['data_root'] = downloaded_input['extracted_path']
-
-    # Download the resume checkpoint, if provided
-    if train_input['resume_ckpt_url'] != "sd_v1-5_vae.ckpt":
-        # Check if the URL is from huggingface.co, if so, grab the model repo id.
-        if re.match(r"huggingface.co", train_input['resume_ckpt_url']):
-            url_parts = train_input['resume_ckpt_url'].split("/")
-            train_input['resume_ckpt'] = f"{url_parts[-2]}/{url_parts[-1]}"
-        else:
-            train_input['resume_ckpt'] = rp_download.file(train_input['resume_ckpt_url'])
-    else:
-        train_input['resume_ckpt'] = train_input['resume_ckpt_url']
-
-    # ------------------------------- Format Inputs ------------------------------ #
-    # train_input['sample_prompts'] -> sample_prompts.txt
-    if train_input['sample_prompts']:
-        os.makedirs("sample_prompts.txt", exist_ok=True)
-        with open(os.path.join("sample_prompts.txt"), "w", encoding="UTF-8") as sample_file:
-            for prompt in train_input['sample_prompts']:
-                sample_file.write(f"{prompt}\n")
-    else:
-        train_input['sample_prompts'] = "sample_prompts.txt"
-
-    # ------------------------------- Set Defaults ------------------------------- #
-    # Set default values for optional parameters
-    train_input['project_name'] = job['id']
-    train_input['gpuid'] = 0
-    train_input['logdir'] = "job_files/logs"
-    train_input['log_step'] = 25
-    train_input['lowvram'] = False
-    train_input['notebook'] = False
-    train_input['num_workers'] = 0
-    train_input['save_ckpt_dir'] = f"job_files/{job['id']}"
-    train_input['save_every_n_epochs'] = None
-    train_input['wandb'] = False
-    train_input['write_schedule'] = False
-
-    os.makedirs(f"job_files/{job['id']}", exist_ok=True)
-
-    job_output = {}
-    job_output['train'] = {}
-    job_output['inference'] = []
-
     try:
+        # --------------------------------- Downloads -------------------------------- #
+        # Convert 'data_url' to 'data_root'
+        downloaded_input = rp_download.file(train_input['data_url'])
+        if downloaded_input['type'] != "zip":
+            job_output = {"error": "data_url must be a zip file"}
+
+        train_input['data_root'] = downloaded_input['extracted_path']
+
+        # Download the resume checkpoint, if provided
+        if train_input['resume_ckpt_url'] != "sd_v1-5_vae.ckpt":
+            # Check if the URL is from huggingface.co, if so, grab the model repo id.
+            if re.match(r"huggingface.co", train_input['resume_ckpt_url']):
+                url_parts = train_input['resume_ckpt_url'].split("/")
+                train_input['resume_ckpt'] = f"{url_parts[-2]}/{url_parts[-1]}"
+            else:
+                train_input['resume_ckpt'] = rp_download.file(train_input['resume_ckpt_url'])
+        else:
+            train_input['resume_ckpt'] = train_input['resume_ckpt_url']
+
+        # ------------------------------- Format Inputs ------------------------------ #
+        # train_input['sample_prompts'] -> sample_prompts.txt
+        if train_input['sample_prompts']:
+            os.makedirs("sample_prompts.txt", exist_ok=True)
+            with open(os.path.join("sample_prompts.txt"), "w", encoding="UTF-8") as sample_file:
+                for prompt in train_input['sample_prompts']:
+                    sample_file.write(f"{prompt}\n")
+        else:
+            train_input['sample_prompts'] = "sample_prompts.txt"
+
+        # ------------------------------- Set Defaults ------------------------------- #
+        # Set default values for optional parameters
+        train_input['project_name'] = job['id']
+        train_input['gpuid'] = 0
+        train_input['logdir'] = "job_files/logs"
+        train_input['log_step'] = 25
+        train_input['lowvram'] = False
+        train_input['notebook'] = False
+        train_input['num_workers'] = 0
+        train_input['save_ckpt_dir'] = f"job_files/{job['id']}"
+        train_input['save_every_n_epochs'] = None
+        train_input['wandb'] = False
+        train_input['write_schedule'] = False
+
+        os.makedirs(f"job_files/{job['id']}", exist_ok=True)
 
         # ------------------------------- Run Training ------------------------------- #
         train_input = DefaultMunch.fromDict(train_input)
@@ -439,7 +437,7 @@ def everydream_runner(job):
         # --------------------------------- Clean Up --------------------------------- #
         rp_cleanup.clean(['job_files'])
 
-        return job_output
+    return job_output
 
 
 # ---------------------------------------------------------------------------- #
