@@ -52,7 +52,7 @@ TRAIN_SCHEMA = {
     'batch_size': {
         'type': int,
         'required': False,
-        'default': 2
+        'default': 4
     },
     'ckpt_every_n_minutes': {
         'type': int,
@@ -119,7 +119,7 @@ TRAIN_SCHEMA = {
     'lr': {
         'type': float,
         'required': False,
-        'default': None
+        'default': 1.5e-6
     },
     'lr_decay_steps': {
         'type': int,
@@ -140,7 +140,7 @@ TRAIN_SCHEMA = {
     'max_epochs': {
         'type': int,
         'required': False,
-        'default': 300
+        'default': 200
     },
     'resolution': {
         'type': int,
@@ -166,7 +166,7 @@ TRAIN_SCHEMA = {
     'save_full_precision': {
         'type': bool,
         'required': False,
-        'default': False
+        'default': True
     },
     'save_optimizer': {
         'type': bool,
@@ -186,7 +186,7 @@ TRAIN_SCHEMA = {
     'shuffle_tags': {
         'type': bool,
         'required': False,
-        'default': False
+        'default': True
     },
     'useadam8bit': {
         'type': bool,
@@ -360,13 +360,12 @@ def everydream_runner(job):
         if 'concept' in job_input:
             concept_images = os.listdir(train_input['data_root'])
 
+            ci = Interrogator(Config(clip_model_name="ViT-L-14/openai"))
             for index, image in enumerate(concept_images):
                 file_type = image.split(".")[-1]
 
                 if concept_input['autocaption']:
-                    img = Image.open(os.path.join(
-                        train_input['data_root'], image)).convert("RGB")
-                    ci = Interrogator(Config(clip_model_name="ViT-L-14/openai"))
+                    img = Image.open(os.path.join(train_input['data_root'], image)).convert("RGB")
                     caption = ci.interrogate(img)
                     caption = caption.split(",")[0]
 
@@ -383,8 +382,8 @@ def everydream_runner(job):
                 else:
                     os.rename(
                         os.path.join(train_input['data_root'], image),
-                        os.path.join(
-                            train_input['data_root'], f"{concept_input['token_name']}_{index}.{file_type}")
+                        os.path.join(train_input['data_root'],
+                                     f"{concept_input['token_name']}_{index}.{file_type}")
                     )
 
         # ------------------------------- Format Inputs ------------------------------ #
@@ -499,6 +498,7 @@ def everydream_runner(job):
         # rp_cleanup.clean(['job_files'])
         pass
 
+    # job_output['stopPod'] = True
     return job_output
 
 
