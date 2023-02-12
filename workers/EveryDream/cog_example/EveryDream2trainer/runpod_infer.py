@@ -352,90 +352,94 @@ def everydream_runner(job):
     job_output['train'] = {}
     job_output['inference'] = []
 
-    # ------------------------------- Run Training ------------------------------- #
-    train_input = DefaultMunch.fromDict(train_input)
-    train.main(train_input)
+    try:
 
-    job_output_files = os.listdir(f"job_files/{job['id']}")
-    for file in job_output_files:
-        if file.endswith(".ckpt"):
-            trained_ckpt_file = file
-    trained_ckpt = f"job_files/{job['id']}/{trained_ckpt_file}"
+        # ------------------------------- Run Training ------------------------------- #
+        train_input = DefaultMunch.fromDict(train_input)
+        train.main(train_input)
 
-    # ------------------------------- Run Inference ------------------------------ #
-    if 'inference' in job_input:
-        # Convert .ckpt to Diffusers
-        os.makedirs(f"job_files/{job['id']}/converted_diffuser", exist_ok=True)
-        subprocess.call([
-            "python3", "utils/convert_original_stable_diffusion_to_diffusers.py",
-            "--scheduler_type=ddim",
-            "--original_config_file=v1-inference.yaml",
-            "--image_size=512",
-            f"--checkpoint_path={trained_ckpt}",
-            "--prediction_type=epsilon",
-            "--upcast_attn=False",
-            f"--dump_path=job_files/{job['id']}/converted_diffuser"
-        ])
-        ckpt_path = f"job_files/{job['id']}/converted_diffuser"
+        job_output_files = os.listdir(f"job_files/{job['id']}")
+        for file in job_output_files:
+            if file.endswith(".ckpt"):
+                trained_ckpt_file = file
+        trained_ckpt = f"job_files/{job['id']}/{trained_ckpt_file}"
 
-        # ckpt_dir = f"{next(os.walk('job_files/logs'))[1][0]}/ckpts"
-        # ckpt_name = next(os.walk(f"job_files/logs/{ckpt_dir}"))[1][0]
-        # ckpt_path = f"job_files/logs/{ckpt_dir}/{ckpt_name}"
+        # ------------------------------- Run Inference ------------------------------ #
+        if 'inference' in job_input:
+            # Convert .ckpt to Diffusers
+            os.makedirs(f"job_files/{job['id']}/converted_diffuser", exist_ok=True)
+            subprocess.call([
+                "python3", "utils/convert_original_stable_diffusion_to_diffusers.py",
+                "--scheduler_type=ddim",
+                "--original_config_file=v1-inference.yaml",
+                "--image_size=512",
+                f"--checkpoint_path={trained_ckpt}",
+                "--prediction_type=epsilon",
+                "--upcast_attn=False",
+                f"--dump_path=job_files/{job['id']}/converted_diffuser"
+            ])
+            ckpt_path = f"job_files/{job['id']}/converted_diffuser"
 
-        infer_model = inference.Predictor(ckpt_path)
-        infer_model.setup()
+            # ckpt_dir = f"{next(os.walk('job_files/logs'))[1][0]}/ckpts"
+            # ckpt_name = next(os.walk(f"job_files/logs/{ckpt_dir}"))[1][0]
+            # ckpt_path = f"job_files/logs/{ckpt_dir}/{ckpt_name}"
 
-        for inference_input in job_input['inference']:
-            img_paths = infer_model.predict(
-                prompt=inference_input["prompt"],
-                negative_prompt=inference_input["negative_prompt"],
-                width=inference_input['width'],
-                height=inference_input['height'],
-                num_outputs=inference_input['num_outputs'],
-                num_inference_steps=inference_input['num_inference_steps'],
-                guidance_scale=inference_input['guidance_scale'],
-                scheduler=inference_input['scheduler'],
-                seed=inference_input['seed']
-            )
+            infer_model = inference.Predictor(ckpt_path)
+            infer_model.setup()
 
-            for index, img_path in enumerate(img_paths):
-                image_url = rp_upload.upload_image(job['id'], img_path)
+            for inference_input in job_input['inference']:
+                img_paths = infer_model.predict(
+                    prompt=inference_input["prompt"],
+                    negative_prompt=inference_input["negative_prompt"],
+                    width=inference_input['width'],
+                    height=inference_input['height'],
+                    num_outputs=inference_input['num_outputs'],
+                    num_inference_steps=inference_input['num_inference_steps'],
+                    guidance_scale=inference_input['guidance_scale'],
+                    scheduler=inference_input['scheduler'],
+                    seed=inference_input['seed']
+                )
 
-                job_output['inference'].append({
-                    "image": image_url,
-                    "prompt": inference_input["prompt"],
-                    "negative_prompt": inference_input["negative_prompt"],
-                    "width": inference_input['width'],
-                    "height": inference_input['height'],
-                    "num_inference_steps": inference_input['num_inference_steps'],
-                    "guidance_scale": inference_input['guidance_scale'],
-                    "scheduler": inference_input['scheduler'],
-                    "seed": inference_input['seed'] + index,
-                    "passback": inference_input["passback"]
-                })
+                for index, img_path in enumerate(img_paths):
+                    image_url = rp_upload.upload_image(job['id'], img_path)
 
-    # ------------------------------- Upload Files ------------------------------- #
-    if 's3Config' in job:
+                    job_output['inference'].append({
+                        "image": image_url,
+                        "prompt": inference_input["prompt"],
+                        "negative_prompt": inference_input["negative_prompt"],
+                        "width": inference_input['width'],
+                        "height": inference_input['height'],
+                        "num_inference_steps": inference_input['num_inference_steps'],
+                        "guidance_scale": inference_input['guidance_scale'],
+                        "scheduler": inference_input['scheduler'],
+                        "seed": inference_input['seed'] + index,
+                        "passback": inference_input["passback"]
+                    })
 
-        # Upload the sample images
-        if os.path.exists(f"job_files/{job['id']}/logs/samples"):
-            sample_images = os.listdir(f"job_files/{job['id']}/logs/samples")
-            sample_urls = []
-            for sample_image in sample_images:
-                if sample_image.endswith(".jpg"):
-                    sample_url = rp_upload.file(
-                        f"{job['id']}/{sample_image}", f"job_files/{job['id']}/logs/samples/{sample_image}", s3_config)
-                    sample_urls.append(sample_url)
-            job_output['train']['samples'] = sample_urls
+        # ------------------------------- Upload Files ------------------------------- #
+        if 's3Config' in job:
 
-        # Upload the checkpoint file
-        ckpt_url = rp_upload.file(f"{job['id']}.ckpt", trained_ckpt, s3_config)
-        job_output['train']['checkpoint_url'] = ckpt_url
+            # Upload the sample images
+            if os.path.exists(f"job_files/{job['id']}/logs/samples"):
+                sample_images = os.listdir(f"job_files/{job['id']}/logs/samples")
+                sample_urls = []
+                for sample_image in sample_images:
+                    if sample_image.endswith(".jpg"):
+                        sample_url = rp_upload.file(
+                            f"{job['id']}/{sample_image}", f"job_files/{job['id']}/logs/samples/{sample_image}", s3_config)
+                        sample_urls.append(sample_url)
+                job_output['train']['samples'] = sample_urls
 
-    # --------------------------------- Clean Up --------------------------------- #
-    rp_cleanup.clean(['job_files'])
+            # Upload the checkpoint file
+            ckpt_url = rp_upload.file(f"{job['id']}.ckpt", trained_ckpt, s3_config)
+            job_output['train']['checkpoint_url'] = ckpt_url
 
-    return job_output
+    finally:
+
+        # --------------------------------- Clean Up --------------------------------- #
+        rp_cleanup.clean(['job_files'])
+
+        return job_output
 
 
 # ---------------------------------------------------------------------------- #

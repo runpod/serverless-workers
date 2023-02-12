@@ -11,7 +11,7 @@
             "disable_textenc_training": true,
             "disable_unet_training": true,
             "disable_xformers": true,
-            "flip_p:": 0.5,
+            "flip_p": 0.5,
             "gradient_checkpointing": true,
             "grad_accum": 3,
             "lr": 0.0001,
