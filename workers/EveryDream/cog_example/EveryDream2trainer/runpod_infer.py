@@ -493,7 +493,7 @@ def everydream_runner(job):
     finally:
 
         # --------------------------------- Clean Up --------------------------------- #
-        rp_cleanup.clean(['job_files'])
+        # rp_cleanup.clean(['job_files'])
 
     return job_output
 
