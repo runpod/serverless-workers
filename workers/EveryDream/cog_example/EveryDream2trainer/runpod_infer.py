@@ -336,26 +336,26 @@ def everydream_runner(job):
             return {"error": validated_s3_config['errors']}
         s3_config = validated_s3_config['validated_input']
 
-    try:
-        # --------------------------------- Downloads -------------------------------- #
-        # Convert 'data_url' to 'data_root'
-        downloaded_input = rp_download.file(train_input['data_url'])
-        if downloaded_input['type'] != "zip":
-            job_output = {"error": "data_url must be a zip file"}
+    # --------------------------------- Downloads -------------------------------- #
+    # Convert 'data_url' to 'data_root'
+    downloaded_input = rp_download.file(train_input['data_url'])
+    if downloaded_input['type'] != "zip":
+        return {"error": "data_url must be a zip file"}
 
-        train_input['data_root'] = downloaded_input['extracted_path']
+    train_input['data_root'] = downloaded_input['extracted_path']
 
-        # Download the resume checkpoint, if provided
-        if train_input['resume_ckpt_url'] != "sd_v1-5_vae.ckpt":
-            # Check if the URL is from huggingface.co, if so, grab the model repo id.
-            if re.match(r"huggingface.co", train_input['resume_ckpt_url']):
-                url_parts = train_input['resume_ckpt_url'].split("/")
-                train_input['resume_ckpt'] = f"{url_parts[-2]}/{url_parts[-1]}"
-            else:
-                train_input['resume_ckpt'] = rp_download.file(train_input['resume_ckpt_url'])
+    # Download the resume checkpoint, if provided
+    if train_input['resume_ckpt_url'] != "sd_v1-5_vae.ckpt":
+        # Check if the URL is from huggingface.co, if so, grab the model repo id.
+        if re.match(r"huggingface.co", train_input['resume_ckpt_url']):
+            url_parts = train_input['resume_ckpt_url'].split("/")
+            train_input['resume_ckpt'] = f"{url_parts[-2]}/{url_parts[-1]}"
         else:
-            train_input['resume_ckpt'] = train_input['resume_ckpt_url']
+            train_input['resume_ckpt'] = rp_download.file(train_input['resume_ckpt_url'])
+    else:
+        train_input['resume_ckpt'] = train_input['resume_ckpt_url']
 
+    try:
         # ---------------------------- Concept Preparation --------------------------- #
         if 'concept' in job_input:
             concept_images = os.listdir(train_input['data_root'])
