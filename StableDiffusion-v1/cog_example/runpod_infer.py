@@ -12,7 +12,7 @@ MODEL = predict.Predictor()
 MODEL.setup()
 
 
-INPUT_VALIDATIONS = {
+INPUT_SCHEMA = {
     'prompt': {
         'type': str,
         'required': True
@@ -76,7 +76,7 @@ INPUT_VALIDATIONS = {
     'seed': {
         'type': int,
         'required': False,
-        'default': None
+        'default': int.from_bytes(os.urandom(2), "big")
     },
     'nsfw': {
         'type': bool,
@@ -93,23 +93,17 @@ def run(job):
     '''
     job_input = job['input']
 
-    # Convert prompt_strength and guidance_scale to float
-    job_input['prompt_strength'] = float(job_input.get('prompt_strength', 0.8))
-    job_input['guidance_scale'] = float(job_input.get('guidance_scale', 7.5))
-
     # Input validation
-    input_errors = validate(job_input, INPUT_VALIDATIONS)
+    validated_input = validate(job_input, INPUT_SCHEMA)
 
-    if input_errors:
-        return {"error": input_errors}
+    if 'errors' in validated_input:
+        return {"error": validated_input['errors']}
+    validated_input = validated_input['validated_input']
 
     # Download input objects
     job_input['init_image'], job_input['mask'] = rp_download.download_input_objects(
         [job_input.get('init_image', None), job_input.get('mask', None)]
     )  # pylint: disable=unbalanced-tuple-unpacking
-
-    # Set seed if not provided
-    job_input['seed'] = job_input.get('seed', int.from_bytes(os.urandom(2), "big"))
 
     MODEL.NSFW = job_input.get('nsfw', True)
 
@@ -125,7 +119,7 @@ def run(job):
         num_inference_steps=job_input.get('num_inference_steps', 50),
         guidance_scale=job_input['guidance_scale'],
         scheduler=job_input.get('scheduler', "K-LMS"),
-        seed=job_input.get('seed', None)
+        seed=job_input['seed']
     )
 
     job_output = []
