@@ -4,61 +4,85 @@ import os
 import predict
 
 import runpod
-from runpod.serverless.utils import upload, validator, download, rp_cleanup
+from runpod.serverless.utils import rp_download, rp_upload, rp_cleanup
+from runpod.serverless.utils.rp_validator import validate
 
 
 MODEL = predict.Predictor()
 MODEL.setup()
 
 
-INPUT_VALIDATIONS = {
+INPUT_SCHEMA = {
     'prompt': {
         'type': str,
         'required': True
     },
     'negative_prompt': {
         'type': str,
-        'required': False
+        'required': False,
+        'default': None
     },
     'width': {
         'type': int,
-        'required': False
+        'required': False,
+        'default': 512,
+        'constraints': lambda width: width in [128, 256, 384, 448, 512, 576, 640, 704, 768]
     },
     'height': {
         'type': int,
-        'required': False
+        'required': False,
+        'default': 512,
+        'constraints': lambda height: height in [128, 256, 384, 448, 512, 576, 640, 704, 768]
     },
     'init_image': {
         'type': str,
-        'required': False
+        'required': False,
+        'default': None
     },
     'mask': {
         'type': str,
-        'required': False
+        'required': False,
+        'default': None
     },
     'prompt_strength': {
         'type': float,
-        'required': False
+        'required': False,
+        'default': 0.8,
+        'constraints': lambda prompt_strength: 0 <= prompt_strength <= 1
     },
     'num_outputs': {
         'type': int,
-        'required': False
+        'required': False,
+        'default': 1,
+        'constraints': lambda num_outputs: 10 > num_outputs > 0
     },
     'num_inference_steps': {
         'type': int,
-        'required': False
+        'required': False,
+        'default': 50,
+        'constraints': lambda num_inference_steps: 0 < num_inference_steps < 500
     },
     'guidance_scale': {
         'type': float,
-        'required': False
+        'required': False,
+        'default': 7.5,
+        'constraints': lambda guidance_scale: 0 < guidance_scale < 20
     },
     'scheduler': {
         'type': str,
-        'required': False
+        'required': False,
+        'default': 'K-LMS',
+        'constraints': lambda scheduler: scheduler in ['DDIM', 'DDPM', 'DPM-M', 'DPM-S',  'EULER-A', 'EULER-D', 'HEUN', 'IPNDM', 'KDPM2-A', 'KDPM2-D', 'PNDM', 'K-LMS']
     },
     'seed': {
         'type': int,
-        'required': False
+        'required': False,
+        'default': int.from_bytes(os.urandom(2), "big")
+    },
+    'nsfw': {
+        'type': bool,
+        'required': False,
+        'default': False
     }
 }
 
@@ -70,21 +94,19 @@ def run(job):
     '''
     job_input = job['input']
 
-    # Convert prompt_strength and guidance_scale to float
-    job_input['prompt_strength'] = float(job_input.get('prompt_strength', 0.8))
-    job_input['guidance_scale'] = float(job_input.get('guidance_scale', 7.5))
+    # Input validation
+    validated_input = validate(job_input, INPUT_SCHEMA)
 
-    input_errors = validator.validate(job_input, INPUT_VALIDATIONS)
-    if input_errors:
-        return {"error": input_errors}
+    if 'errors' in validated_input:
+        return {"error": validated_input['errors']}
+    validated_input = validated_input['validated_input']
 
     # Download input objects
-    job_input['init_image'], job_input['mask'] = download.download_input_objects(
+    job_input['init_image'], job_input['mask'] = rp_download.download_input_objects(
         [job_input.get('init_image', None), job_input.get('mask', None)]
-    )
+    )  # pylint: disable=unbalanced-tuple-unpacking
 
-    # Set seed if not provided
-    job_input['seed'] = job_input.get('seed', int.from_bytes(os.urandom(2), "big"))
+    MODEL.NSFW = job_input.get('nsfw', True)
 
     img_paths = MODEL.predict(
         prompt=job_input["prompt"],
@@ -102,9 +124,8 @@ def run(job):
     )
 
     job_output = []
-
     for index, img_path in enumerate(img_paths):
-        image_url = upload.upload_image(job['id'], img_path, index)
+        image_url = rp_upload.upload_image(job['id'], img_path, index)
 
         job_output.append({
             "image": image_url,

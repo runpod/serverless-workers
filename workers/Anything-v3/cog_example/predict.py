@@ -5,16 +5,35 @@ from typing import List
 
 import torch
 from diffusers import (
-    PNDMScheduler,
-    LMSDiscreteScheduler,
-    DDIMScheduler,
     StableDiffusionPipeline,
     StableDiffusionImg2ImgPipeline,
+    # StableDiffusionInpaintPipeline,
     StableDiffusionInpaintPipelineLegacy,
+
+    DDIMScheduler,
+    DDPMScheduler,
+    # DEISMultistepScheduler,
+    DPMSolverMultistepScheduler,
+    DPMSolverSinglestepScheduler,
+    EulerAncestralDiscreteScheduler,
+    EulerDiscreteScheduler,
+    HeunDiscreteScheduler,
+    IPNDMScheduler,
+    KDPM2AncestralDiscreteScheduler,
+    KDPM2DiscreteScheduler,
+    # KarrasVeScheduler,
+    PNDMScheduler,
+    # RePaintScheduler,
+    # ScoreSdeVeScheduler,
+    # ScoreSdeVpScheduler,
+    # UnCLIPScheduler,
+    # VQDiffusionScheduler,
+    LMSDiscreteScheduler
 )
+
 from PIL import Image
 from cog import BasePredictor, Input, Path
-
+from xformers.ops import MemoryEfficientAttentionFlashAttentionOp
 
 MODEL_CACHE = "diffusers-cache"
 
@@ -55,6 +74,10 @@ class Predictor(BasePredictor):
             feature_extractor=self.txt2img_pipe.feature_extractor,
         ).to("cuda")
 
+        self.txt2img_pipe.enable_xformers_memory_efficient_attention()
+        self.img2img_pipe.enable_xformers_memory_efficient_attention()
+        self.inpaint_pipe.enable_xformers_memory_efficient_attention()
+
     @torch.inference_mode()
     @torch.cuda.amp.autocast()
     def predict(
@@ -65,17 +88,17 @@ class Predictor(BasePredictor):
             default=None,
         ),
         width: int = Input(
-            description="Output image width; max size is 1024x768 or 768x1024 due to memory limit",
+            description="Output image width; max 1024x768 or 768x1024 due to memory limits",
             choices=[128, 256, 384, 448, 512, 576, 640, 704, 768, 832, 896, 960, 1024],
             default=512,
         ),
         height: int = Input(
-            description="Output image height; max size 1024x768 or 768x1024 due to memory limit",
+            description="Output image height; max 1024x768 or 768x1024 due to memory limits",
             choices=[128, 256, 384, 448, 512, 576, 640, 704, 768, 832, 896, 960, 1024],
             default=512,
         ),
         init_image: Path = Input(
-            description="Initial image to generate variations of, resized to the specified WxH",
+            description="Initial image to generate variations of, resized to the specified WxH.",
             default=None,
         ),
         mask: Path = Input(
@@ -85,7 +108,7 @@ class Predictor(BasePredictor):
             default=None,
         ),
         prompt_strength: float = Input(
-            description="Prompt strength when using init image, 1.0 destruction of init image",
+            description="Prompt strength init image. 1.0 full destruction of init image",
             default=0.8,
         ),
         num_outputs: int = Input(
@@ -102,17 +125,19 @@ class Predictor(BasePredictor):
         ),
         scheduler: str = Input(
             default="K-LMS",
-            choices=["DDIM", "K-LMS", "PNDM"],
+            choices=["DDIM", "DDPM", "DPM-M", "DPM-S", "EULER-A", "EULER-D",
+                     "HEUN", "IPNDM", "KDPM2-A", "KDPM2-D", "PNDM",  "K-LMS"],
             description="Choose a scheduler. If you use an init image, PNDM will be used",
         ),
         seed: int = Input(
             description="Random seed. Leave blank to randomize the seed", default=None
         ),
     ) -> List[Path]:
-        """Run a single prediction on the model"""
+        '''
+        Run a single prediction on the model
+        '''
         if seed is None:
             seed = int.from_bytes(os.urandom(2), "big")
-        print(f"Using seed: {seed}")
 
         if width * height > 786432:
             raise ValueError(
@@ -123,11 +148,12 @@ class Predictor(BasePredictor):
         if mask:
             if not init_image:
                 raise ValueError("mask was provided without init_image")
+
             pipe = self.inpaint_pipe
             init_image = Image.open(init_image).convert("RGB")
             extra_kwargs = {
                 "mask_image": Image.open(mask).convert("RGB").resize(init_image.size),
-                "init_image": init_image,
+                "image": init_image,
                 "strength": prompt_strength,
             }
         elif init_image:
@@ -138,15 +164,19 @@ class Predictor(BasePredictor):
             }
         else:
             pipe = self.txt2img_pipe
+            extra_kwargs = {
+                "width": width,
+                "height": height,
+            }
 
-        pipe.scheduler = make_scheduler(scheduler)
+        pipe.scheduler = make_scheduler(scheduler, pipe.scheduler.config)
 
         generator = torch.Generator("cuda").manual_seed(seed)
         output = pipe(
             prompt=[prompt] * num_outputs if prompt is not None else None,
             negative_prompt=[negative_prompt]*num_outputs if negative_prompt is not None else None,
-            width=width,
-            height=height,
+            # width=width,
+            # height=height,
             guidance_scale=guidance_scale,
             generator=generator,
             num_inference_steps=num_inference_steps,
@@ -170,19 +200,28 @@ class Predictor(BasePredictor):
         return output_paths
 
 
-def make_scheduler(name):
+def make_scheduler(name, config):
+    '''
+    Returns a scheduler from a name and config.
+    '''
     return {
-        "PNDM": PNDMScheduler(
-            beta_start=0.00085, beta_end=0.012, beta_schedule="scaled_linear"
-        ),
-        "K-LMS": LMSDiscreteScheduler(
-            beta_start=0.00085, beta_end=0.012, beta_schedule="scaled_linear"
-        ),
-        "DDIM": DDIMScheduler(
-            beta_start=0.00085,
-            beta_end=0.012,
-            beta_schedule="scaled_linear",
-            clip_sample=False,
-            set_alpha_to_one=False,
-        ),
+        "DDIM": DDIMScheduler.from_config(config),
+        "DDPM": DDPMScheduler.from_config(config),
+        # "DEIS": DEISMultistepScheduler.from_config(config),
+        "DPM-M": DPMSolverMultistepScheduler.from_config(config),
+        "DPM-S": DPMSolverSinglestepScheduler.from_config(config),
+        "EULER-A": EulerAncestralDiscreteScheduler.from_config(config),
+        "EULER-D": EulerDiscreteScheduler.from_config(config),
+        "HEUN": HeunDiscreteScheduler.from_config(config),
+        "IPNDM": IPNDMScheduler.from_config(config),
+        "KDPM2-A": KDPM2AncestralDiscreteScheduler.from_config(config),
+        "KDPM2-D": KDPM2DiscreteScheduler.from_config(config),
+        # "KARRAS-VE": KarrasVeScheduler.from_config(config),
+        "PNDM": PNDMScheduler.from_config(config),
+        # "RE-PAINT": RePaintScheduler.from_config(config),
+        # "SCORE-VE": ScoreSdeVeScheduler.from_config(config),
+        # "SCORE-VP": ScoreSdeVpScheduler.from_config(config),
+        # "UN-CLIPS": UnCLIPScheduler.from_config(config),
+        # "VQD": VQDiffusionScheduler.from_config(config),
+        "K-LMS": LMSDiscreteScheduler.from_config(config)
     }[name]
