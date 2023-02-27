@@ -19,7 +19,8 @@ INPUT_SCHEMA = {
     },
     'negative_prompt': {
         'type': str,
-        'required': False
+        'required': False,
+        'default': None
     },
     'width': {
         'type': int,
