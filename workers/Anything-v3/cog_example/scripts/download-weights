@@ -12,5 +12,4 @@ os.makedirs("diffusers-cache", exist_ok=True)
 pipe = StableDiffusionPipeline.from_pretrained(
     "Linaqruf/anything-v3.0",
     cache_dir="diffusers-cache",
-    use_auth_token=sys.argv[1],
 )
