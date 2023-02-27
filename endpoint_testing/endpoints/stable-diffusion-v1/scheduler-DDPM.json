@@ -1,4 +1,6 @@
 {
-    "prompt": "The quick brown fox jumps over the lazy dog.",
-    "scheduler": "DDPM"
+    "TestInput": {
+        "prompt": "The quick brown fox jumps over the lazy dog.",
+        "scheduler": "DDPM"
+    }
 }

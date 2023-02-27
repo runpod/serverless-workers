@@ -1,4 +1,6 @@
 {
-    "prompt": "The quick brown fox jumps over the lazy dog.",
-    "num_outputs": 6
+    "TestInput": {
+        "prompt": "The quick brown fox jumps over the lazy dog.",
+        "num_outputs": 6
+    }
 }
