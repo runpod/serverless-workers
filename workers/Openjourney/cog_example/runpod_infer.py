@@ -77,7 +77,7 @@ INPUT_SCHEMA = {
     'seed': {
         'type': int,
         'required': False,
-        'default': int.from_bytes(os.urandom(2), "big")
+        'default': None
     },
     'nsfw': {
         'type': bool,
