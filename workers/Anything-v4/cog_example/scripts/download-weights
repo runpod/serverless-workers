@@ -10,6 +10,6 @@ os.makedirs("diffusers-cache", exist_ok=True)
 
 
 pipe = StableDiffusionPipeline.from_pretrained(
-    "Linaqruf/anything-v4.0",
+    "andite/anything-v4.0",
     cache_dir="diffusers-cache",
 )
