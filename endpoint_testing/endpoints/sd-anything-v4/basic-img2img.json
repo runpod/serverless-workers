@@ -1,0 +1,6 @@
+{
+    "TestInput": {
+        "prompt": "angry godzilla",
+        "init_image": "https://github.com/runpod/serverless-workers/raw/main/Input-Samples/nyc_skyline.png"
+    }
+}
