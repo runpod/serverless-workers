@@ -1,0 +1,6 @@
+{
+    "TestInput": {
+        "prompt": "The quick brown fox jumps over the lazy dog.",
+        "scheduler": "KDPM2-D"
+    }
+}
