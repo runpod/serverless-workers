@@ -108,6 +108,9 @@ def run(job):
 
     MODEL.NSFW = job_input.get('nsfw', True)
 
+    if job_input['seed'] is None:
+        job_input['seed'] = int.from_bytes(os.urandom(2), "big")
+
     img_paths = MODEL.predict(
         prompt=job_input["prompt"],
         negative_prompt=job_input.get("negative_prompt", None),
