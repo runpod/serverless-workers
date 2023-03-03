@@ -77,7 +77,7 @@ INPUT_SCHEMA = {
     'seed': {
         'type': int,
         'required': False,
-        'default': int.from_bytes(os.urandom(2), "big")
+        'default': None
     },
     'nsfw': {
         'type': bool,
@@ -107,6 +107,9 @@ def run(job):
     )  # pylint: disable=unbalanced-tuple-unpacking
 
     MODEL.NSFW = job_input.get('nsfw', True)
+
+    if job_input['seed'] is None:
+        job_input['seed'] = int.from_bytes(os.urandom(2), "big")
 
     img_paths = MODEL.predict(
         prompt=job_input["prompt"],
