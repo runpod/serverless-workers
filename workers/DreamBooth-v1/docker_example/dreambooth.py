@@ -9,7 +9,7 @@ import subprocess
 #                                 Text Encoder                                 #
 # ---------------------------------------------------------------------------- #
 def dump_only_textenc(
-        model_name, concept_dir, ouput_dir, PT, seed,
+        model_name, concept_dir, ouput_dir, offset_noise, PT, seed,
         precision, training_steps, learning_rate, lr_scheduler, enable_adam):
     '''
     Train the text encoder first.
@@ -34,6 +34,9 @@ def dump_only_textenc(
         f"--mixed_precision={precision}",
         "--image_captions_filename"
     ]
+
+    if offset_noise:
+        text_options.append("--offset_noise")
 
     if enable_adam:
         text_options.append("--use_8bit_adam")

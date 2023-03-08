@@ -35,6 +35,11 @@ TRAIN_SCHEMA = {
         'required': False,
         'default': None
     },
+    'offset_noise': {
+        'type': bool,
+        'required': False,
+        'default': False
+    },
     # Text Encoder Training Parameters
     'text_steps': {
         'type': int,
@@ -363,6 +368,7 @@ def handler(job):
         model_name="/src/stable-diffusion-v1-5",
         concept_dir=downloaded_input['extracted_path'],
         ouput_dir=f"job_files/{job['id']}/model",
+        offset_noise=train_input['offset_noise'],
         training_steps=train_input['text_steps'],
         PT="",
         seed=train_input['text_seed'],
