@@ -9,7 +9,7 @@ import subprocess
 #                                 Text Encoder                                 #
 # ---------------------------------------------------------------------------- #
 def dump_only_textenc(
-        model_name, concept_dir, ouput_dir, offset_noise, PT, seed,
+        model_name, concept_dir, ouput_dir, PT, seed,
         precision, training_steps, learning_rate, lr_scheduler, enable_adam):
     '''
     Train the text encoder first.
@@ -35,9 +35,6 @@ def dump_only_textenc(
         "--image_captions_filename"
     ]
 
-    if offset_noise:
-        text_options.append("--offset_noise")
-
     if enable_adam:
         text_options.append("--use_8bit_adam")
 
@@ -50,8 +47,8 @@ def dump_only_textenc(
 #                                     UNet                                     #
 # ---------------------------------------------------------------------------- #
 def train_only_unet(
-        stp, SESSION_DIR, MODELT_NAME, INSTANCE_DIR, OUTPUT_DIR,
-        PT, seed, resolution, precision, num_train_epochs, learning_rate, lr_scheduler, enable_adam):
+        stp, SESSION_DIR, MODELT_NAME, INSTANCE_DIR, OUTPUT_DIR, offset_noise, PT, seed,
+        resolution, precision, num_train_epochs, learning_rate, lr_scheduler, enable_adam):
     '''
     Train only the image encoder.
     '''
@@ -78,6 +75,9 @@ def train_only_unet(
 
         f"--Session_dir={SESSION_DIR}"
     ]
+
+    if offset_noise:
+        unet_options.append("--offset_noise")
 
     if enable_adam:
         unet_options.append("--use_8bit_adam")
