@@ -6,6 +6,7 @@ This is the handler for the DreamBooth serverless worker.
 
 import io
 import os
+import shutil
 import base64
 import requests
 import subprocess
@@ -349,14 +350,28 @@ def handler(job):
     # -------------------------- Download Training Data -------------------------- #
     downloaded_input = rp_download.file(train_input['data_url'])
 
+    # Make clean data directory
+    allowed_extensions = [".jpg", ".jpeg", ".png"]
+    flat_directory = f"job_files/{job['id']}/clean_data"
+    os.makedirs(flat_directory, exist_ok=True)
+
+    for root, dirs, files in os.walk(downloaded_input):
+        for file in files:
+            file_path = os.path.join(root, file)
+            if os.path.splitext(file_path)[1].lower() in allowed_extensions:
+                shutil.copy(
+                    os.path.join(downloaded_input['extracted_path'], file_path),
+                    flat_directory
+                )
+
     # Rename the files to the concept name, if provided.
     if train_input['concept_name'] is not None:
-        concept_images = os.listdir(downloaded_input['extracted_path'])
+        concept_images = os.listdir(flat_directory)
         for index, image in enumerate(concept_images):
             file_type = image.split(".")[-1]
             os.rename(
-                os.path.join(downloaded_input['extracted_path'], image),
-                os.path.join(downloaded_input['extracted_path'],
+                os.path.join(flat_directory, image),
+                os.path.join(flat_directory,
                              f"{train_input['concept_name']} ({index}).{file_type}")
             )
 
@@ -366,7 +381,7 @@ def handler(job):
     # ----------------------------------- Train ---------------------------------- #
     dump_only_textenc(
         model_name="/src/stable-diffusion-v1-5",
-        concept_dir=downloaded_input['extracted_path'],
+        concept_dir=flat_directory,
         ouput_dir=f"job_files/{job['id']}/model",
         training_steps=train_input['text_steps'],
         PT="",
@@ -381,7 +396,7 @@ def handler(job):
         stp=500,
         SESSION_DIR="TEST_OUTPUT",
         MODELT_NAME="/src/stable-diffusion-v1-5",
-        INSTANCE_DIR=downloaded_input['extracted_path'],
+        INSTANCE_DIR=flat_directory,
         OUTPUT_DIR=f"job_files/{job['id']}/model",
         offset_noise=train_input['offset_noise'],
         PT="",
