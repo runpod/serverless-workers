@@ -355,7 +355,7 @@ def handler(job):
     flat_directory = f"job_files/{job['id']}/clean_data"
     os.makedirs(flat_directory, exist_ok=True)
 
-    for root, dirs, files in os.walk(downloaded_input):
+    for root, dirs, files in os.walk(downloaded_input['extracted_path']):
         for file in files:
             file_path = os.path.join(root, file)
             if os.path.splitext(file_path)[1].lower() in allowed_extensions:
