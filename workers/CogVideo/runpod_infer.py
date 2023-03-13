@@ -2,9 +2,18 @@
 RunPod | Inference
 '''
 
+import os
+
+import runpod
+from runpod.serverless.utils import rp_download, rp_upload, rp_cleanup
+from runpod.serverless.utils.rp_validator import validate
+
 import predict
 
-PREDICT_SCHEMA = {
+MODEL = predict.Predictor()
+MODEL.setup()
+
+INPUT_SCHEMA = {
     'prompt': {
         'type': str,
         'required': True
@@ -36,100 +45,34 @@ PREDICT_SCHEMA = {
     }
 }
 
-ARG_SCHEMA = {
-    'layout': {
-        'type': list,
-        'required': False,
-        'default': [64, 464, 2064]
-    },
-    'window_size': {
-        'type': int,
-        'required': False,
-        'default': 10
-    },
-    'additional_seqlen': {
-        'type': int,
-        'required': False,
-        'default': 2000
-    },
-    'cogvideo_stage': {
-        'type': int,
-        'required': False,
-        'default': 1
-    },
-    'do_train': {
-        'type': bool,
-        'required': False,
-        'default': False
-    },
-    'parallel_size': {
-        'type': int,
-        'required': False,
-        'default': 1
-    },
-    'guidance_alpha': {
-        'type': float,
-        'required': False,
-        'default': 3.0
-    },
-    'generate_frame_num': {
-        'type': int,
-        'required': False,
-        'default': 5
-    },
-    'coglm_temperature': {
-        'type': float,
-        'required': False,
-        'default': 0.89
-    },
-    'coglm_temperature2': {
-        'type': float,
-        'required': False,
-        'default': 0.89
-    },
-    'generate_frame_num': {
-        'type': int,
-        'required': False,
-        'default': 5
-    },
-    'stage1_max_inference_batch_size': {
-        'type': int,
-        'required': False,
-        'default': -1
-    },
-    'max_inference_batch_size': {
-        'type': int,
-        'required': False,
-        'default': 8
-    },
-    'top_k': {
-        'type': int,
-        'required': False,
-        'default': 12
-    },
-    'use_guidance_stage1': {
-        'type': bool,
-        'required': False,
-        'default': True
-    },
-    'use_guidance_stage2': {
-        'type': bool,
-        'required': False,
-        'default': False
-    },
-    'both_stages': {
-        'type': bool,
-        'required': False,
-        'default': True
-    },
-    'device': {
-        'type': str,
-        'required': False,
-        'default': torch.device("cuda")
-    },
-    'image_prompt': {
-        'type': str,
-        'required': False,
-        'default': None
-    }
-}
+
+def run(job):
+    '''
+    Run inference on the model.
+    '''
+    job_input = job['input']
+
+    # Input Validation
+    validated_input = validate(job_input, INPUT_SCHEMA)
+
+    if 'errors' in validated_input:
+        return {"error": validated_input['errors']}
+    validated_input = validated_input['validated_input']
+
+    if validated_input['image_prompt'] is not None:
+        validated_input['image_prompt'] = rp_download.download_input_objects(
+            [validated_input.get('image_prompt', None)])
+
+    if validated_input['seed'] is None:
+        validated_input['seed'] = int.from_bytes(os.urandom(2), "big")
+
+    video_file = MODEL.predict(
+        prompt=validated_input['prompt'],
+        seed=validated_input['seed'],
+        translate=validated_input['translate'],
+        both_stages=validated_input['both_stages'],
+        use_guidance=validated_input['use_guidance'],
+        image_prompt=validated_input['image_prompt'],
+    )
+
+    print(video_file)
