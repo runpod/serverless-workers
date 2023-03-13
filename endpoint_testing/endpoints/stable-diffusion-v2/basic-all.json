@@ -1,0 +1,13 @@
+{
+    "TestInput": {
+        "prompt": "The quick brown fox jumps over the lazy dog.",
+        "negative_prompt": "Eggs and bacon.",
+        "width": 768,
+        "guidance_scale": 1.0,
+        "num_inference_steps": 100,
+        "num_outputs": 3,
+        "prompt_strength": 0.5,
+        "scheduler": "K_EULER",
+        "seed": 69
+    }
+}
