@@ -105,7 +105,7 @@ TRAIN_SCHEMA = {
     'unet_batch_size': {
         'type': int,
         'required': False,
-        ' default': 1
+        'default': 1
     },
     'unet_resolution': {
         'type': int,
