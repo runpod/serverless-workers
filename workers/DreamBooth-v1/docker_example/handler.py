@@ -34,7 +34,7 @@ TRAIN_SCHEMA = {
         'type': str,
         'required': True
     },
-    'hf_model_url': {
+    'hf_model': {
         'type': str,
         'required': False,
         'default': None
@@ -412,9 +412,9 @@ def handler(job):
     os.makedirs(f"job_files/{job['id']}/model", exist_ok=True)
 
     # ---------------------------- Set Starting Model ---------------------------- #
-    if train_input['hf_model_url'] and train_input['ckpt_link']:
+    if train_input['hf_model'] and train_input['ckpt_link']:
         return {"error": "Please provide either a Hugging Face model or a checkpoint URL."}
-    model_name = selected_model(train_input['hf_model_url'],
+    model_name = selected_model(train_input['hf_model'],
                                 train_input['ckpt_link'], train_input['hf_token'])
 
     # ----------------------------------- Train ---------------------------------- #
