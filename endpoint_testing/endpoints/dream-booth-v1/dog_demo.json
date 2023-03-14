@@ -1,0 +1,33 @@
+{
+    "input": {
+        "train": {
+            "concept_name": "RWXdoggo",
+            "data_url": "https://github.com/runpod/serverless-workers/blob/main/Input-Samples/runpod_dog2.zip?raw=true",
+            "unet_epochs": 100,
+            "text_steps": 400,
+            "unet_resolution": 512,
+            "text_learning_rate": 2e-6,
+            "unet_learning_rate": 2e-6,
+            "text_lr_scheduler": "polynomial",
+            "unet_lr_scheduler": "polynomial"
+        },
+        "inference": [
+            {
+                "prompt": "portrait of RWXdoggo, highly detailed face, symmetrical eyes, colorful, flowing hair, fully visible face, powerful, magic, thunders, dramatic lighting, painting, concept art, smooth, sharp focus",
+                "negative_prompt": "blurry, side looking, duplication, lowres, cropped, worst quality, low quality, jpeg artifacts, out of frame, watermark, signature",
+                "sampler_name": "Euler a",
+                "batch_size": 10,
+                "steps": 40,
+                "cfg_scale": 7
+            },
+            {
+                "prompt": "RWXdoggo trapped inside a basket at the park grass detailed at a picnic",
+                "negative_prompt": "lowres, cropped, worst quality, low quality, out of frame, watermark, signature",
+                "sampler_name": "Euler a",
+                "batch_size": 10,
+                "steps": 40,
+                "cfg_scale": 7
+            }
+        ]
+    }
+}
