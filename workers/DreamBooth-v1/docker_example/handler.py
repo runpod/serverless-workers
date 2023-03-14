@@ -412,7 +412,7 @@ def handler(job):
     os.makedirs(f"job_files/{job['id']}/model", exist_ok=True)
 
     # ---------------------------- Set Starting Model ---------------------------- #
-    if train_input['hf_model_url'] and train_input['ckpt_url']:
+    if train_input['hf_model_url'] and train_input['ckpt_link']:
         return {"error": "Please provide either a Hugging Face model or a checkpoint URL."}
     model_name = selected_model(train_input['hf_model_url'],
                                 train_input['ckpt_link'], train_input['hf_token'])
