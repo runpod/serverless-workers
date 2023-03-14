@@ -38,7 +38,7 @@ def downloadmodel_hf(Path_to_HuggingFace, huggingface_token=None):
             'https://raw.githubusercontent.com/TheLastBen/fast-stable-diffusion/main/Dreambooth/model_index.json')
         os.chdir('/src')
 
-    while not os.path.exists('/workspace/stable-diffusion-custom/unet/diffusion_pytorch_model.bin'):
+    while not os.path.exists('/src/stable-diffusion-custom/unet/diffusion_pytorch_model.bin'):
         os.chdir('/src')
 
     print("Downloaded model is compatible with DreamBooth.")
