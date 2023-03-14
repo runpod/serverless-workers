@@ -19,6 +19,8 @@ def downloadmodel_hf(Path_to_HuggingFace, huggingface_token=None):
 
     os.makedirs('/src/stable-diffusion-custom', exist_ok=True)
 
+    print(f"Current working directory: {os.getcwd()}")
+
     os.chdir("/src/stable-diffusion-custom")
     call("git init", shell=True)
     call("git lfs install --system --skip-repo", shell=True)
@@ -26,6 +28,9 @@ def downloadmodel_hf(Path_to_HuggingFace, huggingface_token=None):
     call("git config core.sparsecheckout true", shell=True)
     call('echo -e "\nscheduler\ntext_encoder\ntokenizer\nunet\nvae\nmodel_index.json\n!*.safetensors" > .git/info/sparse-checkout', shell=True)
     call("git pull origin main", shell=True)
+
+    print("Successfully downloaded model from HuggingFace.")
+
     if os.path.exists('unet/diffusion_pytorch_model.bin'):
         call("rm -r .git", shell=True)
         call("rm model_index.json", shell=True)
@@ -35,6 +40,8 @@ def downloadmodel_hf(Path_to_HuggingFace, huggingface_token=None):
 
     while not os.path.exists('/workspace/stable-diffusion-custom/unet/diffusion_pytorch_model.bin'):
         os.chdir('/src')
+
+    print("Downloaded model is compatible with DreamBooth.")
 
 
 def downloadmodel_lnk(CKPT_Link):
