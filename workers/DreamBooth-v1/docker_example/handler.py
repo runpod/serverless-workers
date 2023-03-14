@@ -17,11 +17,14 @@ from PIL import Image
 import runpod
 from runpod.serverless.utils import rp_download, rp_upload
 from runpod.serverless.utils.rp_validator import validate
+
 from dreambooth import dump_only_textenc, train_only_unet
+from custom_model import selected_model
 
 automatic_session = requests.Session()
 retries = Retry(total=6, backoff_factor=10, status_forcelist=[502, 503, 504])
 automatic_session.mount('http://', HTTPAdapter(max_retries=retries))
+
 
 # ---------------------------------------------------------------------------- #
 #                                    Schemas                                   #
@@ -30,6 +33,21 @@ TRAIN_SCHEMA = {
     'data_url': {
         'type': str,
         'required': True
+    },
+    'hf_model_url': {
+        'type': str,
+        'required': False,
+        'default': None
+    },
+    'hf_token': {
+        'type': str,
+        'required': False,
+        'default': None
+    },
+    'ckpt_link': {
+        'type': str,
+        'required': False,
+        'default': None
     },
     'concept_name': {
         'type': str,
@@ -52,6 +70,16 @@ TRAIN_SCHEMA = {
         'required': False,
         'default': 555
     },
+    'text_batch_size': {
+        'type': int,
+        'required': False,
+        'default': 1
+    },
+    'text_resolution': {
+        'type': int,
+        'required': False,
+        'default': 512
+    },
     'text_learning_rate': {
         'type': float,
         'required': False,
@@ -73,6 +101,11 @@ TRAIN_SCHEMA = {
         'type': int,
         'required': False,
         'default': 555
+    },
+    'unet_batch_size': {
+        'type': int,
+        'required': False,
+        ' default': 1
     },
     'unet_resolution': {
         'type': int,
@@ -378,14 +411,22 @@ def handler(job):
     os.makedirs(f"job_files/{job['id']}", exist_ok=True)
     os.makedirs(f"job_files/{job['id']}/model", exist_ok=True)
 
+    # ---------------------------- Set Starting Model ---------------------------- #
+    if train_input['hf_model_url'] and train_input['ckpt_url']:
+        return {"error": "Please provide either a Hugging Face model or a checkpoint URL."}
+    model_name = selected_model(train_input['hf_model_url'],
+                                train_input['ckpt_link'], train_input['hf_token'])
+
     # ----------------------------------- Train ---------------------------------- #
     dump_only_textenc(
-        model_name="/src/stable-diffusion-v1-5",
+        model_name=model_name,
         concept_dir=flat_directory,
         ouput_dir=f"job_files/{job['id']}/model",
         training_steps=train_input['text_steps'],
         PT="",
         seed=train_input['text_seed'],
+        batch_size=train_input['text_batch_size'],
+        resolution=train_input['text_resolution'],
         precision="fp16",
         learning_rate=train_input['text_learning_rate'],
         lr_scheduler=train_input['text_lr_scheduler'],
@@ -395,12 +436,13 @@ def handler(job):
     train_only_unet(
         stp=500,
         SESSION_DIR="TEST_OUTPUT",
-        MODELT_NAME="/src/stable-diffusion-v1-5",
+        model_name=model_name,
         INSTANCE_DIR=flat_directory,
         OUTPUT_DIR=f"job_files/{job['id']}/model",
         offset_noise=train_input['offset_noise'],
         PT="",
         seed=train_input['unet_seed'],
+        batch_size=train_input['unet_batch_size'],
         resolution=train_input['unet_resolution'],
         precision="fp16",
         num_train_epochs=train_input['unet_epochs'],

@@ -33,6 +33,7 @@ RUN apt clean && rm -rf /var/lib/apt/lists/* && \
     echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
 
 ADD dreambooth.py /src/
+ADD custom_model.py /src/
 ADD handler.py /src/
 ADD start.sh /src/
 ADD test_input.json /src/

@@ -9,7 +9,7 @@ import subprocess
 #                                 Text Encoder                                 #
 # ---------------------------------------------------------------------------- #
 def dump_only_textenc(
-        model_name, concept_dir, ouput_dir, PT, seed,
+        model_name, concept_dir, ouput_dir, PT, seed, batch_size, resolution,
         precision, training_steps, learning_rate, lr_scheduler, enable_adam):
     '''
     Train the text encoder first.
@@ -23,8 +23,8 @@ def dump_only_textenc(
         f"--instance_prompt={PT}",
         f"--output_dir={ouput_dir}",
         f"--seed={seed}",
-        "--resolution=512",
-        "--train_batch_size=1",
+        f"--resolution={resolution}",
+        f"--train_batch_size={batch_size}",
         f"--max_train_steps={training_steps}",
         "--gradient_accumulation_steps=1",
         # "--gradient_checkpointing",
@@ -47,7 +47,7 @@ def dump_only_textenc(
 #                                     UNet                                     #
 # ---------------------------------------------------------------------------- #
 def train_only_unet(
-        stp, SESSION_DIR, MODELT_NAME, INSTANCE_DIR, OUTPUT_DIR, offset_noise, PT, seed,
+        stp, SESSION_DIR, model_name, INSTANCE_DIR, OUTPUT_DIR, offset_noise, PT, seed, batch_size,
         resolution, precision, num_train_epochs, learning_rate, lr_scheduler, enable_adam):
     '''
     Train only the image encoder.
@@ -58,14 +58,14 @@ def train_only_unet(
         "--train_only_unet",
         f"--save_n_steps={stp}",
 
-        f"--pretrained_model_name_or_path={MODELT_NAME}",
+        f"--pretrained_model_name_or_path={model_name}",
         f"--instance_data_dir={INSTANCE_DIR}",
         f"--output_dir={OUTPUT_DIR}",
         f"--instance_prompt={PT}",
         f"--seed={seed}",
         f"--resolution={resolution}",
         f"--mixed_precision={precision}",
-        "--train_batch_size=1",
+        f"--train_batch_size={batch_size}",
         "--gradient_accumulation_steps=1",
         f"--learning_rate={learning_rate}",
         f"--lr_scheduler={lr_scheduler}",
