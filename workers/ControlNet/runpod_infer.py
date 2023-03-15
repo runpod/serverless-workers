@@ -172,20 +172,18 @@ def predict(job):
             ddim_sampler,
         )
 
-        print(outputs)
+    # outputs from list to PIL
+    outputs = [Image.fromarray(output) for output in outputs]
 
-        # outputs from list to PIL
-        outputs = [Image.fromarray(output) for output in outputs]
+    # save outputs to file
+    os.makedirs("tmp", exist_ok=True)
+    outputs = [output.save(f"tmp/output_{i}.png") for i, output in enumerate(outputs)]
 
-        # save outputs to file
-        os.makedirs("tmp", exist_ok=True)
-        outputs = [output.save(f"tmp/output_{i}.png") for i, output in enumerate(outputs)]
+    for index, output in enumerate(outputs):
+        outputs = rp_upload.upload_image(job['id'], f"tmp/output_{index}.png")
 
-        for index, output in enumerate(outputs):
-            outputs = rp_upload.upload_image(job['id'], f"tmp/output_{index}.png")
-
-        # return paths to output files
-        return outputs
+    # return paths to output files
+    return outputs
 
 
 # ---------------------------------------------------------------------------- #
