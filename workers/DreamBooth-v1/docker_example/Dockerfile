@@ -15,7 +15,9 @@ RUN cd /workspace/sd/stable-diffusion-webui/modules && sed -i 's@/content/gdrive
 RUN python -m pip install --upgrade pip
 RUN pip install bitsandbytes==0.35
 RUN pip install transformers==4.21.1
+
 # RUN pip install runpod==0.9.0
+
 RUN pip install setuptools==67.4.0
 RUN pip install https://github.com/runpod/runpod-python/archive/main.zip
 
