@@ -1,0 +1,16 @@
+{
+    "input": {
+        "image": "https://27eastmount.s3.amazonaws.com/2022/11/IMG-3346-scaled.jpg",
+        "prompt": "an astronaut on the moon, digital art",
+        "a_prompt": "best quality, extremely detailed",
+        "n_prompt": "longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality",
+        "num_samples": 2,
+        "image_resolution": 512,
+        "ddim_steps": 20,
+        "scale": 9,
+        "seed": 123,
+        "eta": 0.0,
+        "low_threshold": 100,
+        "high_threshold": 200
+    }
+}
