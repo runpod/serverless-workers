@@ -3,6 +3,7 @@ RunPod | ControlNet | Infer
 '''
 
 import os
+import argparse
 from subprocess import call
 
 from PIL import Image
@@ -16,31 +17,6 @@ from runpod.serverless.utils.rp_validator import validate
 from cldm.model import create_model, load_state_dict
 from ldm.models.diffusion.ddim import DDIMSampler
 from utils import get_state_dict_path, download_model, model_dl_urls, annotator_dl_urls
-
-
-MODEL_TYPE = "openpose"
-
-if MODEL_TYPE == "canny":
-    from gradio_canny2image import process_canny
-elif MODEL_TYPE == "depth":
-    from gradio_depth2image import process_depth
-elif MODEL_TYPE == "hed":
-    from gradio_hed2image import process_hed
-elif MODEL_TYPE == "normal":
-    from gradio_normal2image import process_normal
-elif MODEL_TYPE == "mlsd":
-    from gradio_hough2image import process_mlsd
-elif MODEL_TYPE == "scribble":
-    from gradio_scribble2image import process_scribble
-elif MODEL_TYPE == "seg":
-    from gradio_seg2image import process_seg
-elif MODEL_TYPE == "openpose":
-    from gradio_pose2image import process_pose
-
-
-model = create_model('./models/cldm_v15.yaml').cuda()
-model.load_state_dict(load_state_dict(get_state_dict_path(MODEL_TYPE), location='cuda'))
-ddim_sampler = DDIMSampler(model)
 
 
 def predict(job):
@@ -121,6 +97,7 @@ def predict(job):
             job_input['n_prompt'],
             num_samples,
             image_resolution,
+            job_input['detect_resolution'],
             job_input['ddim_steps'],
             job_input['scale'],
             seed,
@@ -209,4 +186,39 @@ def predict(job):
         return outputs
 
 
-runpod.serverless.start({"handler": predict})
+# ---------------------------------------------------------------------------- #
+#                                     Main                                     #
+# ---------------------------------------------------------------------------- #
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("--model_type", type=str,
+                    default=None, help="Model URL")
+
+
+if __name__ == "__main__":
+    args = parser.parse_args()
+    print(args)
+
+    MODEL_TYPE = args.model_type
+
+    if MODEL_TYPE == "canny":
+        from gradio_canny2image import process_canny
+    elif MODEL_TYPE == "depth":
+        from gradio_depth2image import process_depth
+    elif MODEL_TYPE == "hed":
+        from gradio_hed2image import process_hed
+    elif MODEL_TYPE == "normal":
+        from gradio_normal2image import process_normal
+    elif MODEL_TYPE == "mlsd":
+        from gradio_hough2image import process_mlsd
+    elif MODEL_TYPE == "scribble":
+        from gradio_scribble2image import process_scribble
+    elif MODEL_TYPE == "seg":
+        from gradio_seg2image import process_seg
+    elif MODEL_TYPE == "openpose":
+        from gradio_pose2image import process_pose
+
+    model = create_model('./models/cldm_v15.yaml').cuda()
+    model.load_state_dict(load_state_dict(get_state_dict_path(MODEL_TYPE), location='cuda'))
+    ddim_sampler = DDIMSampler(model)
+
+    runpod.serverless.start({"handler": predict})
