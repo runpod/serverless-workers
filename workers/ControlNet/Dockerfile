@@ -26,6 +26,8 @@ RUN apt-get install python3.8 -y
 RUN apt-get install python3-pip -y
 RUN apt-get install python3.8-distutils -y
 
+RUN apt-get install python3.8-dev -y
+RUN apt-get install python3.8-venv -y
 RUN python3.8 -m venv /venv
 ENV PATH=/venv/bin:$PATH
 
