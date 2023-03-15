@@ -4,18 +4,14 @@ SHELL ["/bin/bash", "-c"]
 
 WORKDIR /src
 
-RUN : \
-    && apt-get update \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    software-properties-common \
-    && add-apt-repository -y ppa:deadsnakes \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    python3.8.5-venv \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && :
+RUN apt-get update && apt-get install -y --no-install-recommends
+RUN apt-get install software-properties-common -y
+RUN add-apt-repository ppa:deadsnakes/ppa
+RUN apt-get install python3.8.5 -y
+RUN apt-get install python3-pip -y
+RUN apt-get install python3.8.5-distutils -y
 
-RUN python3.8 -m venv /venv
+RUN python3.8.5 -m venv /venv
 ENV PATH=/venv/bin:$PATH
 
 # Install system dependencies
