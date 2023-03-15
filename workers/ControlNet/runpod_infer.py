@@ -194,7 +194,6 @@ def predict(job):
             model,
             ddim_sampler,
         )
-        print(outputs)
 
         # outputs from list to PIL
         outputs = [Image.fromarray(output) for output in outputs]
