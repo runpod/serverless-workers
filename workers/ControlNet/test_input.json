@@ -5,6 +5,7 @@
         "a_prompt": "best quality, extremely detailed",
         "n_prompt": "longbody, lowres, bad anatomy, bad hands, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality",
         "num_samples": 2,
+        "detect_resolution": 512,
         "image_resolution": 512,
         "ddim_steps": 20,
         "scale": 9,
