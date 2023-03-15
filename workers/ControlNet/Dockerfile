@@ -5,6 +5,7 @@ SHELL ["/bin/bash", "-c"]
 WORKDIR /src
 
 # Install system dependencies
+RUN apt-get update -y
 RUN apt-get install python3-opencv -y
 
 # Install Python dependencies
