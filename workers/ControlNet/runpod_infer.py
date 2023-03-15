@@ -57,7 +57,7 @@ def predict(job):
     else:
         seed = int(job_input['seed'])
 
-    image_path = rp_download(job_input['image'])
+    image_path = rp_download.file(job_input['image'])
 
     # load input_image
     input_image = Image.open(image_path['file_path'])
