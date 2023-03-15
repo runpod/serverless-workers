@@ -10,6 +10,7 @@ RUN apt-get install python3-opencv -y
 
 # Install Python dependencies
 RUN python -m pip install --upgrade pip
+RUN pip install basicsr==1.3.3.1
 RUN pip install torch==1.13.0
 RUN pip install torchvision==0.14.0
 RUN pip install numpy==1.21.6
