@@ -31,6 +31,7 @@ BASE_SCHEMA = {
     'num_samples': {'type': int, 'required': False, 'default': 1, 'constraints': lambda samples: samples in [1, 4]},
     'image_resolution': {'type': int, 'required': False, 'default': 512, 'constraints': lambda resolution: resolution in [256, 512, 768]},
     'ddim_steps': {'type': int, 'required': False, 'default': 20},
+    'scale': {'type': float, 'required': False, 'default': 9.0, 'constraints': lambda scale: 0.1 < scale < 30.0},
     'seed': {'type': int, 'required': True},
     'eta': {'type': float, 'required': False, 'default': 0.0},
     'low_threshold': {'type': int, 'required': False, 'default': 100, 'constraints': lambda threshold: 1 < threshold < 255},
