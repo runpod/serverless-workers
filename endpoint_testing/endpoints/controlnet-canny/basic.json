@@ -1,0 +1,6 @@
+{
+    "input": {
+        "input_url": "https://github.com/runpod/serverless-workers/raw/main/Input-Samples/yoga.jpg",
+        "prompt": "A frog performing yoga."
+    }
+}

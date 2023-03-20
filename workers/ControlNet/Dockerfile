@@ -61,7 +61,7 @@ RUN python3.8 -m pip install timm==0.6.12
 RUN python3.8 -m pip install addict==2.4.0
 RUN python3.8 -m pip install yapf==0.32.0
 RUN python3.8 -m pip install prettytable==3.6.0
-RUN python3.8 -m pip install runpod==0.9.0
+RUN python3.8 -m pip install runpod==0.9.1
 
 # Copy model files
 COPY . /src/
