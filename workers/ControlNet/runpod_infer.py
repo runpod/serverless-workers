@@ -68,6 +68,10 @@ OPENPOSE_SCHEMA = BASE_SCHEMA.copy()
 
 
 def get_image(image_url, image_base64):
+    '''
+    Get the image from the provided URL or base64 string.
+    Returns a PIL image.
+    '''
     if image_url is not None:
         image = rp_download.file(image_url)
         image = image['file_path']
@@ -173,7 +177,7 @@ def predict(job):
 
     # ---------------------------------- Normal ---------------------------------- #
     elif MODEL_TYPE == "normal":
-        normal_validate = validate(job_input, HED_SCHEMA)
+        normal_validate = validate(job_input, NORMAL_SCHEMA)
         if 'errors' in normal_validate:
             return {'error': normal_validate['errors']}
         validated_input = normal_validate['validated_input']
@@ -197,7 +201,7 @@ def predict(job):
 
     # ----------------------------------- MLSD ----------------------------------- #
     elif MODEL_TYPE == "mlsd":
-        mlsd_validate = validate(job_input, HED_SCHEMA)
+        mlsd_validate = validate(job_input, MLSD_SCHEMA)
         if 'errors' in mlsd_validate:
             return {'error': mlsd_validate['errors']}
         validated_input = mlsd_validate['validated_input']
