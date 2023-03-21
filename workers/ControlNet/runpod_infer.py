@@ -252,7 +252,7 @@ def predict(job):
 
     # ------------------------------------ Seg ----------------------------------- #
     elif MODEL_TYPE == "seg":
-        seg_validate = validate(job_input, SCRIBBLE_SCHEMA)
+        seg_validate = validate(job_input, SEG_SCHEMA)
         if 'errors' in seg_validate:
             return {'error': seg_validate['errors']}
         validated_input = seg_validate['validated_input']
