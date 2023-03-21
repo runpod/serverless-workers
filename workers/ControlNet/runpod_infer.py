@@ -59,6 +59,8 @@ MLSD_SCHEMA['value_threshold'] = {'type': float, 'required': False,
                                   'default': 0.0, 'constraints': lambda threshold: 0 <= threshold <= 1}
 MLSD_SCHEMA['detect_resolution'] = {'type': int, 'required': False,
                                     'default': 256, 'constraints': lambda resolution: resolution in [128, 256, 384]}
+MLSD_SCHEMA['distance_threshold'] = {'type': float, 'required': False,
+                                     'default': 0.1, 'constraints': lambda threshold: 0.01 <= threshold <= 20.0}
 
 SCRIBBLE_SCHEMA = BASE_SCHEMA.copy()
 
