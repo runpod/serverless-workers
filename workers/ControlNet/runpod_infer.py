@@ -69,6 +69,8 @@ SEG_SCHEMA['detect_resolution'] = {'type': int, 'required': False,
                                    'default': 256, 'constraints': lambda resolution: resolution in [128, 256, 384]}
 
 OPENPOSE_SCHEMA = BASE_SCHEMA.copy()
+OPENPOSE_SCHEMA['detect_resolution'] = {'type': int, 'required': False,
+                                        'default': 256, 'constraints': lambda resolution: resolution in [128, 256, 384]}
 
 
 def get_image(image_url, image_base64):
