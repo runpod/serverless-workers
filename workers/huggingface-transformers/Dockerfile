@@ -29,28 +29,11 @@ RUN apt-get install python3.8-venv -y
 RUN python3.8 -m venv /venv
 ENV PATH=/venv/bin:$PATH
 
-RUN apt update && \
-    apt install -y bash \
-    build-essential \
-    git \
-    curl \
-    ca-certificates \
-    python3 \
-    python3-pip && \
-    rm -rf /var/lib/apt/lists
-
-RUN python3 -m pip install --no-cache-dir --upgrade pip && \
-    python3 -m pip install --no-cache-dir \
-    jupyter \
-    tensorflow \
-    torch
-
-RUN git clone https://github.com/NVIDIA/apex
-RUN cd apex && \
-    python3 setup.py install && \
-    pip install -v --no-cache-dir --global-option="--cpp_ext" --global-option="--cuda_ext" ./
+RUN python3.8 -m pip install --upgrade pip==20.3
+RUN pytohn3.8 -m pip isntall runpod==0.9.1
+RUN python3.8 -m pip install torch==2.0.0
+RUN python3.8 -m pip install transformers==4.27.2
 
 COPY . /src/
-RUN python3.8 -m pip install -r requirements.txt
 
 CMD python3.8 -u runpod_infer.py
