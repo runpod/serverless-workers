@@ -1,7 +1,7 @@
 from transformers import GPTNeoXForCausalLM, GPTNeoXTokenizerFast
 
-model = GPTNeoXForCausalLM.from_pretrained("EleutherAI/gpt-neox-20b")
-tokenizer = GPTNeoXTokenizerFast.from_pretrained("EleutherAI/gpt-neox-20b")
+model = GPTNeoXForCausalLM.from_pretrained("EleutherAI/gpt-neo-1.3B")
+tokenizer = GPTNeoXTokenizerFast.from_pretrained("EleutherAI/gpt-neo-1.3B")
 
 prompt = "GPTNeoX20B is a 20B-parameter autoregressive Transformer model developed by EleutherAI."
 
