@@ -34,6 +34,10 @@ RUN python3.8 -m pip install runpod==0.9.1
 RUN python3.8 -m pip install torch==2.0.0
 RUN python3.8 -m pip install transformers==4.27.2
 
+COPY download_model.py /src/download_model.py
+RUN python3.8 download_model.py
+
 COPY runpod_infer.py /src/runpod_infer.py
+COPY test_input.json /src/test_input.json
 
 CMD python3.8 -u runpod_infer.py
