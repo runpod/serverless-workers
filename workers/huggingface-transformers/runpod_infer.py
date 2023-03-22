@@ -2,10 +2,10 @@
 RunPod | Transformer | Handler
 '''
 import runpod
-from transformers import GPTNeoXForCausalLM, GPTNeoXTokenizerFast
+from transformers import GPTNeoForCausalLM, GPT2Tokenizer
 
-model = GPTNeoXForCausalLM.from_pretrained("EleutherAI/gpt-neo-1.3B")
-tokenizer = GPTNeoXTokenizerFast.from_pretrained("EleutherAI/gpt-neo-1.3B")
+model = GPTNeoForCausalLM.from_pretrained("EleutherAI/gpt-neo-1.3B")
+tokenizer = GPT2Tokenizer.from_pretrained("EleutherAI/gpt-neo-1.3B")
 
 
 def generator(job):
