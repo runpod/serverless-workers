@@ -38,9 +38,9 @@ RUN python3.8 -m pip install torch==2.0.0
 RUN python3.8 -m pip install transformers==4.27.2
 
 COPY model_fetcher.py /src/model_fetcher.py
-RUN python3.8 model_fetcher.py --MODEL_NAME=${MODEL_NAME}
+RUN python3.8 model_fetcher.py --model_name=${MODEL_NAME}
 
 COPY runpod_infer.py /src/runpod_infer.py
 COPY test_input.json /src/test_input.json
 
-CMD python3.8 -u runpod_infer.py --MODEL_NAME=${MODEL_NAME}
+CMD python3.8 -u runpod_infer.py --model_name=${MODEL_NAME}
