@@ -58,7 +58,7 @@ def generator(job):
         do_sample=val_input['do_sample'],
         temperature=val_input['temperature'],
         max_length=val_input['max_length'],
-    )
+    ).to(device)
 
     gen_text = tokenizer.batch_decode(gen_tokens)[0]
 
