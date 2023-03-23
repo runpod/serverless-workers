@@ -1,10 +1,12 @@
 '''
 RunPod | Transformer | Handler
 '''
+import torch
 import runpod
 from runpod.serverless.utils.rp_validator import validate
-
 from transformers import GPTNeoForCausalLM, GPT2Tokenizer
+
+torch.cuda.is_available()
 
 model = GPTNeoForCausalLM.from_pretrained("EleutherAI/gpt-neo-1.3B")
 tokenizer = GPT2Tokenizer.from_pretrained("EleutherAI/gpt-neo-1.3B")
