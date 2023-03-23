@@ -1,6 +1,9 @@
 ARG BASE_IMAGE=nvidia/cuda:11.6.2-cudnn8-devel-ubuntu20.04
 FROM ${BASE_IMAGE} as dev-base
 
+ARG MODEL_NAME
+ENV MODEL_NAME=${MODEL_NAME}
+
 WORKDIR /src
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -34,10 +37,10 @@ RUN python3.8 -m pip install runpod==0.9.1
 RUN python3.8 -m pip install torch==2.0.0
 RUN python3.8 -m pip install transformers==4.27.2
 
-COPY download_model.py /src/download_model.py
-RUN python3.8 download_model.py
+COPY model_fetcher.py /src/model_fetcher.py
+RUN python3.8 model_fetcher.py --MODEL_NAME=${MODEL_NAME}
 
 COPY runpod_infer.py /src/runpod_infer.py
 COPY test_input.json /src/test_input.json
 
-CMD python3.8 -u runpod_infer.py
+CMD python3.8 -u runpod_infer.py --MODEL_NAME=${MODEL_NAME}

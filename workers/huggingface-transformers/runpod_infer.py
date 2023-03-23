@@ -1,16 +1,16 @@
 '''
 RunPod | Transformer | Handler
 '''
+import argparse
+
 import torch
 import runpod
 from runpod.serverless.utils.rp_validator import validate
 from transformers import GPTNeoForCausalLM, GPT2Tokenizer
+from transformers import AutoTokenizer, AutoModelForCausalLM
 
 torch.cuda.is_available()
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-model = GPTNeoForCausalLM.from_pretrained("EleutherAI/gpt-neo-1.3B").to(device)
-tokenizer = GPT2Tokenizer.from_pretrained("EleutherAI/gpt-neo-1.3B")
 
 INPUT_SCHEMA = {
     'prompt': {
@@ -66,6 +66,21 @@ def generator(job):
 
 
 # ---------------------------------------------------------------------------- #
-#                                 Start Worker                                 #
+#                                Parse Arguments                               #
 # ---------------------------------------------------------------------------- #
-runpod.serverless.start({"handler": generator})
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("--model_name", type=str,
+                    default="gpt-neo-1.3B", help="URL of the model to download.")
+
+
+if __name__ == "__main__":
+    args = parser.parse_args()
+
+    if args.model_name == 'gpt-neo-1.3B':
+        model = GPTNeoForCausalLM.from_pretrained("EleutherAI/gpt-neo-1.3B")
+        tokenizer = GPT2Tokenizer.from_pretrained("EleutherAI/gpt-neo-1.3B")
+    elif args.model_name == 'gpt-neox-20b':
+        tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neox-20b")
+        model = AutoModelForCausalLM.from_pretrained("EleutherAI/gpt-neox-20b")
+
+    runpod.serverless.start({"handler": generator})
