@@ -77,10 +77,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.model_name == 'gpt-neo-1.3B':
-        model = GPTNeoForCausalLM.from_pretrained("EleutherAI/gpt-neo-1.3B")
+        model = GPTNeoForCausalLM.from_pretrained("EleutherAI/gpt-neo-1.3B").to(device)
         tokenizer = GPT2Tokenizer.from_pretrained("EleutherAI/gpt-neo-1.3B")
     elif args.model_name == 'gpt-neox-20b':
+        model = AutoModelForCausalLM.from_pretrained("EleutherAI/gpt-neox-20b").to(device)
         tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neox-20b")
-        model = AutoModelForCausalLM.from_pretrained("EleutherAI/gpt-neox-20b")
 
     runpod.serverless.start({"handler": generator})
