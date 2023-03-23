@@ -84,5 +84,9 @@ if __name__ == "__main__":
         model = AutoModelForCausalLM.from_pretrained(
             "EleutherAI/gpt-neox-20b", local_files_only=True).to(device)
         tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neox-20b", local_files_only=True)
+    elif args.model_name == 'pygmalion-6b':
+        model = AutoModelForCausalLM.from_pretrained(
+            "PygmalionAI/pygmalion-6b", local_files_only=True).to(device)
+        tokenizer = AutoTokenizer.from_pretrained("PygmalionAI/pygmalion-6b", local_files_only=True)
 
     runpod.serverless.start({"handler": generator})

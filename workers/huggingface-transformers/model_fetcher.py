@@ -15,6 +15,9 @@ def download_model(model_name):
     elif model_name == 'gpt-neox-20b':
         AutoTokenizer.from_pretrained("EleutherAI/gpt-neox-20b")
         AutoModelForCausalLM.from_pretrained("EleutherAI/gpt-neox-20b")
+    elif model_name == 'pygmalion-6b':
+        AutoModelForCausalLM.from_pretrained("PygmalionAI/pygmalion-6b")
+        AutoTokenizer.from_pretrained("PygmalionAI/pygmalion-6b")
 
 
 # ---------------------------------------------------------------------------- #
