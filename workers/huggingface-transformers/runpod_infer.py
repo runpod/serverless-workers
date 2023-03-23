@@ -7,8 +7,9 @@ from runpod.serverless.utils.rp_validator import validate
 from transformers import GPTNeoForCausalLM, GPT2Tokenizer
 
 torch.cuda.is_available()
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-model = GPTNeoForCausalLM.from_pretrained("EleutherAI/gpt-neo-1.3B")
+model = GPTNeoForCausalLM.from_pretrained("EleutherAI/gpt-neo-1.3B").to(device)
 tokenizer = GPT2Tokenizer.from_pretrained("EleutherAI/gpt-neo-1.3B")
 
 INPUT_SCHEMA = {
