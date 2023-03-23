@@ -10,11 +10,12 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 
 def download_model(model_name):
     if model_name == 'gpt-neo-1.3B':
-        model = GPTNeoForCausalLM.from_pretrained("EleutherAI/gpt-neo-1.3B")
-        tokenizer = GPT2Tokenizer.from_pretrained("EleutherAI/gpt-neo-1.3B")
+        GPTNeoForCausalLM.from_pretrained("EleutherAI/gpt-neo-1.3B", local_files_only=True)
+        GPT2Tokenizer.from_pretrained("EleutherAI/gpt-neo-1.3B", local_files_only=True)
     elif model_name == 'gpt-neox-20b':
-        tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neox-20b")
-        model = AutoModelForCausalLM.from_pretrained("EleutherAI/gpt-neox-20b")
+        AutoTokenizer.from_pretrained("EleutherAI/gpt-neox-20b", local_files_only=True)
+        AutoModelForCausalLM.from_pretrained(
+            "EleutherAI/gpt-neox-20b", local_files_only=True)
 
 
 # ---------------------------------------------------------------------------- #
