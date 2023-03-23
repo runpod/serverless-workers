@@ -51,7 +51,7 @@ def generator(job):
         return {"error": val_input['errors']}
     val_input = val_input['validated_input']
 
-    input_ids = tokenizer(val_input['prompt'], return_tensors="pt").input_ids
+    input_ids = tokenizer(val_input['prompt'], return_tensors="pt").input_ids.to(device)
 
     gen_tokens = model.generate(
         input_ids,
