@@ -6,7 +6,7 @@ import argparse
 
 import torch
 from transformers import (GPTNeoForCausalLM, GPT2Tokenizer, GPTNeoXForCausalLM,
-                          GPTNeoXTokenizerFast, AutoTokenizer, AutoModelForCausalLM)
+                          GPTNeoXTokenizerFast, GPTJForCausalLM, AutoTokenizer, AutoModelForCausalLM)
 
 
 def download_model(model_name):
@@ -29,8 +29,8 @@ def download_model(model_name):
         AutoTokenizer.from_pretrained("PygmalionAI/pygmalion-6b")
 
     elif model_name == 'gpt-j-6b':
+        GPTJForCausalLM.from_pretrained("EleutherAI/gpt-j-6B")
         AutoTokenizer.from_pretrained("EleutherAI/gpt-j-6B")
-        AutoModelForCausalLM.from_pretrained("EleutherAI/gpt-j-6B")
 
 
 # ---------------------------------------------------------------------------- #

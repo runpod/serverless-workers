@@ -7,7 +7,7 @@ import torch
 import runpod
 from runpod.serverless.utils.rp_validator import validate
 from transformers import (GPTNeoForCausalLM, GPT2Tokenizer, GPTNeoXForCausalLM,
-                          GPTNeoXTokenizerFast, AutoTokenizer, AutoModelForCausalLM)
+                          GPTNeoXTokenizerFast, GPTJForCausalLM, AutoTokenizer, AutoModelForCausalLM)
 
 
 torch.cuda.is_available()
@@ -101,9 +101,10 @@ if __name__ == "__main__":
             "PygmalionAI/pygmalion-6b", local_files_only=True)
 
     elif args.model_name == 'gpt-j-6b':
-        model = AutoTokenizer.from_pretrained(
+        model = GPTJForCausalLM.from_pretrained(
+            "EleutherAI/gpt-j-6B", local_files_only=True, revision="float16",
+            torch_dtype=torch.float16).to(device)
+        tokenizer = AutoTokenizer.from_pretrained(
             "EleutherAI/gpt-j-6B", local_files_only=True).to(device)
-        tokenizer = AutoModelForCausalLM.from_pretrained(
-            "EleutherAI/gpt-j-6B", local_files_only=True)
 
     runpod.serverless.start({"handler": generator})
