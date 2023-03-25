@@ -6,8 +6,9 @@ import argparse
 import torch
 import runpod
 from runpod.serverless.utils.rp_validator import validate
-from transformers import GPTNeoForCausalLM, GPT2Tokenizer
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import (GPTNeoForCausalLM, GPT2Tokenizer, GPTNeoXForCausalLM,
+                          GPTNeoXTokenizerFast, AutoTokenizer, AutoModelForCausalLM)
+
 
 torch.cuda.is_available()
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -76,21 +77,33 @@ parser.add_argument("--model_name", type=str,
 if __name__ == "__main__":
     args = parser.parse_args()
 
+    # --------------------------------- Neo 1.3B --------------------------------- #
     if args.model_name == 'gpt-neo-1.3B':
         model = GPTNeoForCausalLM.from_pretrained(
             "EleutherAI/gpt-neo-1.3B", local_files_only=True).to(device)
         tokenizer = GPT2Tokenizer.from_pretrained("EleutherAI/gpt-neo-1.3B", local_files_only=True)
+
     elif args.model_name == 'gpt-neo-2.7B':
         model = GPTNeoForCausalLM.from_pretrained(
-            "EleutherAI/gpt-neo-2.7B", local_files_only=True).to(device)
+            "EleutherAI/gpt-neo-2.7B", local_files_only=True, torch_dtype=torch.float16).to(device)
         tokenizer = GPT2Tokenizer.from_pretrained("EleutherAI/gpt-neo-2.7B", local_files_only=True)
+
     elif args.model_name == 'gpt-neox-20b':
-        model = AutoModelForCausalLM.from_pretrained(
-            "EleutherAI/gpt-neox-20b", local_files_only=True).to(device)
-        tokenizer = AutoTokenizer.from_pretrained("EleutherAI/gpt-neox-20b", local_files_only=True)
+        model = GPTNeoXForCausalLM.from_pretrained(
+            "EleutherAI/gpt-neox-20b", local_files_only=True).half().to(device)
+        tokenizer = GPTNeoXTokenizerFast.from_pretrained(
+            "EleutherAI/gpt-neox-20b", local_files_only=True)
+
     elif args.model_name == 'pygmalion-6b':
         model = AutoModelForCausalLM.from_pretrained(
             "PygmalionAI/pygmalion-6b", local_files_only=True).to(device)
-        tokenizer = AutoTokenizer.from_pretrained("PygmalionAI/pygmalion-6b", local_files_only=True)
+        tokenizer = AutoTokenizer.from_pretrained(
+            "PygmalionAI/pygmalion-6b", local_files_only=True)
+
+    elif args.model_name == 'gpt-j-6b':
+        model = AutoTokenizer.from_pretrained(
+            "EleutherAI/gpt-j-6B", local_files_only=True).to(device)
+        tokenizer = AutoModelForCausalLM.from_pretrained(
+            "EleutherAI/gpt-j-6B", local_files_only=True)
 
     runpod.serverless.start({"handler": generator})
