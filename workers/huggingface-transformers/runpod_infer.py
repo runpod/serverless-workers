@@ -105,6 +105,6 @@ if __name__ == "__main__":
             "EleutherAI/gpt-j-6B", local_files_only=True, revision="float16",
             torch_dtype=torch.float16).to(device)
         tokenizer = AutoTokenizer.from_pretrained(
-            "EleutherAI/gpt-j-6B", local_files_only=True).to(device)
+            "EleutherAI/gpt-j-6B", local_files_only=True)
 
     runpod.serverless.start({"handler": generator})
