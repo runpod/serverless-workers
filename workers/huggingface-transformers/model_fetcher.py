@@ -29,7 +29,8 @@ def download_model(model_name):
         AutoTokenizer.from_pretrained("PygmalionAI/pygmalion-6b")
 
     elif model_name == 'gpt-j-6b':
-        GPTJForCausalLM.from_pretrained("EleutherAI/gpt-j-6B")
+        GPTJForCausalLM.from_pretrained("EleutherAI/gpt-j-6B", revision="float16",
+                                        torch_dtype=torch.float16)
         AutoTokenizer.from_pretrained("EleutherAI/gpt-j-6B")
 
 
