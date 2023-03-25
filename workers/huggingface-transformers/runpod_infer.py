@@ -80,6 +80,10 @@ if __name__ == "__main__":
         model = GPTNeoForCausalLM.from_pretrained(
             "EleutherAI/gpt-neo-1.3B", local_files_only=True).to(device)
         tokenizer = GPT2Tokenizer.from_pretrained("EleutherAI/gpt-neo-1.3B", local_files_only=True)
+    elif args.model_name == 'gpt-neo-2.7B':
+        model = GPTNeoForCausalLM.from_pretrained(
+            "EleutherAI/gpt-neo-2.7B", local_files_only=True).to(device)
+        tokenizer = GPT2Tokenizer.from_pretrained("EleutherAI/gpt-neo-2.7B", local_files_only=True)
     elif args.model_name == 'gpt-neox-20b':
         model = AutoModelForCausalLM.from_pretrained(
             "EleutherAI/gpt-neox-20b", local_files_only=True).to(device)

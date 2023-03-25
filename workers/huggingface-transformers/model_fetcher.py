@@ -12,6 +12,9 @@ def download_model(model_name):
     if model_name == 'gpt-neo-1.3B':
         GPTNeoForCausalLM.from_pretrained("EleutherAI/gpt-neo-1.3B")
         GPT2Tokenizer.from_pretrained("EleutherAI/gpt-neo-1.3B")
+    elif model_name == 'gpt-neo-2.7B':
+        GPTNeoForCausalLM.from_pretrained("EleutherAI/gpt-neo-2.7B")
+        GPT2Tokenizer.from_pretrained("EleutherAI/gpt-neo-2.7B")
     elif model_name == 'gpt-neox-20b':
         AutoTokenizer.from_pretrained("EleutherAI/gpt-neox-20b")
         AutoModelForCausalLM.from_pretrained("EleutherAI/gpt-neox-20b")
