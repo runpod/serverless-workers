@@ -16,18 +16,22 @@ def download_model(model_name):
         GPTNeoForCausalLM.from_pretrained("EleutherAI/gpt-neo-1.3B")
         GPT2Tokenizer.from_pretrained("EleutherAI/gpt-neo-1.3B")
 
+    # --------------------------------- Neo 2.7B --------------------------------- #
     elif model_name == 'gpt-neo-2.7B':
         GPTNeoForCausalLM.from_pretrained("EleutherAI/gpt-neo-2.7B", torch_dtype=torch.float16)
         GPT2Tokenizer.from_pretrained("EleutherAI/gpt-neo-2.7B")
 
+    # ----------------------------------- NeoX ----------------------------------- #
     elif model_name == 'gpt-neox-20b':
         GPTNeoXForCausalLM.from_pretrained("EleutherAI/gpt-neox-20b").half()
         GPTNeoXTokenizerFast.from_pretrained("EleutherAI/gpt-neox-20b")
 
+    # --------------------------------- Pygmalion -------------------------------- #
     elif model_name == 'pygmalion-6b':
         AutoModelForCausalLM.from_pretrained("PygmalionAI/pygmalion-6b")
         AutoTokenizer.from_pretrained("PygmalionAI/pygmalion-6b")
 
+    # ----------------------------------- GPT-J ----------------------------------- #
     elif model_name == 'gpt-j-6b':
         GPTJForCausalLM.from_pretrained("EleutherAI/gpt-j-6B", revision="float16",
                                         torch_dtype=torch.float16)
