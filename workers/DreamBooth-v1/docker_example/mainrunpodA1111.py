@@ -339,4 +339,3 @@ def done():
         tooltip='',
         icon='check'
     )
-    display(done)
