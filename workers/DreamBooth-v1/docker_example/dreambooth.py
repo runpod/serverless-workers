@@ -10,12 +10,12 @@ import subprocess
 # ---------------------------------------------------------------------------- #
 def dump_only_textenc(
         model_name, concept_dir, ouput_dir, PT, seed, batch_size, resolution,
-        precision, training_steps, learning_rate, lr_scheduler, enable_adam):
+        precision, training_steps, learning_rate, lr_scheduler, enable_adam, pndm_scheduler):
     '''
     Train the text encoder first.
     '''
     text_options = [
-        "accelerate", "launch", "/src/diffusers/examples/dreambooth/train_dreambooth.py",
+        "accelerate", "launch", "/src/diffusers/examples/dreambooth/train_dreambooth_rnpdendpt.py",
         "--train_text_encoder",
         "--dump_only_text_encoder",
         f"--pretrained_model_name_or_path={model_name}",
@@ -38,6 +38,9 @@ def dump_only_textenc(
     if enable_adam:
         text_options.append("--use_8bit_adam")
 
+    if pndm_scheduler:
+        text_options.append("--PNDM")
+
     text_encoder = subprocess.Popen(text_options)
 
     text_encoder.wait()
@@ -48,12 +51,12 @@ def dump_only_textenc(
 # ---------------------------------------------------------------------------- #
 def train_only_unet(
         stp, SESSION_DIR, model_name, INSTANCE_DIR, OUTPUT_DIR, offset_noise, PT, seed, batch_size,
-        resolution, precision, num_train_epochs, learning_rate, lr_scheduler, enable_adam):
+        resolution, precision, num_train_epochs, learning_rate, lr_scheduler, enable_adam, pndm_scheduler):
     '''
     Train only the image encoder.
     '''
     unet_options = [
-        "accelerate", "launch", "/src/diffusers/examples/dreambooth/train_dreambooth.py",
+        "accelerate", "launch", "/src/diffusers/examples/dreambooth/train_dreambooth_rnpdendpt.py",
         "--image_captions_filename",
         "--train_only_unet",
         f"--save_n_steps={stp}",
@@ -81,6 +84,9 @@ def train_only_unet(
 
     if enable_adam:
         unet_options.append("--use_8bit_adam")
+
+    if pndm_scheduler:
+        unet_options.append("--PNDM")
 
     unet = subprocess.Popen(unet_options)
 

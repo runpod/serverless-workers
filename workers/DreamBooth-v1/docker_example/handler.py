@@ -59,6 +59,11 @@ TRAIN_SCHEMA = {
         'required': False,
         'default': False
     },
+    'pndm_scheduler': {
+        'type': bool,
+        'required': False,
+        'default': False
+    },
     # Text Encoder Training Parameters
     'text_steps': {
         'type': int,
@@ -431,6 +436,7 @@ def handler(job):
         learning_rate=train_input['text_learning_rate'],
         lr_scheduler=train_input['text_lr_scheduler'],
         enable_adam=train_input['text_8_bit_adam'],
+        pndm_scheduler=train_input['pndm_scheduler']
     )
 
     train_only_unet(
@@ -449,6 +455,7 @@ def handler(job):
         learning_rate=train_input['unet_learning_rate'],
         lr_scheduler=train_input['unet_lr_scheduler'],
         enable_adam=train_input['unet_8_bit_adam'],
+        pndm_scheduler=train_input['pndm_scheduler']
     )
 
     # Convert to CKPT

@@ -1,4 +1,4 @@
-FROM runpod/pytorch:3.10-1.13.1-116
+FROM runpod/pytorch:3.10-2.0.0-116-nightly
 
 SHELL ["/bin/bash", "-c"]
 
@@ -14,8 +14,8 @@ RUN cd /workspace/sd/stable-diffusion-webui/modules && sed -i 's@/content/gdrive
 
 RUN python -m pip install --upgrade pip
 RUN pip install bitsandbytes==0.35
-RUN pip install transformers==4.21.1
-# RUN pip install runpod==0.9.0
+RUN pip install transformers==4.25.1
+# RUN pip install runpod==0.9.1
 RUN pip install setuptools==67.4.0
 RUN pip install https://github.com/runpod/runpod-python/archive/main.zip
 
@@ -25,7 +25,7 @@ ADD model_fetcher.sh /src/
 RUN sh /src/model_fetcher.sh
 
 RUN git clone https://github.com/TheLastBen/fast-stable-diffusion.git
-RUN git clone --depth 1 --branch updt https://github.com/TheLastBen/diffusers
+RUN git clone --depth 1 --branch main https://github.com/TheLastBen/diffusers
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt update && apt install python3.10-venv --yes --no-install-recommends
