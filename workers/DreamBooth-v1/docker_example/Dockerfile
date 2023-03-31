@@ -1,4 +1,5 @@
-FROM runpod/pytorch:3.10-2.0.0-116-nightly
+# FROM runpod/pytorch:3.10-2.0.0-116-nightly
+FROM runpod/pytorch:3.10-1.13.1-116
 
 SHELL ["/bin/bash", "-c"]
 
