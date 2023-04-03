@@ -1,4 +1,5 @@
-FROM runpod/pytorch:3.10-2.0.0-116-nightly
+ARG BASE_IMAGE=runpod/pytorch:3.10-2.0.0-117
+FROM ${BASE_IMAGE} as dev-base
 
 SHELL ["/bin/bash", "-c"]
 
@@ -18,6 +19,9 @@ RUN pip install transformers==4.25.1
 # RUN pip install runpod==0.9.1
 RUN pip install setuptools==67.4.0
 RUN pip install https://github.com/runpod/runpod-python/archive/main.zip
+
+# Install missing dependencies
+RUN pip install torchvision==0.15.1
 
 RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
 RUN apt-get install git-lfs -y
