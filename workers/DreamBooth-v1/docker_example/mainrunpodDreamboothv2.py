@@ -24,10 +24,10 @@ def Deps(force_reinstall):
 
     if not force_reinstall and os.path.exists('/usr/local/lib/python3.10/dist-packages/safetensors'):
         ntbks()
-        print('[1;32mModules and notebooks updated, dependencies already installed')
+        print('Modules and notebooks updated, dependencies already installed')
         os.environ['PYTHONWARNINGS'] = 'ignore'
     else:
-        print('[1;33mInstalling the dependencies...')
+        print('Installing the dependencies...')
         call('pip install --root-user-action=ignore --disable-pip-version-check --no-deps -qq gdown numpy==1.23.5 accelerate==0.12.0 --force-reinstall',
              shell=True, stdout=open('/dev/null', 'w'))
         ntbks()
