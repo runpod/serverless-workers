@@ -33,12 +33,12 @@ def Deps(force_reinstall):
         call('wget -q https://huggingface.co/TheLastBen/dependencies/resolve/main/rnpddeps-t2.tar.zst',
              shell=True, stdout=open('/dev/null', 'w'))
         call('tar -C / --zstd -xf rnpddeps-t2.tar.zst', shell=True, stdout=open('/dev/null', 'w'))
-        call("sed -i 's@~/.cache@/src/cache@' /usr/local/lib/python3.10/dist-packages/transformers/utils/hub.py", shell=True)
-        os.chdir('/src')
+        call("sed -i 's@~/.cache@/workspace/cache@' /usr/local/lib/python3.10/dist-packages/transformers/utils/hub.py", shell=True)
+        os.chdir('/workspace')
         call("git clone --depth 1 -q --branch main https://github.com/TheLastBen/diffusers",
              shell=True, stdout=open('/dev/null', 'w'))
         call("rm -r deps", shell=True)
-        os.chdir('/src')
+        os.chdir('/workspace')
         os.environ['PYTHONWARNINGS'] = 'ignore'
         clear_output()
 
@@ -70,14 +70,14 @@ def Depnds(force_reinstall):
         call('tar -C / --zstd -xf rnpddeps.tar.zst', shell=True, stdout=open('/dev/null', 'w'))
         Popen('apt-get install libfontconfig1 libgles2-mesa-dev -q=2 --no-install-recommends',
               shell=True, stdout=open('/dev/null', 'w'), stderr=open('/dev/null', 'w'))
-        call("sed -i 's@~/.cache@/src/cache@' /usr/local/lib/python3.10/dist-packages/transformers/utils/hub.py", shell=True)
-        os.chdir('/src')
+        call("sed -i 's@~/.cache@/workspace/cache@' /usr/local/lib/python3.10/dist-packages/transformers/utils/hub.py", shell=True)
+        os.chdir('/workspace')
         call("git clone --depth 1 -q --branch main https://github.com/TheLastBen/diffusers",
              shell=True, stdout=open('/dev/null', 'w'))
         call("pip install --root-user-action=ignore -qq gradio==3.23",
              shell=True, stdout=open('/dev/null', 'w'))
         call("rm -r deps", shell=True)
-        os.chdir('/src')
+        os.chdir('/workspace')
         clear_output()
 
         done()
@@ -85,16 +85,16 @@ def Depnds(force_reinstall):
 
 def ntbks():
 
-    os.chdir('/src')
+    os.chdir('/workspace')
     if not os.path.exists('Latest_Notebooks'):
         call('mkdir Latest_Notebooks', shell=True)
     else:
         call('rm -r Latest_Notebooks', shell=True)
         call('mkdir Latest_Notebooks', shell=True)
-    os.chdir('/src/Latest_Notebooks')
+    os.chdir('/workspace/Latest_Notebooks')
     call('wget -q -i https://huggingface.co/datasets/TheLastBen/RNPD/raw/main/Notebooks.txt', shell=True)
     call('rm Notebooks.txt', shell=True)
-    os.chdir('/src')
+    os.chdir('/workspace')
 
 
 def repo(Huggingface_token_optional):
@@ -102,44 +102,44 @@ def repo(Huggingface_token_optional):
     from slugify import slugify
     from huggingface_hub import HfApi, CommitOperationAdd, create_repo
 
-    os.chdir('/src')
+    os.chdir('/workspace')
     if Huggingface_token_optional != "":
         username = HfApi().whoami(Huggingface_token_optional)["name"]
         backup = f"https://USER:{Huggingface_token_optional}@huggingface.co/datasets/{username}/fast-stable-diffusion/resolve/main/sd_backup_rnpd.tar.zst"
         response = requests.head(backup)
         if response.status_code == 302:
             print('[1;33mRestoring the SD folder...')
-            open('/src/sd_backup_rnpd.tar.zst', 'wb').write(requests.get(backup).content)
+            open('/workspace/sd_backup_rnpd.tar.zst', 'wb').write(requests.get(backup).content)
             call('tar --zstd -xf sd_backup_rnpd.tar.zst', shell=True)
             call('rm sd_backup_rnpd.tar.zst', shell=True)
         else:
             print('[1;33mBackup not found, using a fresh/existing repo...')
             time.sleep(2)
-            if not os.path.exists('/src/sd/stablediffusion'):
+            if not os.path.exists('/workspace/sd/stablediffusion'):
                 call('wget -q -O sd_rep.tar.zst https://huggingface.co/TheLastBen/dependencies/resolve/main/sd_rep.tar.zst', shell=True)
                 call('tar --zstd -xf sd_rep.tar.zst', shell=True)
                 call('rm sd_rep.tar.zst', shell=True)
-            os.chdir('/src/sd')
+            os.chdir('/workspace/sd')
             if not os.path.exists('stable-diffusion-webui'):
                 call('git clone -q --depth 1 --branch master https://github.com/AUTOMATIC1111/stable-diffusion-webui', shell=True)
 
     else:
         print('[1;33mInstalling/Updating the repo...')
-        os.chdir('/src')
-        if not os.path.exists('/src/sd/stablediffusion'):
+        os.chdir('/workspace')
+        if not os.path.exists('/workspace/sd/stablediffusion'):
             call('wget -q -O sd_rep.tar.zst https://huggingface.co/TheLastBen/dependencies/resolve/main/sd_rep.tar.zst', shell=True)
             call('tar --zstd -xf sd_rep.tar.zst', shell=True)
             call('rm sd_rep.tar.zst', shell=True)
 
-        os.chdir('/src/sd')
+        os.chdir('/workspace/sd')
         if not os.path.exists('stable-diffusion-webui'):
             call('git clone -q --depth 1 --branch master https://github.com/AUTOMATIC1111/stable-diffusion-webui', shell=True)
 
-    os.chdir('/src/sd/stable-diffusion-webui/')
+    os.chdir('/workspace/sd/stable-diffusion-webui/')
     call('git reset --hard', shell=True)
     print('[1;32m')
     call('git pull', shell=True)
-    os.chdir('/src')
+    os.chdir('/workspace')
     clear_output()
     done()
 
@@ -148,9 +148,9 @@ def mdls(Original_Model_Version, Path_to_MODEL, MODEL_LINK, safetensors):
 
     import gdown
 
-    if os.path.exists('/src/auto-models/SDv1-5.ckpt'):
-        call('mv /src/auto-models/* /src/sd/stable-diffusion-webui/models/Stable-diffusion', shell=True)
-        call('rm -r /src/auto-models', shell=True)
+    if os.path.exists('/workspace/auto-models/SDv1-5.ckpt'):
+        call('mv /workspace/auto-models/* /workspace/sd/stable-diffusion-webui/models/Stable-diffusion', shell=True)
+        call('rm -r /workspace/auto-models', shell=True)
 
     if Path_to_MODEL != '':
         if os.path.exists(str(Path_to_MODEL)):
@@ -161,7 +161,7 @@ def mdls(Original_Model_Version, Path_to_MODEL, MODEL_LINK, safetensors):
 
     elif MODEL_LINK != "":
         modelname = "model.safetensors" if safetensors else "model.ckpt"
-        model = f'/src/sd/stable-diffusion-webui/models/Stable-diffusion/{modelname}'
+        model = f'/workspace/sd/stable-diffusion-webui/models/Stable-diffusion/{modelname}'
         if os.path.exists(model):
             call('rm '+model, shell=True)
         gdown.download(url=MODEL_LINK, output=model, quiet=False, fuzzy=True)
@@ -174,28 +174,28 @@ def mdls(Original_Model_Version, Path_to_MODEL, MODEL_LINK, safetensors):
 
     else:
         if Original_Model_Version == "v1.5":
-            model = "/src/sd/stable-diffusion-webui/models/Stable-diffusion/SDv1-5.ckpt"
+            model = "/workspace/sd/stable-diffusion-webui/models/Stable-diffusion/SDv1-5.ckpt"
             print('[1;32mUsing the original V1.5 model')
         elif Original_Model_Version == "v2-512":
-            if not os.path.exists('/src/sd/stable-diffusion-webui/models/Stable-diffusion/SDv2-512.ckpt'):
+            if not os.path.exists('/workspace/sd/stable-diffusion-webui/models/Stable-diffusion/SDv2-512.ckpt'):
                 print('[1;33mDownlading the V2-512 model...')
-                model = '/src/sd/stable-diffusion-webui/models/Stable-diffusion/SDv2-512.ckpt'
+                model = '/workspace/sd/stable-diffusion-webui/models/Stable-diffusion/SDv2-512.ckpt'
                 call('gdown -O '+model+' https://huggingface.co/stabilityai/stable-diffusion-2-1-base/resolve/main/v2-1_512-nonema-pruned.ckpt', shell=True)
                 clear_output()
                 print('[1;32mUsing the original V2-512 model')
             else:
                 print('[1;32mUsing the original V2-512 model')
-                model = '/src/sd/stable-diffusion-webui/models/Stable-diffusion/SDv2-512.ckpt'
+                model = '/workspace/sd/stable-diffusion-webui/models/Stable-diffusion/SDv2-512.ckpt'
         elif Original_Model_Version == "v2-768":
-            model = "/src/sd/stable-diffusion-webui/models/Stable-diffusion/SDv2-768.ckpt"
+            model = "/workspace/sd/stable-diffusion-webui/models/Stable-diffusion/SDv2-768.ckpt"
             print('[1;32mUsing the original V2-768 model')
         else:
-            model = "/src/sd/stable-diffusion-webui/models/Stable-diffusion"
+            model = "/workspace/sd/stable-diffusion-webui/models/Stable-diffusion"
             print('[1;31mWrong model version, try again')
     try:
         model
     except:
-        model = "/src/sd/stable-diffusion-webui/models/Stable-diffusion"
+        model = "/workspace/sd/stable-diffusion-webui/models/Stable-diffusion"
 
     return model
 
@@ -212,17 +212,17 @@ def CNet(ControlNet_Model, ControlNet_v2_Model):
         else:
             print(f"[1;32mThe model {filename} already exists[0m")
 
-    os.chdir('/src/sd/stable-diffusion-webui/extensions')
+    os.chdir('/workspace/sd/stable-diffusion-webui/extensions')
     if not os.path.exists("sd-webui-controlnet"):
         call('git clone https://github.com/Mikubill/sd-webui-controlnet.git', shell=True)
-        os.chdir('/src')
+        os.chdir('/workspace')
     else:
         os.chdir('sd-webui-controlnet')
         call('git reset --hard', shell=True, stdout=open('/dev/null', 'w'), stderr=open('/dev/null', 'w'))
         call('git pull', shell=True, stdout=open('/dev/null', 'w'), stderr=open('/dev/null', 'w'))
-        os.chdir('/src')
+        os.chdir('/workspace')
 
-    mdldir = "/src/sd/stable-diffusion-webui/extensions/sd-webui-controlnet/models"
+    mdldir = "/workspace/sd/stable-diffusion-webui/extensions/sd-webui-controlnet/models"
     for filename in os.listdir(mdldir):
         if "_sd14v1" in filename:
             renamed = re.sub("_sd14v1", "-fp16", filename)
@@ -291,10 +291,10 @@ def sd(User, Password, model):
 
     call('wget -q -O /usr/local/lib/python3.10/dist-packages/gradio/blocks.py https://raw.githubusercontent.com/TheLastBen/fast-stable-diffusion/main/AUTOMATIC1111_files/blocks.py', shell=True)
 
-    os.chdir('/src/sd/stable-diffusion-webui/modules')
+    os.chdir('/workspace/sd/stable-diffusion-webui/modules')
     call('wget -q -O paths.py https://raw.githubusercontent.com/TheLastBen/fast-stable-diffusion/main/AUTOMATIC1111_files/paths.py', shell=True)
-    call("sed -i 's@/content/gdrive/MyDrive/sd/stablediffusion@/src/sd/stablediffusion@' /src/sd/stable-diffusion-webui/modules/paths.py", shell=True)
-    os.chdir('/src/sd/stable-diffusion-webui')
+    call("sed -i 's@/content/gdrive/MyDrive/sd/stablediffusion@/workspace/sd/stablediffusion@' /workspace/sd/stable-diffusion-webui/modules/paths.py", shell=True)
+    os.chdir('/workspace/sd/stable-diffusion-webui')
     clear_output()
 
     podid = os.environ.get('RUNPOD_POD_ID')
@@ -330,7 +330,7 @@ def save(Huggingface_Write_token):
         print('[1;31mA huggingface write token is required')
 
     else:
-        os.chdir('/src')
+        os.chdir('/workspace')
 
         if os.path.exists('sd'):
 
@@ -343,7 +343,7 @@ def save(Huggingface_Write_token):
             print("[1;32mBacking up...")
 
             operations = [CommitOperationAdd(
-                path_in_repo="sd_backup_rnpd.tar.zst", path_or_fileobj="/src/sd_backup_rnpd.tar.zst")]
+                path_in_repo="sd_backup_rnpd.tar.zst", path_or_fileobj="/workspace/sd_backup_rnpd.tar.zst")]
 
             create_repo(repo_id, private=True, token=Huggingface_Write_token,
                         exist_ok=True, repo_type="dataset")
