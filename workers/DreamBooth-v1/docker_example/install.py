@@ -1,4 +1,4 @@
 from mainrunpodA1111 import *
 
-Depnds(True)
+Deps(True)
 repo("")
