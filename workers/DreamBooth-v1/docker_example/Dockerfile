@@ -5,6 +5,10 @@ SHELL ["/bin/bash", "-c"]
 
 WORKDIR /src
 
+# Install missing dependencies
+RUN pip install torchvision==0.15.1
+RUN pip install python-slugify==8.0.1
+
 ADD mainrunpodA1111.py /src/
 ADD install.py /src/
 RUN python -u install.py
@@ -19,9 +23,6 @@ RUN pip install transformers==4.25.1
 # RUN pip install runpod==0.9.1
 RUN pip install setuptools==67.4.0
 RUN pip install https://github.com/runpod/runpod-python/archive/main.zip
-
-# Install missing dependencies
-RUN pip install torchvision==0.15.1
 
 RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
 RUN apt-get install git-lfs -y
