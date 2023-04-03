@@ -6,7 +6,7 @@ SHELL ["/bin/bash", "-c"]
 WORKDIR /src
 
 # Install missing dependencies
-RUN apt-get update -y
+RUN apt-get update && apt-get install -y --no-install-recommends apt-utils
 RUN pip install torchvision==0.15.1
 RUN pip install python-slugify==8.0.1
 RUN pip install huggingface-hub==0.13.3
@@ -24,6 +24,7 @@ RUN cd /workspace/sd/stable-diffusion-webui/modules && sed -i 's@/content/gdrive
 RUN python -m pip install --upgrade pip
 RUN pip install bitsandbytes==0.35
 RUN pip install transformers==4.25.1
+RUN pip install xformers==0.0.18
 # RUN pip install runpod==0.9.1
 RUN pip install setuptools==67.4.0
 RUN pip install https://github.com/runpod/runpod-python/archive/main.zip
