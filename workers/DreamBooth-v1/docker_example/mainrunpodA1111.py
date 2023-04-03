@@ -11,6 +11,40 @@ from urllib.parse import urlparse
 import re
 
 
+def Deps(force_reinstall):
+
+    if not force_reinstall and os.path.exists('/usr/local/lib/python3.10/dist-packages/safetensors'):
+        ntbks()
+        print('[1;32mModules and notebooks updated, dependencies already installed')
+        os.environ['PYTHONWARNINGS'] = 'ignore'
+    else:
+        print('[1;33mInstalling the dependencies...')
+        call('pip install --root-user-action=ignore --disable-pip-version-check --no-deps -qq gdown numpy==1.23.5 accelerate==0.12.0 --force-reinstall',
+             shell=True, stdout=open('/dev/null', 'w'))
+        ntbks()
+        if os.path.exists('deps'):
+            call("rm -r deps", shell=True)
+        if os.path.exists('diffusers'):
+            call("rm -r diffusers", shell=True)
+        call('mkdir deps', shell=True)
+        if not os.path.exists('cache'):
+            call('mkdir cache', shell=True)
+        os.chdir('deps')
+        call('wget -q https://huggingface.co/TheLastBen/dependencies/resolve/main/rnpddeps-t2.tar.zst',
+             shell=True, stdout=open('/dev/null', 'w'))
+        call('tar -C / --zstd -xf rnpddeps-t2.tar.zst', shell=True, stdout=open('/dev/null', 'w'))
+        call("sed -i 's@~/.cache@/workspace/cache@' /usr/local/lib/python3.10/dist-packages/transformers/utils/hub.py", shell=True)
+        os.chdir('/workspace')
+        call("git clone --depth 1 -q --branch main https://github.com/TheLastBen/diffusers",
+             shell=True, stdout=open('/dev/null', 'w'))
+        call("rm -r deps", shell=True)
+        os.chdir('/workspace')
+        os.environ['PYTHONWARNINGS'] = 'ignore'
+        clear_output()
+
+        done()
+
+
 def Depnds(force_reinstall):
 
     if not force_reinstall and os.path.exists('/usr/local/lib/python3.10/dist-packages/safetensors'):
