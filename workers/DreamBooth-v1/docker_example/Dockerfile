@@ -10,7 +10,7 @@ RUN apt-get update -y
 RUN pip install torchvision==0.15.1
 RUN pip install python-slugify==8.0.1
 RUN pip install huggingface-hub==0.13.3
-RUN apt-get install apt install zstd -y
+RUN apt-get install zstd -y
 
 ADD mainrunpodA1111.py /src/
 ADD mainrunpodDreamboothv2.py /src/
