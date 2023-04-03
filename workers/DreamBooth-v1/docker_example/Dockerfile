@@ -8,6 +8,7 @@ WORKDIR /src
 # Install missing dependencies
 RUN pip install torchvision==0.15.1
 RUN pip install python-slugify==8.0.1
+RUN pip install huggingface-hub==0.13.3
 
 ADD mainrunpodA1111.py /src/
 ADD install.py /src/
