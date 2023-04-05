@@ -25,9 +25,9 @@ RUN python -m pip install --upgrade pip
 RUN pip install bitsandbytes==0.35
 RUN pip install transformers==4.25.1
 RUN pip install xformers==0.0.18
-# RUN pip install runpod==0.9.1
+RUN pip install runpod==0.9.1
 RUN pip install setuptools==67.4.0
-RUN pip install https://github.com/runpod/runpod-python/archive/main.zip
+# RUN pip install https://github.com/runpod/runpod-python/archive/main.zip
 
 RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
 RUN apt-get install git-lfs -y
