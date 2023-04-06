@@ -17,4 +17,4 @@ COPY . /src
 
 RUN python model_fetcher.py
 
-CMD python -y /src/runpod_handler.py
+CMD python -u /src/runpod_handler.py
