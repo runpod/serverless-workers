@@ -48,7 +48,7 @@ class Predictor(BasePredictor):
         print("Loading pipeline...")
 
         self.txt2img_pipe = StableDiffusionPipeline.from_pretrained(
-            "./stable-diffusion-v1-5",
+            "runwayml/stable-diffusion-v1-5",
             safety_checker=None,
             cache_dir=MODEL_CACHE,
             local_files_only=True,
