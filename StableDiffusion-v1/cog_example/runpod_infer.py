@@ -83,6 +83,17 @@ INPUT_SCHEMA = {
         'type': bool,
         'required': False,
         'default': False
+    },
+    'lora' : {
+        'type' : str,
+        'required' : False,
+        'default' : None
+    },
+    'lora_scale' : {
+        'type' : float,
+        'required' : False,
+        'default' : 1,
+        'constraints': lambda lora_scale: 0 <= lora_scale <= 1
     }
 }
 
@@ -123,6 +134,8 @@ def run(job):
         num_inference_steps=job_input.get('num_inference_steps', 50),
         guidance_scale=job_input['guidance_scale'],
         scheduler=job_input.get('scheduler', "K-LMS"),
+        lora=job_input.get("lora", None),
+        lora_scale=job_input.get("lora_scale", 1),
         seed=job_input['seed']
     )
 

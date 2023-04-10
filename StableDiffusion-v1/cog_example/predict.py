@@ -48,7 +48,7 @@ class Predictor(BasePredictor):
         print("Loading pipeline...")
 
         self.txt2img_pipe = StableDiffusionPipeline.from_pretrained(
-            "runwayml/stable-diffusion-v1-5",
+            "./stable-diffusion-v1-5",
             safety_checker=None,
             cache_dir=MODEL_CACHE,
             local_files_only=True,
@@ -132,10 +132,18 @@ class Predictor(BasePredictor):
         seed: int = Input(
             description="Random seed. Leave blank to randomize the seed", default=None
         ),
+        lora: str = Input(
+            description="instantly download lora models and use them via runpod",
+            default=None
+        ),
+        lora_scale : int = Input(
+            description="what percentage of the lora model do you want applied?",
+            default=1
+        )
     ) -> List[Path]:
         '''
         Run a single prediction on the model
-        '''
+        '''        
         if seed is None:
             seed = int.from_bytes(os.urandom(2), "big")
 
@@ -170,6 +178,11 @@ class Predictor(BasePredictor):
             }
 
         pipe.scheduler = make_scheduler(scheduler, pipe.scheduler.config)
+        
+        if not (lora is None):
+            print("loaded lora")
+            pipe.unet.load_attn_procs(lora)
+            extra_kwargs['cross_attention_kwargs'] = {"scale": lora_scale}
 
         generator = torch.Generator("cuda").manual_seed(seed)
         output = pipe(
