@@ -73,6 +73,9 @@ class Predictor(BasePredictor):
             # safety_checker=self.txt2img_pipe.safety_checker,
             feature_extractor=self.txt2img_pipe.feature_extractor,
         ).to("cuda")
+        
+        # because lora is loaded for the entire model
+        self.lora_loaded = False
 
         self.txt2img_pipe.enable_xformers_memory_efficient_attention()
         self.img2img_pipe.enable_xformers_memory_efficient_attention()
@@ -182,7 +185,13 @@ class Predictor(BasePredictor):
         if not (lora is None):
             print("loaded lora")
             pipe.unet.load_attn_procs(lora)
+            pipe.unet.load_attn_procs(lora)
+            self.lora_loaded = True
             extra_kwargs['cross_attention_kwargs'] = {"scale": lora_scale}
+        
+        # because lora is retained between requests
+        if (lora is None) and self.lora_loaded:
+            extra_kwargs['cross_attention_kwargs'] = {"scale": 0}
 
         generator = torch.Generator("cuda").manual_seed(seed)
         output = pipe(
