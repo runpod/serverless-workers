@@ -147,7 +147,7 @@ INFERENCE_SCHEMA = {
         'default': False
     },
     'denoising_strength': {
-        'type': int,
+        'type': float,
         'required': False,
         'default': 0
     },
