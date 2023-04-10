@@ -185,7 +185,6 @@ class Predictor(BasePredictor):
         if not (lora is None):
             print("loaded lora")
             pipe.unet.load_attn_procs(lora)
-            pipe.unet.load_attn_procs(lora)
             self.lora_loaded = True
             extra_kwargs['cross_attention_kwargs'] = {"scale": lora_scale}
         
