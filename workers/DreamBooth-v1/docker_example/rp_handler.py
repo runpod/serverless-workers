@@ -5,6 +5,7 @@ This is the handler for the DreamBooth serverless worker.
 '''
 
 import os
+import base64
 import shutil
 import requests
 import subprocess
@@ -180,9 +181,10 @@ def handler(job):
             results['passback'] = passback
 
             for index, image in enumerate(results['images']):
+                image_bytes = base64.b64decode(image.split(",", 1)[1])
                 results['images'][index] = upload_in_memory_object(
                     file_name=f"{infer_index}-{index}.png",
-                    file_data=image
+                    file_data=image_bytes
                 )
 
             inference_results.append(results)
