@@ -152,13 +152,22 @@ def handler(job):
     )
 
     # Convert to CKPT
-    diffusers_to_ckpt = subprocess.Popen([
-        "python", "/src/diffusers/scripts/convertosdv2.py",
-        "--fp16",
-        f"/src/job_files/{job['id']}/model",
-        f"/src/job_files/{job['id']}/{job['id']}.ckpt"
-    ])
-    diffusers_to_ckpt.wait()
+    diffusers_to_ckpt = subprocess.Popen(
+        [
+            "python", "/src/diffusers/scripts/convertosdv2.py",
+            "--fp16",
+            f"/src/job_files/{job['id']}/model",
+            f"/src/job_files/{job['id']}/{job['id']}.ckpt"
+        ],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE
+    )
+
+    stdout, stderr = diffusers_to_ckpt.communicate()
+    return_code = diffusers_to_ckpt.returncode
+
+    if return_code != 0:
+        return {"error": f"Error converting to CKPT: {stderr.decode('utf-8')}"}
 
     trained_ckpt = f"/src/job_files/{job['id']}/{job['id']}.ckpt"
 
