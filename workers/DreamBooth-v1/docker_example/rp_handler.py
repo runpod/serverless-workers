@@ -167,6 +167,7 @@ def handler(job):
     return_code = diffusers_to_ckpt.returncode
 
     if return_code != 0:
+        print(f"Converting to ckpt stdout: {stdout.decode('utf-8')}")
         return {"error": f"Error converting to CKPT: {stderr.decode('utf-8')}"}
 
     trained_ckpt = f"/src/job_files/{job['id']}/{job['id']}.ckpt"
