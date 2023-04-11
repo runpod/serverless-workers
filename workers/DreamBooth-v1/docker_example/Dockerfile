@@ -45,7 +45,6 @@ ADD dreambooth.py /src/
 ADD custom_model.py /src/
 ADD rp_handler.py /src/
 ADD rp_schemas.py /src/
-ADD start.sh /src/
 ADD test_input.json /src/
 
 ENV PYTHONUNBUFFERED=1
