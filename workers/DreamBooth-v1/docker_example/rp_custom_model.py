@@ -4,7 +4,7 @@ RunPod | DreamBooth | Custom Model Fetcher
 
 import os
 import wget
-
+import subprocess
 from subprocess import call
 
 
@@ -13,21 +13,30 @@ def downloadmodel_hf(Path_to_HuggingFace, huggingface_token=None):
     Download model from HuggingFace.
     '''
     if huggingface_token:
-        authe = f'https://USER:{huggingface_token}@'
+        auth = f'https://USER:{huggingface_token}@'
     else:
-        authe = "https://"
+        auth = "https://"
 
-    os.makedirs('/src/stable-diffusion-custom', exist_ok=True)
+    custom_path = '/src/stable-diffusion-custom'
+    os.makedirs(custom_path, exist_ok=True)
 
     print(f"Current working directory: {os.getcwd()}")
 
-    os.chdir("/src/stable-diffusion-custom")
-    call("git init", shell=True)
-    call("git lfs install --system --skip-repo", shell=True)
-    call('git remote add -f origin '+authe+'huggingface.co/'+Path_to_HuggingFace, shell=True)
-    call("git config core.sparsecheckout true", shell=True)
-    call('echo -e "\nscheduler\ntext_encoder\ntokenizer\nunet\nvae\nmodel_index.json\n!*.safetensors" > .git/info/sparse-checkout', shell=True)
-    call("git pull origin main", shell=True)
+    os.chdir(custom_path)
+    commands = [
+        "git init",
+        "git lfs install --system --skip-repo",
+        f'git remote add -f origin {auth}huggingface.co/{Path_to_HuggingFace}',
+        "git config core.sparsecheckout true",
+        'echo -e "\nscheduler\ntext_encoder\ntokenizer\nunet\nvae\nmodel_index.json\n!*.safetensors" > .git/info/sparse-checkout',
+        "git pull origin main"
+    ]
+
+    for command in commands:
+        result = subprocess.run(command, shell=True, stderr=subprocess.PIPE, check=False)
+        if result.returncode != 0:
+            raise RuntimeError(
+                f"Error executing command: {command}\nError message: {result.stderr.decode('utf-8')}")
 
     print("Successfully downloaded model from HuggingFace.")
 

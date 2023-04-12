@@ -41,8 +41,8 @@ RUN git clone --depth 1 --branch main https://github.com/TheLastBen/diffusers
 
 ENV DEBIAN_FRONTEND noninteractive
 
-ADD dreambooth.py /src/
-ADD custom_model.py /src/
+ADD rp_dreambooth.py /src/
+ADD rp_custom_model.py /src/
 ADD rp_handler.py /src/
 ADD rp_schemas.py /src/
 ADD test_input.json /src/

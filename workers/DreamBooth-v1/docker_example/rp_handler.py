@@ -15,8 +15,8 @@ import runpod
 from runpod.serverless.utils import rp_download, upload_file_to_bucket, upload_in_memory_object
 from runpod.serverless.utils.rp_validator import validate
 
-from dreambooth import dump_only_textenc, train_only_unet
-from custom_model import selected_model
+from rp_dreambooth import dump_only_textenc, train_only_unet
+from rp_custom_model import selected_model
 from rp_schemas import TRAIN_SCHEMA, INFERENCE_SCHEMA, S3_SCHEMA
 
 
@@ -111,8 +111,12 @@ def handler(job):
     # ---------------------------- Set Starting Model ---------------------------- #
     if train_input['hf_model'] and train_input['ckpt_link']:
         return {"error": "Please provide either a Hugging Face model or a checkpoint URL."}
-    model_name = selected_model(train_input['hf_model'],
-                                train_input['ckpt_link'], train_input['hf_token'])
+
+    model_name = selected_model(
+        train_input['hf_model'],
+        train_input['ckpt_link'],
+        train_input['hf_token']
+    )
 
     # ----------------------------------- Train ---------------------------------- #
     dump_only_textenc(
