@@ -11,3 +11,5 @@
 
 - Merged PR that corrected denoising_strength type from in to float.
 - Removed start.sh and consolidated into Dockerfile
+- Update runpod to use main version, fix breaking changes
+- Refresh worker after failed jobs

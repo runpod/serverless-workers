@@ -47,7 +47,6 @@ def handler(job):
     job_input = job['input']
 
     job_output = {}
-    job_output['train'] = {}
 
     # -------------------------------- Validation -------------------------------- #
     # Validate the training input
@@ -204,6 +203,8 @@ def handler(job):
 
     # ------------------------------- Upload Files ------------------------------- #
     if 's3Config' in job:
+        job_output['train'] = {}
+
         # Upload the checkpoint file
         job_output['train']['checkpoint_url'] = upload_file_to_bucket(
             file_name=f"{job['id']}.ckpt",
