@@ -212,7 +212,7 @@ def handler(job):
         # Upload the checkpoint file
         job_output['train']['checkpoint_url'] = upload_file_to_bucket(
             file_name=f"{job['id']}.ckpt",
-            file_data=trained_ckpt,
+            file_location=trained_ckpt,
             bucket_creds=s3_config,
             bucket_name=job['s3Config']['bucketName'],
         )
