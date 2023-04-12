@@ -53,58 +53,69 @@ def downloadmodel_hf(Path_to_HuggingFace, huggingface_token=None):
     print("Downloaded model is compatible with DreamBooth.")
 
 
-def downloadmodel_lnk(CKPT_Link):
+def downloadmodel_lnk(ckpt_link):
     '''
     Download a model from a ckpt link.
     '''
     result = subprocess.run(
-        f"gdown --fuzzy {CKPT_Link} -O model.ckpt",
+        f"gdown --fuzzy {ckpt_link} -O model.ckpt",
         shell=True, stderr=subprocess.PIPE, check=False
     )
     if result.returncode != 0:
         raise RuntimeError(
-            f"Error downloading model from link: {CKPT_Link}\nError message: {result.stderr.decode('utf-8')}")
+            f"Error downloading model from link: {ckpt_link}\nError message: {result.stderr.decode('utf-8')}")
 
-    if os.path.exists('model.ckpt'):
-        if os.path.getsize("model.ckpt") > 1810671599:
-            wget.download(
-                'https://github.com/TheLastBen/fast-stable-diffusion/raw/main/Dreambooth/refmdlz')
-            subprocess.run('unzip -o -q refmdlz', shell=True, check=False)
-            subprocess.run('rm -f refmdlz', shell=True, check=False)
-            wget.download(
-                'https://raw.githubusercontent.com/TheLastBen/fast-stable-diffusion/main/Dreambooth/convertodiffv1.py')
+    if os.path.exists('model.ckpt') and os.path.getsize("model.ckpt") > 1810671599:
+        refmdlz_file = 'refmdlz'
+        wget.download(
+            f'https://github.com/TheLastBen/fast-stable-diffusion/raw/main/Dreambooth/{refmdlz_file}')
 
-            subprocess.run(
-                'python convertodiffv1.py model.ckpt stable-diffusion-custom --v1',
-                shell=True, stderr=subprocess.PIPE, check=False
-            )
-            if result.returncode != 0:
-                raise RuntimeError(
-                    f"Error executing convertodiffv1.py\nError message: {result.stderr.decode('utf-8')}")
+        if not os.path.exists(refmdlz_file):
+            raise RuntimeError(f"Error downloading {refmdlz_file}")
 
-            subprocess.run('rm convertodiffv1.py', shell=True, check=False)
-            subprocess.run('rm -r refmdl', shell=True, check=False)
+        subprocess.run(f'unzip -o -q {refmdlz_file}', shell=True, check=True)
+        subprocess.run(f'rm -f {refmdlz_file}', shell=True, check=True)
+
+        wget.download(
+            'https://raw.githubusercontent.com/TheLastBen/fast-stable-diffusion/main/Dreambooth/convertodiffv1.py')
+
+        result = subprocess.run(
+            'python convertodiffv1.py model.ckpt /src/stable-diffusion-custom --v1',
+            shell=True, stderr=subprocess.PIPE, check=False
+        )
+        if result.returncode != 0:
+            raise RuntimeError(
+                f"Error executing convertodiffv1.py\nError message: {result.stderr.decode('utf-8')}")
+
+        subprocess.run('rm convertodiffv1.py', shell=True, check=True)
+        subprocess.run('rm -r refmdl', shell=True, check=True)
 
 
-def selected_model(Path_to_HuggingFace, CKPT_Link, huggingface_token=None):
+def selected_model(path_to_huggingface=None, ckpt_link=None, huggingface_token=None):
     '''
     Either download a model from HuggingFace or from a ckpt link.
     Or use the original V1.5 model.
     '''
-    MODEL_NAME = "/src/stable-diffusion-v1-5"
-    if Path_to_HuggingFace:
-        downloadmodel_hf(Path_to_HuggingFace, huggingface_token)
-        MODEL_NAME = "/src/stable-diffusion-custom"
-    elif CKPT_Link:
-        downloadmodel_lnk(CKPT_Link)
-        MODEL_NAME = "/src/stable-diffusion-custom"
+    model_name = "/src/stable-diffusion-v1-5"
 
+    if path_to_huggingface:
+        downloadmodel_hf(path_to_huggingface, huggingface_token)
+        model_name = "/src/stable-diffusion-custom"
+    elif ckpt_link:
+        downloadmodel_lnk(ckpt_link)
+        model_name = "/src/stable-diffusion-custom"
+
+    # Ensure the required directory exists
+    os.makedirs(model_name, exist_ok=True)
+
+    # Modify the config.json file
     result = subprocess.run(
-        f"sed -i 's@\"sample_size\": 256,@\"sample_size\": 512,@g' {MODEL_NAME}/vae/config.json",
+        f"sed -i 's@\"sample_size\": 256,@\"sample_size\": 512,@g' {model_name}/vae/config.json",
         shell=True, stderr=subprocess.PIPE, check=False
     )
+
     if result.returncode != 0:
         raise RuntimeError(
             f"Error modifying config.json\nError message: {result.stderr.decode('utf-8')}")
 
-    return MODEL_NAME
+    return model_name
