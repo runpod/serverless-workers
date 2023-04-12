@@ -57,20 +57,33 @@ def downloadmodel_lnk(CKPT_Link):
     '''
     Download a model from a ckpt link.
     '''
-    call("gdown --fuzzy " + CKPT_Link + " -O model.ckpt", shell=True)
+    result = subprocess.run(
+        f"gdown --fuzzy {CKPT_Link} -O model.ckpt",
+        shell=True, stderr=subprocess.PIPE, check=False
+    )
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"Error downloading model from link: {CKPT_Link}\nError message: {result.stderr.decode('utf-8')}")
 
     if os.path.exists('model.ckpt'):
         if os.path.getsize("model.ckpt") > 1810671599:
             wget.download(
                 'https://github.com/TheLastBen/fast-stable-diffusion/raw/main/Dreambooth/refmdlz')
-            call('unzip -o -q refmdlz', shell=True)
-            call('rm -f refmdlz', shell=True)
+            subprocess.run('unzip -o -q refmdlz', shell=True, check=False)
+            subprocess.run('rm -f refmdlz', shell=True, check=False)
             wget.download(
                 'https://raw.githubusercontent.com/TheLastBen/fast-stable-diffusion/main/Dreambooth/convertodiffv1.py')
 
-            call('python convertodiffv1.py model.ckpt stable-diffusion-custom --v1', shell=True)
-            call('rm convertodiffv1.py', shell=True)
-            call('rm -r refmdl', shell=True)
+            subprocess.run(
+                'python convertodiffv1.py model.ckpt stable-diffusion-custom --v1',
+                shell=True, stderr=subprocess.PIPE, check=False
+            )
+            if result.returncode != 0:
+                raise RuntimeError(
+                    f"Error executing convertodiffv1.py\nError message: {result.stderr.decode('utf-8')}")
+
+            subprocess.run('rm convertodiffv1.py', shell=True, check=False)
+            subprocess.run('rm -r refmdl', shell=True, check=False)
 
 
 def selected_model(Path_to_HuggingFace, CKPT_Link, huggingface_token=None):
@@ -86,6 +99,12 @@ def selected_model(Path_to_HuggingFace, CKPT_Link, huggingface_token=None):
         downloadmodel_lnk(CKPT_Link)
         MODEL_NAME = "/src/stable-diffusion-custom"
 
-    call("sed -i 's@\"sample_size\": 256,@\"sample_size\": 512,@g' " +
-         MODEL_NAME+"/vae/config.json", shell=True)
+    result = subprocess.run(
+        f"sed -i 's@\"sample_size\": 256,@\"sample_size\": 512,@g' {MODEL_NAME}/vae/config.json",
+        shell=True, stderr=subprocess.PIPE, check=False
+    )
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"Error modifying config.json\nError message: {result.stderr.decode('utf-8')}")
+
     return MODEL_NAME
