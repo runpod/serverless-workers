@@ -97,6 +97,7 @@ def selected_model(path_to_huggingface=None, ckpt_link=None, huggingface_token=N
     Or use the original V1.5 model.
     '''
     model_name = "/src/stable-diffusion-v1-5"
+    os.makedirs("/src/stable-diffusion-custom", exist_ok=True)
 
     if path_to_huggingface:
         downloadmodel_hf(path_to_huggingface, huggingface_token)
@@ -104,9 +105,6 @@ def selected_model(path_to_huggingface=None, ckpt_link=None, huggingface_token=N
     elif ckpt_link:
         downloadmodel_lnk(ckpt_link)
         model_name = "/src/stable-diffusion-custom"
-
-    # Ensure the required directory exists
-    os.makedirs(model_name, exist_ok=True)
 
     # Modify the config.json file
     result = subprocess.run(

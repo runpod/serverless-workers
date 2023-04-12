@@ -7,7 +7,7 @@ WORKDIR /src
 
 # Install missing dependencies
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends apt-utils zstd python3.10-venv git-lfs && \
+    apt-get install -y --no-install-recommends apt-utils zstd python3.10-venv git-lfs unzip && \
     apt clean && rm -rf /var/lib/apt/lists/* && \
     echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
     curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash
