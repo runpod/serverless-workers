@@ -194,7 +194,8 @@ def handler(job):
                 image_bytes = base64.b64decode(image.split(",", 1)[0])
                 results['images'][index] = upload_in_memory_object(
                     file_name=f"{infer_index}-{index}.png",
-                    file_data=image_bytes
+                    file_data=image_bytes,
+                    prefix=job['id']
                 )
 
             inference_results.append(results)
@@ -204,11 +205,14 @@ def handler(job):
     # ------------------------------- Upload Files ------------------------------- #
     if 's3Config' in job:
         # Upload the checkpoint file
-        ckpt_url = upload_file_to_bucket(f"{job['id']}.ckpt", trained_ckpt, s3_config)
-        job_output['train']['checkpoint_url'] = ckpt_url
+        job_output['train']['checkpoint_url'] = upload_file_to_bucket(
+            file_name=f"{job['id']}.ckpt",
+            file_data=trained_ckpt,
+            bucket_creds=s3_config,
+            bucket_name=job['s3Config']['bucketName'],
+        )
 
-    job_output['refresh_worker'] = True  # Refresh the worker after the job is done
     return job_output
 
 
-runpod.serverless.start({"handler": handler})
+runpod.serverless.start({"handler": handler, "refresh_worker": True})
