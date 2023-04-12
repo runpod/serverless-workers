@@ -83,6 +83,10 @@ def downloadmodel_lnk(ckpt_link):
             'python convertodiffv1.py model.ckpt /src/stable-diffusion-custom --v1',
             shell=True, stderr=subprocess.PIPE, check=False
         )
+        result = subprocess.run(
+            '/src/diffusers/scripts/convert_original_stable_diffusion_to_diffusers.py - -checkpoint_path /src/model.ckpt - -dump_path /src/stable-diffusion-custom - -original_config_file config.yaml ',
+            shell=True, stderr=subprocess.PIPE, check=False)
+
         if result.returncode != 0:
             raise RuntimeError(
                 f"Error executing convertodiffv1.py\nError message: {result.stderr.decode('utf-8')}")
