@@ -89,7 +89,7 @@ def downloadmodel_lnk(ckpt_link):
 
         if result.returncode != 0:
             raise RuntimeError(
-                f"Error executing convertodiffv1.py\nError message: {result.stderr.decode('utf-8')}")
+                f"Error executing convert_original_stable_diffusion_to_diffusers.py\nError message: {result.stderr.decode('utf-8')}")
 
         subprocess.run('rm convertodiffv1.py', shell=True, check=True)
         subprocess.run('rm -r refmdl', shell=True, check=True)
