@@ -74,7 +74,7 @@ def downloadmodel_lnk(ckpt_link):
         wget.download(
             'https://github.com/CompVis/stable-diffusion/raw/main/configs/stable-diffusion/v1-inference.yaml', 'config.yaml')
         subprocess.run(
-            'python /src/diffusers/scripts/convert_original_stable_diffusion_to_diffusers.py --checkpoint_path /src/model.ckpt -dump_path /src/stable-diffusion-custom -original_config_file config.yaml',
+            'python /src/diffusers/scripts/convert_original_stable_diffusion_to_diffusers.py --checkpoint_path /src/model.ckpt --dump_path /src/stable-diffusion-custom --original_config_file config.yaml',
             shell=True, check=True)
 
         # refmdlz_file = 'refmdlz'
