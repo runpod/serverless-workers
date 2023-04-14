@@ -5,7 +5,7 @@ RunPod | DreamBooth | Custom Model Fetcher
 import os
 import wget
 import subprocess
-from subprocess import call
+from subprocess import call, check_output
 
 
 def downloadmodel_hf(Path_to_HuggingFace, huggingface_token=None):
@@ -58,7 +58,7 @@ def downloadmodel_lnk(ckpt_link):
     Download a model from a ckpt link.
     '''
     result = subprocess.run(
-        f"gdown --fuzzy {ckpt_link} -O model.ckpt",
+        f"gdown --fuzzy -O model.ckpt {ckpt_link}",
         shell=True, stderr=subprocess.PIPE, check=False
     )
     if result.returncode != 0:
@@ -66,33 +66,44 @@ def downloadmodel_lnk(ckpt_link):
             f"Error downloading model from link: {ckpt_link}\nError message: {result.stderr.decode('utf-8')}")
 
     if os.path.exists('model.ckpt') and os.path.getsize("model.ckpt") > 1810671599:
-        refmdlz_file = 'refmdlz'
-        wget.download(
-            f'https://github.com/TheLastBen/fast-stable-diffusion/raw/main/Dreambooth/{refmdlz_file}')
+        wget.download('https://github.com/TheLastBen/fast-stable-diffusion/raw/main/Dreambooth/det.py')
+        custom_model_version = check_output(
+            'python det.py --MODEL_PATH /src/model.ckpt', shell=True).decode('utf-8').replace('\n', '')
 
-        if not os.path.exists(refmdlz_file):
-            raise RuntimeError(f"Error downloading {refmdlz_file}")
+        if custom_model_version == 'v1.5':
+            wget.download(
+                'https://github.com/CompVis/stable-diffusion/raw/main/configs/stable-diffusion/v1-inference.yaml', 'config.yaml')
+            subprocess.run(
+                'python /src/diffusers/scripts/convert_original_stable_diffusion_to_diffusers.py --checkpoint_path /src/model.ckpt - -dump_path /src/stable-diffusion-custom - -original_config_file config.yaml',
+                shell=True, check=True)
 
-        subprocess.run(f'unzip -o -q {refmdlz_file}', shell=True, check=True)
-        subprocess.run(f'rm -f {refmdlz_file}', shell=True, check=True)
+        # refmdlz_file = 'refmdlz'
+        # wget.download(
+        #     f'https://github.com/TheLastBen/fast-stable-diffusion/raw/main/Dreambooth/{refmdlz_file}')
 
-        wget.download(
-            'https://raw.githubusercontent.com/TheLastBen/fast-stable-diffusion/main/Dreambooth/convertodiffv1.py')
+        # if not os.path.exists(refmdlz_file):
+        #     raise RuntimeError(f"Error downloading {refmdlz_file}")
 
+        # subprocess.run(f'unzip -o -q {refmdlz_file}', shell=True, check=True)
+        # subprocess.run(f'rm -f {refmdlz_file}', shell=True, check=True)
+
+        # wget.download(
+        #     'https://raw.githubusercontent.com/TheLastBen/fast-stable-diffusion/main/Dreambooth/convertodiffv1.py')
+
+        # # result = subprocess.run(
+        # #     'python convertodiffv1.py model.ckpt /src/stable-diffusion-custom --v1',
+        # #     shell=True, stderr=subprocess.PIPE, check=False
+        # # )
         # result = subprocess.run(
-        #     'python convertodiffv1.py model.ckpt /src/stable-diffusion-custom --v1',
-        #     shell=True, stderr=subprocess.PIPE, check=False
-        # )
-        result = subprocess.run(
-            '/src/diffusers/scripts/convert_original_stable_diffusion_to_diffusers.py - -checkpoint_path /src/model.ckpt - -dump_path /src/stable-diffusion-custom - -original_config_file config.yaml ',
-            shell=True, stderr=subprocess.PIPE, check=False)
+        #     '/src/diffusers/scripts/convert_original_stable_diffusion_to_diffusers.py - -checkpoint_path /src/model.ckpt - -dump_path /src/stable-diffusion-custom - -original_config_file config.yaml ',
+        #     shell=True, stderr=subprocess.PIPE, check=False)
 
-        if result.returncode != 0:
-            raise RuntimeError(
-                f"Error executing convert_original_stable_diffusion_to_diffusers.py\nError message: {result.stderr.decode('utf-8')}")
+        # if result.returncode != 0:
+        #     raise RuntimeError(
+        #         f"Error executing convert_original_stable_diffusion_to_diffusers.py\nError message: {result.stderr.decode('utf-8')}")
 
-        subprocess.run('rm convertodiffv1.py', shell=True, check=True)
-        subprocess.run('rm -r refmdl', shell=True, check=True)
+        # subprocess.run('rm convertodiffv1.py', shell=True, check=True)
+        # subprocess.run('rm -r refmdl', shell=True, check=True)
 
 
 def selected_model(path_to_huggingface=None, ckpt_link=None, huggingface_token=None):
