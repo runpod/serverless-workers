@@ -66,16 +66,16 @@ def downloadmodel_lnk(ckpt_link):
             f"Error downloading model from link: {ckpt_link}\nError message: {result.stderr.decode('utf-8')}")
 
     if os.path.exists('model.ckpt') and os.path.getsize("model.ckpt") > 1810671599:
-        wget.download('https://github.com/TheLastBen/fast-stable-diffusion/raw/main/Dreambooth/det.py')
-        custom_model_version = check_output(
-            'python det.py --MODEL_PATH /src/model.ckpt', shell=True).decode('utf-8').replace('\n', '')
+        # wget.download('https://github.com/TheLastBen/fast-stable-diffusion/raw/main/Dreambooth/det.py')
+        # custom_model_version = check_output(
+        #     'python det.py --MODEL_PATH /src/model.ckpt', shell=True).decode('utf-8').replace('\n', '')
 
-        if custom_model_version == 'v1.5':
-            wget.download(
-                'https://github.com/CompVis/stable-diffusion/raw/main/configs/stable-diffusion/v1-inference.yaml', 'config.yaml')
-            subprocess.run(
-                'python /src/diffusers/scripts/convert_original_stable_diffusion_to_diffusers.py --checkpoint_path /src/model.ckpt - -dump_path /src/stable-diffusion-custom - -original_config_file config.yaml',
-                shell=True, check=True)
+        # if custom_model_version == 'v1.5':
+        wget.download(
+            'https://github.com/CompVis/stable-diffusion/raw/main/configs/stable-diffusion/v1-inference.yaml', 'config.yaml')
+        subprocess.run(
+            'python /src/diffusers/scripts/convert_original_stable_diffusion_to_diffusers.py --checkpoint_path /src/model.ckpt - -dump_path /src/stable-diffusion-custom - -original_config_file config.yaml',
+            shell=True, check=True)
 
         # refmdlz_file = 'refmdlz'
         # wget.download(
