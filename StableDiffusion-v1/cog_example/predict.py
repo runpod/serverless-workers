@@ -73,6 +73,9 @@ class Predictor(BasePredictor):
             # safety_checker=self.txt2img_pipe.safety_checker,
             feature_extractor=self.txt2img_pipe.feature_extractor,
         ).to("cuda")
+        
+        # because lora is loaded for the entire model
+        self.lora_loaded = False
 
         self.txt2img_pipe.enable_xformers_memory_efficient_attention()
         self.img2img_pipe.enable_xformers_memory_efficient_attention()
@@ -132,10 +135,18 @@ class Predictor(BasePredictor):
         seed: int = Input(
             description="Random seed. Leave blank to randomize the seed", default=None
         ),
+        lora: str = Input(
+            description="instantly download lora models and use them via runpod",
+            default=None
+        ),
+        lora_scale : int = Input(
+            description="what percentage of the lora model do you want applied?",
+            default=1
+        )
     ) -> List[Path]:
         '''
         Run a single prediction on the model
-        '''
+        '''        
         if seed is None:
             seed = int.from_bytes(os.urandom(2), "big")
 
@@ -170,6 +181,16 @@ class Predictor(BasePredictor):
             }
 
         pipe.scheduler = make_scheduler(scheduler, pipe.scheduler.config)
+        
+        if not (lora is None):
+            print("loaded lora")
+            pipe.unet.load_attn_procs(lora)
+            self.lora_loaded = True
+            extra_kwargs['cross_attention_kwargs'] = {"scale": lora_scale}
+        
+        # because lora is retained between requests
+        if (lora is None) and self.lora_loaded:
+            extra_kwargs['cross_attention_kwargs'] = {"scale": 0}
 
         generator = torch.Generator("cuda").manual_seed(seed)
         output = pipe(
