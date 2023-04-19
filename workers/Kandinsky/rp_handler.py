@@ -9,7 +9,7 @@ from runpod.serverless.utils.rp_validator import validate
 model = get_kandinsky2(
     'cuda',
     task_type='text2img',
-    cache_dir='/app/kandinsky2',
+    cache_dir='/kandinsky2',
     model_version='2.1',
     use_flash_attention=False
 )
