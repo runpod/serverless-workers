@@ -20,7 +20,7 @@ RUN python -m pip install --upgrade pip && \
     bitsandbytes==0.35 \
     transformers==4.25.1 \
     xformers==0.0.18 \
-    runpod==0.9.2
+    runpod==0.9.3
 
 # RUN pip install setuptools==67.4.0
 # RUN pip install https://github.com/runpod/runpod-python/archive/main.zip
