@@ -63,6 +63,11 @@ def handler(job):
     if 's3Config' not in job and 'inference' not in job_input:
         return {"error": "Please provide either an inference input or an S3 config."}
     if 'inference' in job_input:
+
+        # Ensure that the inference input is a list
+        if not isinstance(job_input['inference'], list):
+            return {"error": "Inference input must be a list of inferences."}
+
         for index, inference_input in enumerate(job_input['inference']):
             validated_inf_input = validate(inference_input, INFERENCE_SCHEMA)
             if 'errors' in validated_inf_input:
@@ -86,6 +91,10 @@ def handler(job):
     os.makedirs(flat_directory, exist_ok=True)
 
     for root, dirs, files in os.walk(downloaded_input['extracted_path']):
+        # Skip __MACOSX folder
+        if '__MACOSX' in root:
+            continue
+
         for file in files:
             file_path = os.path.join(root, file)
             if os.path.splitext(file_path)[1].lower() in allowed_extensions:
