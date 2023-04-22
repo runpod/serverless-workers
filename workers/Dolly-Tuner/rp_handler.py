@@ -16,7 +16,7 @@ from runpod.serverless.utils import rp_validator, download_files_from_urls
 
 from peft import prepare_model_for_int8_training, LoraConfig, get_peft_model
 
-from .rp_schemas import INPUT_SCHEMA
+from rp_schemas import INPUT_SCHEMA
 
 
 def generate_prompt(data_point):
