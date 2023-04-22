@@ -21,4 +21,4 @@ RUN pip install sentencepiece
 # Copy all files
 COPY . /
 
-CMD python -u rp_handler.py
+CMD python -u /rp_handler.py
