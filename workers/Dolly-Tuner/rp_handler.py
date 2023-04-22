@@ -66,7 +66,7 @@ def handler(job):
     dataset_file = download_files_from_urls(job['id'], job_input['dataset_url'])[0]
 
     tokenizer = AutoTokenizer.from_pretrained(
-        job_input['base_model'], add_eos_token=job_input['add_eos_token']).to(device)
+        job_input['base_model'], add_eos_token=job_input['add_eos_token'])
     model = GPTJForCausalLM.from_pretrained(
         job_input['base_model'], load_in_8bit=job_input['load_in_8bit'], device_map="auto").to(device)
 
