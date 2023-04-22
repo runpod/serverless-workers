@@ -8,6 +8,7 @@ This file is responsible for handling the RunPod request and returning the respo
 import os
 import zipfile
 
+import torch
 import bitsandbytes as bnb
 from datasets import load_dataset
 import transformers
@@ -18,6 +19,9 @@ from runpod.serverless.utils import rp_validator, download_files_from_urls, uplo
 from peft import prepare_model_for_int8_training, LoraConfig, get_peft_model
 
 from rp_schemas import INPUT_SCHEMA
+
+torch.cuda.is_available()
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 def generate_prompt(data_point):
@@ -62,12 +66,12 @@ def handler(job):
     dataset_file = download_files_from_urls(job['id'], job_input['dataset_url'])[0]
 
     tokenizer = AutoTokenizer.from_pretrained(
-        job_input['base_model'], add_eos_token=job_input['add_eos_token'])
+        job_input['base_model'], add_eos_token=job_input['add_eos_token']).to(device)
     model = GPTJForCausalLM.from_pretrained(
-        job_input['base_model'], load_in_8bit=job_input['load_in_8bit'], device_map="auto")
+        job_input['base_model'], load_in_8bit=job_input['load_in_8bit'], device_map="auto").to(device)
 
     model = prepare_model_for_int8_training(
-        model, use_gradient_checkpointing=job_input['use_gradient_checkpointing'])
+        model, use_gradient_checkpointing=job_input['use_gradient_checkpointing']).to(device)
 
     config = LoraConfig(
         r=job_input['lora_rank'],
@@ -114,6 +118,10 @@ def handler(job):
 
     # Zip the model
     model_path = os.path.join("lora-dolly-finetuned", "model.zip")
+    with zipfile.ZipFile(model_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        for root, dirs, files in os.walk("lora-dolly-finetuned"):
+            for file in files:
+                zipf.write(os.path.join(root, file))
 
     uploaded_url = upload_file_to_bucket(
         file_name=f"{job['id']}.zip",
