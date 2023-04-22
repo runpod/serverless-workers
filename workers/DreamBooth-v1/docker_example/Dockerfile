@@ -38,7 +38,6 @@ RUN cd /workspace/sd/stable-diffusion-webui/modules && \
 ADD model_fetcher.sh /src/
 RUN sh /src/model_fetcher.sh
 
-RUN git clone https://github.com/TheLastBen/fast-stable-diffusion.git
 RUN git clone --depth 1 --branch main https://github.com/TheLastBen/diffusers
 RUN pip install -e /src/diffusers
 

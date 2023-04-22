@@ -3,6 +3,8 @@ FROM ${BASE_IMAGE} as dev-base
 
 SHELL ["/bin/bash", "-c"]
 
+WORKDIR /
+
 
 # Install dependencies
 RUN pip install --upgrade pip
@@ -15,5 +17,8 @@ RUN pip install bitsandbytes==0.38.1
 RUN pip install protobuf==3.20.*
 RUN pip install loralib
 RUN pip install sentencepiece
+
+# Copy all files
+COPY . /
 
 CMD python -u rp_handler.py
