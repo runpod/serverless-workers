@@ -53,7 +53,7 @@ def handler(job):
     job_input = job['input']
 
     # Download the dataset
-    dataset_file = download_files_from_urls(job_input['dataset_url'])[0]
+    dataset_file = download_files_from_urls(job['id'], job_input['dataset_url'])[0]
 
     tokenizer = AutoTokenizer.from_pretrained(
         job_input['base_model'], add_eos_token=job_input['add_eos_token'])
