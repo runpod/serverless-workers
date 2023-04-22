@@ -5,14 +5,15 @@ Contains the schemas for the RunPod Fine-Tuner inputs.
 '''
 
 INPUT_SCHEMA = {
+    'dataset_url': {
+        'type': str,
+        'required': True
+    },
     'base_model': {
         'type': str,
         'required': False,
         'default': 'databricks/dolly-v2-12b'
     },
-    'dataset_url': {
-        'type': str,
-        'required': True},
     'micro_batch_size': {
         'type': int,
         'required': False,
