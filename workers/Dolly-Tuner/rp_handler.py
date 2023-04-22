@@ -52,6 +52,11 @@ def generate_prompt(data_point):
 def handler(job):
     job_input = job['input']
 
+    validate_input = rp_validator.validate(job_input, INPUT_SCHEMA)
+    if "error" in validate_input:
+        return validate_input
+    job_input = validate_input['validated_input']
+
     # Download the dataset
     dataset_file = download_files_from_urls(job['id'], job_input['dataset_url'])[0]
 
@@ -105,6 +110,10 @@ def handler(job):
     trainer.train(resume_from_checkpoint=False)
 
     model.save_pretrained("lora-dolly-finetuned")
+
+    model_path = os.path.join("lora-dolly-finetuned", "pytorch_model.bin")
+
+    return f"Model saved at {model_path}"
 
 
 runpod.serverless.start({"handler": handler})
