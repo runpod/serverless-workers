@@ -21,4 +21,8 @@ RUN pip install sentencepiece
 # Copy all files
 COPY . /
 
+# Run the fetcher
+RUN python -u /fetcher.py
+RUN rm /fetcher.py
+
 CMD python -u /rp_handler.py
