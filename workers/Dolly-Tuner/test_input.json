@@ -1,3 +1,5 @@
 {
-    "data_url": "https://github.com/gururise/AlpacaDataCleaned/raw/main/alpaca_data_cleaned.json"
+    "input": {
+        "data_url": "https://github.com/gururise/AlpacaDataCleaned/raw/main/alpaca_data_cleaned.json"
+    }
 }
