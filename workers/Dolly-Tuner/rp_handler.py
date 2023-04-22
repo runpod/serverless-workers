@@ -6,13 +6,14 @@ This file is responsible for handling the RunPod request and returning the respo
 '''
 
 import os
+import zipfile
 
 import bitsandbytes as bnb
 from datasets import load_dataset
 import transformers
 from transformers import AutoTokenizer, AutoModel, AutoConfig, GPTJForCausalLM
 import runpod
-from runpod.serverless.utils import rp_validator, download_files_from_urls
+from runpod.serverless.utils import rp_validator, download_files_from_urls, upload_file_to_bucket
 
 from peft import prepare_model_for_int8_training, LoraConfig, get_peft_model
 
@@ -111,9 +112,17 @@ def handler(job):
 
     model.save_pretrained("lora-dolly-finetuned")
 
-    model_path = os.path.join("lora-dolly-finetuned", "pytorch_model.bin")
+    # Zip the model
+    model_path = os.path.join("lora-dolly-finetuned", "model.zip")
 
-    return f"Model saved at {model_path}"
+    uploaded_url = upload_file_to_bucket(
+        file_name=f"{job['id']}.zip",
+        file_location=model_path
+    )
+
+    return {
+        'tunned_model_url': uploaded_url,
+    }
 
 
 runpod.serverless.start({"handler": handler})
