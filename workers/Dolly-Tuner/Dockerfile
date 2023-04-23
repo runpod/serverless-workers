@@ -5,6 +5,9 @@ SHELL ["/bin/bash", "-c"]
 
 WORKDIR /
 
+# Clone Dolly Repo
+RUN git clone https://github.com/databrickslabs/dolly.git
+
 # Install dependencies
 COPY requirements.txt /requirements.txt
 RUN pip install --upgrade pip && \
