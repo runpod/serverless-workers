@@ -5,6 +5,9 @@ SHELL ["/bin/bash", "-c"]
 
 WORKDIR /
 
+# Get Updates and install essentials
+RUN apt-get update && apt-get build-essentials -y
+
 # Clone Dolly Repo and install dependencies
 RUN git clone https://github.com/databrickslabs/dolly.git
 RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/libcusparse-dev-11-3_11.5.0.58-1_amd64.deb -O /tmp/libcusparse-dev-11-3_11.5.0.58-1_amd64.deb && \
