@@ -6,7 +6,7 @@ SHELL ["/bin/bash", "-c"]
 WORKDIR /
 
 # Get Updates and install essentials
-RUN apt-get update && apt-get build-essentials -y
+RUN apt-get update && apt-get isntall build-essentials -y
 
 # Clone Dolly Repo and install dependencies
 RUN git clone https://github.com/databrickslabs/dolly.git
