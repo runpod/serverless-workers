@@ -1,5 +1,6 @@
 runpod==0.9.3
 accelerate>=0.16.0,<1
+bitsandbytes==0.38.1
 click>=8.0.4,<9
 datasets>=2.10.0,<3
 deepspeed>=0.9.0,<1
