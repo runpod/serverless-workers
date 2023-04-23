@@ -8,18 +8,34 @@ This file is responsible for handling the RunPod request and returning the respo
 import os
 import zipfile
 
+# Import torch and related libraries
 import torch
 import bitsandbytes as bnb
-from datasets import load_dataset
+
+# Import Hugging Face transformers and related libraries
+from transformers import (
+    AutoTokenizer, AutoModel, AutoConfig, GPTJForCausalLM,
+)
 import transformers
-from transformers import AutoTokenizer, AutoModel, AutoConfig, GPTJForCausalLM
+
+# Import datasets
+from datasets import load_dataset
+
+# Import RunPod and related libraries
 import runpod
-from runpod.serverless.utils import rp_validator, download_files_from_urls, upload_file_to_bucket
+from runpod.serverless.utils import (
+    rp_validator, download_files_from_urls, upload_file_to_bucket,
+)
 
-from peft import prepare_model_for_int8_training, LoraConfig, get_peft_model
+# Import PEFT and related libraries
+from peft import (
+    prepare_model_for_int8_training, LoraConfig, get_peft_model,
+)
 
+# Import local modules
 from rp_schemas import INPUT_SCHEMA
 
+# Check for GPU availability
 torch.cuda.is_available()
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -55,6 +71,9 @@ def generate_prompt(data_point):
 
 
 def handler(job):
+    '''
+    Handler for the RunPod Fine-Tuner.
+    '''
     job_input = job['input']
 
     validate_input = rp_validator.validate(job_input, INPUT_SCHEMA)
@@ -65,6 +84,7 @@ def handler(job):
     # Download the dataset
     dataset_file = download_files_from_urls(job['id'], job_input['dataset_url'])[0]
 
+    # Load model and tokenizer
     tokenizer = AutoTokenizer.from_pretrained(
         job_input['base_model'], add_eos_token=job_input['add_eos_token'])
     model = GPTJForCausalLM.from_pretrained(
@@ -73,6 +93,7 @@ def handler(job):
     model = prepare_model_for_int8_training(
         model, use_gradient_checkpointing=job_input['use_gradient_checkpointing']).to(device)
 
+    # Configure Lora
     config = LoraConfig(
         r=job_input['lora_rank'],
         lora_alpha=job_input['lora_alpha'],
@@ -84,8 +105,8 @@ def handler(job):
     model = get_peft_model(model, config)
     tokenizer.pad_token_id = 0
 
+    # Load and preprocess dataset
     data = load_dataset('json', data_files=dataset_file)
-
     data = data.shuffle().map(
         lambda data_point: tokenizer(
             generate_prompt(data_point),
@@ -95,6 +116,7 @@ def handler(job):
         )
     )
 
+    # Configure trainer
     trainer = transformers.Trainer(
         model=model,
         train_dataset=data['train'],
@@ -111,18 +133,20 @@ def handler(job):
         ),
         data_collator=transformers.DataCollatorForLanguageModeling(tokenizer, mlm=False),
     )
+
+    # Train the model
     model.config.use_cache = False
     trainer.train(resume_from_checkpoint=False)
 
+    # Save and zip the model
     model.save_pretrained("lora-dolly-finetuned")
-
-    # Zip the model
     model_path = os.path.join("lora-dolly-finetuned", "model.zip")
     with zipfile.ZipFile(model_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
         for root, dirs, files in os.walk("lora-dolly-finetuned"):
             for file in files:
                 zipf.write(os.path.join(root, file))
 
+    # Upload the model
     uploaded_url = upload_file_to_bucket(
         file_name=f"{job['id']}.zip",
         file_location=model_path

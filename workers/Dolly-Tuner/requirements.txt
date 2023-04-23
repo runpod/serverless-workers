@@ -1,0 +1,9 @@
+runpod==0.9.3
+tensorflow-io
+datasets==2.11.0
+git+https://github.com/huggingface/transformers
+git+https://github.com/huggingface/peft.git
+bitsandbytes==0.38.1
+protobuf==3.20.*
+loralib==0.1.1
+sentencepiece=0.1.98
