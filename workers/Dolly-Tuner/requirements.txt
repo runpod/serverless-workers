@@ -6,4 +6,4 @@ git+https://github.com/huggingface/peft.git
 bitsandbytes==0.38.1
 protobuf==3.20.*
 loralib==0.1.1
-sentencepiece=0.1.98
+sentencepiece==0.1.98
