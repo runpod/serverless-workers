@@ -39,6 +39,7 @@ def generate_image(job):
         return {"error": validated_input['errors']}
     validated_input = validated_input['validated_input']
 
+    # Run inference on the model and get the generated images
     images = model.generate_text2img(
         validated_input['prompt'],
         negative_prior_prompt=validated_input['negative_prior_prompt'],
@@ -54,14 +55,16 @@ def generate_image(job):
     )
 
     # Save the generated image to a file
-    output_path = os.path.join("/tmp", f"{job['id']}_output.png")
-    images[0].save(output_path)
+    os.makedirs(f"/{job['id']}", exist_ok=True)
+
+    image_path = os.path.join(f"/{job['id']}", "0.png")
+    images[0].save(image_path)
 
     # Upload the output image to the S3 bucket
-    image_url = rp_upload.upload_image(job['id'], output_path)
+    image_url = rp_upload.upload_image(job['id'], image_path)
 
     # Cleanup
-    rp_cleanup.clean(['/tmp'])
+    rp_cleanup.clean([f"/{job['id']}"])
 
     return {"image_url": image_url}
 
