@@ -6,6 +6,8 @@ import runpod
 from runpod.serverless.utils import rp_download, rp_upload, rp_cleanup
 from runpod.serverless.utils.rp_validator import validate
 
+from rp_schemas import INPUT_SCHEMA
+
 model = get_kandinsky2(
     'cuda',
     task_type='text2img',
@@ -14,56 +16,21 @@ model = get_kandinsky2(
     use_flash_attention=False
 )
 
-INPUT_SCHEMA = {
-    'text': {
-        'type': str,
-        'required': True
-    },
-    'num_steps': {
-        'type': int,
-        'required': False,
-        'default': 100
-    },
-    'batch_size': {
-        'type': int,
-        'required': False,
-        'default': 1
-    },
-    'guidance_scale': {
-        'type': float,
-        'required': False,
-        'default': 4
-    },
-    'h': {
-        'type': int,
-        'required': False,
-        'default': 768
-    },
-    'w': {
-        'type': int,
-        'required': False,
-        'default': 768
-    },
-    'sampler': {
-        'type': str,
-        'required': False,
-        'default': 'p_sampler'
-    },
-    'prior_cf_scale': {
-        'type': float,
-        'required': False,
-        'default': 4
-    },
-    'prior_steps': {
-        'type': str,
-        'required': False,
-        'default': "5"
-    }
-}
-
 
 def generate_image(job):
+    '''
+    Generate an image from text using Kandinsky2
+    '''
     job_input = job["input"]
+
+    # Prompt is the new name for text, but we keep text for backwards compatibility
+    if job_input.get('text', None) is not None:
+        job_input['prompt'] = job_input['text']
+
+    # Sets negative_prior & negative_decoder to negative_prompt if only negative_prompt is provided
+    if job_input.get('negative_prompt', None) is not None:
+        job_input['negative_prior_prompt'] = job_input['negative_prompt']
+        job_input['negative_decoder_prompt'] = job_input['negative_prompt']
 
     # Input validation
     validated_input = validate(job_input, INPUT_SCHEMA)
@@ -73,7 +40,9 @@ def generate_image(job):
     validated_input = validated_input['validated_input']
 
     images = model.generate_text2img(
-        validated_input['text'],
+        validated_input['prompt'],
+        negative_prior_prompt=validated_input['negative_prior_prompt'],
+        negative_decoder_prompt=validated_input['negative_decoder_prompt'],
         num_steps=validated_input['num_steps'],
         batch_size=validated_input['batch_size'],
         guidance_scale=validated_input['guidance_scale'],

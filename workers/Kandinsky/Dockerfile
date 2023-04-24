@@ -21,11 +21,11 @@ WORKDIR /
 RUN pip install --no-cache-dir runpod==0.9.2 opencv-python "git+https://github.com/ai-forever/Kandinsky-2.git" "git+https://github.com/openai/CLIP.git"
 
 # Copy the fetcher script into the container
-COPY fetcher.py /fetcher.py
+COPY model_fetcher.py /model_fetcher.py
 
 # Run the fetcher script to fetch the model files
-RUN python /fetcher.py && \
-    rm /fetcher.py
+RUN python /model_fetcher.py && \
+    rm /model_fetcher.py
 
 # Copy the serverless implementation file into the container
 COPY rp_handler.py /rp_handler.py
