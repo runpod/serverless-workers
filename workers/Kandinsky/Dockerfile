@@ -29,6 +29,7 @@ RUN python /model_fetcher.py && \
 
 # Copy the serverless implementation file into the container
 COPY rp_handler.py /rp_handler.py
+COPY rp_schemas.py /rp_schemas.py
 
 # Set the entry point
 CMD ["python", "/rp_handler.py"]
