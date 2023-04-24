@@ -18,7 +18,7 @@ RUN apt-get update && \
 WORKDIR /
 
 # Install Python packages
-RUN pip install --no-cache-dir runpod==0.9.2 opencv-python "git+https://github.com/ai-forever/Kandinsky-2.git" "git+https://github.com/openai/CLIP.git"
+RUN pip install --no-cache-dir runpod==0.9.3 opencv-python "git+https://github.com/ai-forever/Kandinsky-2.git" "git+https://github.com/openai/CLIP.git"
 
 # Copy the fetcher script into the container
 COPY model_fetcher.py /model_fetcher.py
