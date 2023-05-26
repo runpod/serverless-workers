@@ -6,7 +6,7 @@
 
 </div>
 
-Official set of serverless AI Endpoint workers provided by RunPod. To make requests to the live endpoints please reference our [API docs](https://docs.runpod.io/reference/runpod-apis).
+**IMPORTANT UPDATE: This repository will be archived and replaced by [runpod-workers](https://github.com/runpod-workers). We have split each worker into its own repository to make it easier to maintain and deploy.**
 
 ## Table of Contents
 
