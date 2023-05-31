@@ -1,3 +1,1 @@
-## Cog Example
-
-https://github.com/chenxwh/cog-whisper
+**This repo has been moved to [runpod-workers/worker-whisper](https://github.com/runpod-workers/worker-whisper)**
