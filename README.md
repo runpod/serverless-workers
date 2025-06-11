@@ -18,7 +18,7 @@
 
 ## Pod Worker Functionality
 
-All the workers us the [RunPod Python Package](https://github.com/runpod/runpod-python) to implement the work functions.
+All the workers us the [Runpod Python Package](https://github.com/runpod/runpod-python) to implement the work functions.
 
 ## Cog
 
