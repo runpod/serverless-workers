@@ -3,15 +3,37 @@ RunPod | DreamBooth | Custom Model Fetcher
 '''
 
 import os
+import re
 import wget
 import subprocess
-from subprocess import call, check_output
+
+
+# Only allow "org/repo"-style Hugging Face identifiers: no shell metacharacters,
+# no path traversal, no flag-injection via a leading "-".
+HF_REPO_ID_RE = re.compile(r"^[A-Za-z0-9_.\-]+/[A-Za-z0-9_.\-]+$")
+
+
+def _run(command, error_prefix):
+    '''
+    Run a command as an argv list (never shell=True) so that untrusted job
+    input interpolated into any argument can't be interpreted as additional
+    shell commands.
+    '''
+    result = subprocess.run(command, shell=False, stderr=subprocess.PIPE, check=False)
+    if result.returncode != 0:
+        raise RuntimeError(
+            f"{error_prefix}: {' '.join(command)}\nError message: {result.stderr.decode('utf-8')}")
+    return result
 
 
 def downloadmodel_hf(Path_to_HuggingFace, huggingface_token=None):
     '''
     Download model from HuggingFace.
     '''
+    if not HF_REPO_ID_RE.match(Path_to_HuggingFace or ""):
+        raise ValueError(
+            f"Invalid Hugging Face repo id, expected 'org/repo': {Path_to_HuggingFace!r}")
+
     if huggingface_token:
         auth = f'https://USER:{huggingface_token}@'
     else:
@@ -23,26 +45,30 @@ def downloadmodel_hf(Path_to_HuggingFace, huggingface_token=None):
     print(f"Current working directory: {os.getcwd()}")
 
     os.chdir(custom_path)
-    commands = [
-        "git init",
-        "git lfs install --system --skip-repo",
-        f'git remote add -f origin {auth}huggingface.co/{Path_to_HuggingFace}',
-        "git config core.sparsecheckout true",
-        'echo -e "\nscheduler\ntext_encoder\ntokenizer\nunet\nvae\nmodel_index.json\n!*.safetensors" > .git/info/sparse-checkout',
-        "git pull origin main"
-    ]
 
-    for command in commands:
-        result = subprocess.run(command, shell=True, stderr=subprocess.PIPE, check=False)
-        if result.returncode != 0:
-            raise RuntimeError(
-                f"Error executing command: {command}\nError message: {result.stderr.decode('utf-8')}")
+    _run(["git", "init"], "Error executing command")
+    _run(["git", "lfs", "install", "--system", "--skip-repo"], "Error executing command")
+    _run(
+        ["git", "remote", "add", "-f", "origin", f'{auth}huggingface.co/{Path_to_HuggingFace}'],
+        "Error executing command"
+    )
+    _run(["git", "config", "core.sparsecheckout", "true"], "Error executing command")
+
+    # Write the sparse-checkout config directly instead of shelling out to
+    # `echo ... > file`, which requires shell interpretation of redirection.
+    os.makedirs(".git/info", exist_ok=True)
+    with open(".git/info/sparse-checkout", "w", encoding="utf-8") as sparse_checkout_file:
+        sparse_checkout_file.write(
+            "\nscheduler\ntext_encoder\ntokenizer\nunet\nvae\nmodel_index.json\n!*.safetensors\n"
+        )
+
+    _run(["git", "pull", "origin", "main"], "Error executing command")
 
     print("Successfully downloaded model from HuggingFace.")
 
     if os.path.exists('unet/diffusion_pytorch_model.bin'):
-        call("rm -r .git", shell=True)
-        call("rm model_index.json", shell=True)
+        _run(["rm", "-r", ".git"], "Error executing command")
+        _run(["rm", "model_index.json"], "Error executing command")
         wget.download(
             'https://raw.githubusercontent.com/TheLastBen/fast-stable-diffusion/main/Dreambooth/model_index.json')
         os.chdir('/src')
@@ -57,53 +83,27 @@ def downloadmodel_lnk(ckpt_link):
     '''
     Download a model from a ckpt link.
     '''
-    result = subprocess.run(
-        f"gdown --fuzzy -O model.ckpt {ckpt_link}",
-        shell=True, stderr=subprocess.PIPE, check=False
+    if not re.match(r"^https?://", ckpt_link or ""):
+        raise ValueError(f"Invalid checkpoint link, must be an http(s) URL: {ckpt_link!r}")
+
+    _run(
+        ["gdown", "--fuzzy", "-O", "model.ckpt", ckpt_link],
+        f"Error downloading model from link: {ckpt_link}"
     )
-    if result.returncode != 0:
-        raise RuntimeError(
-            f"Error downloading model from link: {ckpt_link}\nError message: {result.stderr.decode('utf-8')}")
 
     if os.path.exists('model.ckpt') and os.path.getsize("model.ckpt") > 1810671599:
-        # wget.download('https://github.com/TheLastBen/fast-stable-diffusion/raw/main/Dreambooth/det.py')
-        # custom_model_version = check_output(
-        #     'python det.py --MODEL_PATH /src/model.ckpt', shell=True).decode('utf-8').replace('\n', '')
-
-        # if custom_model_version == 'v1.5':
         wget.download(
-            'https://github.com/CompVis/stable-diffusion/raw/main/configs/stable-diffusion/v1-inference.yaml', 'config.yaml')
-        subprocess.run(
-            'python /src/diffusers/scripts/convert_original_stable_diffusion_to_diffusers.py --checkpoint_path /src/model.ckpt --dump_path /src/stable-diffusion-custom --original_config_file config.yaml',
-            shell=True, check=True)
-
-        # refmdlz_file = 'refmdlz'
-        # wget.download(
-        #     f'https://github.com/TheLastBen/fast-stable-diffusion/raw/main/Dreambooth/{refmdlz_file}')
-
-        # if not os.path.exists(refmdlz_file):
-        #     raise RuntimeError(f"Error downloading {refmdlz_file}")
-
-        # subprocess.run(f'unzip -o -q {refmdlz_file}', shell=True, check=True)
-        # subprocess.run(f'rm -f {refmdlz_file}', shell=True, check=True)
-
-        # wget.download(
-        #     'https://raw.githubusercontent.com/TheLastBen/fast-stable-diffusion/main/Dreambooth/convertodiffv1.py')
-
-        # # result = subprocess.run(
-        # #     'python convertodiffv1.py model.ckpt /src/stable-diffusion-custom --v1',
-        # #     shell=True, stderr=subprocess.PIPE, check=False
-        # # )
-        # result = subprocess.run(
-        #     '/src/diffusers/scripts/convert_original_stable_diffusion_to_diffusers.py - -checkpoint_path /src/model.ckpt - -dump_path /src/stable-diffusion-custom - -original_config_file config.yaml ',
-        #     shell=True, stderr=subprocess.PIPE, check=False)
-
-        # if result.returncode != 0:
-        #     raise RuntimeError(
-        #         f"Error executing convert_original_stable_diffusion_to_diffusers.py\nError message: {result.stderr.decode('utf-8')}")
-
-        # subprocess.run('rm convertodiffv1.py', shell=True, check=True)
-        # subprocess.run('rm -r refmdl', shell=True, check=True)
+            'https://github.com/CompVis/stable-diffusion/raw/main/configs/stable-diffusion/v1-inference.yaml',
+            'config.yaml')
+        _run(
+            [
+                "python", "/src/diffusers/scripts/convert_original_stable_diffusion_to_diffusers.py",
+                "--checkpoint_path", "/src/model.ckpt",
+                "--dump_path", "/src/stable-diffusion-custom",
+                "--original_config_file", "config.yaml"
+            ],
+            "Error converting checkpoint to diffusers format"
+        )
 
 
 def selected_model(path_to_huggingface=None, ckpt_link=None, huggingface_token=None):
@@ -121,14 +121,12 @@ def selected_model(path_to_huggingface=None, ckpt_link=None, huggingface_token=N
         downloadmodel_lnk(ckpt_link)
         model_name = "/src/stable-diffusion-custom"
 
-    # Modify the config.json file
-    result = subprocess.run(
-        f"sed -i 's@\"sample_size\": 256,@\"sample_size\": 512,@g' {model_name}/vae/config.json",
-        shell=True, stderr=subprocess.PIPE, check=False
+    # Modify the config.json file. model_name is one of the two hardcoded
+    # paths above (never derived from job input), but this is converted to
+    # argv form too so the file has no remaining shell=True usage.
+    _run(
+        ["sed", "-i", 's@"sample_size": 256,@"sample_size": 512,@g', f"{model_name}/vae/config.json"],
+        "Error modifying config.json"
     )
-
-    if result.returncode != 0:
-        raise RuntimeError(
-            f"Error modifying config.json\nError message: {result.stderr.decode('utf-8')}")
 
     return model_name

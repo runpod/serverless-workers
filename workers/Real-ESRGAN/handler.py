@@ -4,6 +4,7 @@ from runpod.serverless.utils.rp_upload import files, upload_file_to_bucket
 from runpod.serverless.utils.rp_validator import validate
 
 import os
+import stat
 import cv2
 import zipfile
 from basicsr.archs.rrdbnet_arch import RRDBNet
@@ -62,6 +63,33 @@ INPUT_SCHEMA = {
 
 def is_image_file(filename):
     return any(filename.endswith(extension) for extension in [".png", ".jpg", ".jpeg", ".bmp", ".tiff"])
+
+
+def safe_extract(zip_ref, dest_dir):
+    '''
+    Safely extract a zip archive to dest_dir.
+
+    Rejects any member whose resolved path would escape dest_dir (zip-slip /
+    path traversal via "../" or absolute paths in the archive entry name),
+    and rejects symlink entries outright, since a symlink can point outside
+    dest_dir and defeat a write-time path check. `data_url` is untrusted,
+    user-supplied job input, so the archive it points to must be treated as
+    hostile.
+    '''
+    dest_dir = os.path.realpath(dest_dir)
+
+    for member in zip_ref.infolist():
+        # Reject symlink entries - they can be extracted pointing outside
+        # dest_dir regardless of what their declared name looks like.
+        mode = (member.external_attr >> 16) & 0xFFFF
+        if stat.S_ISLNK(mode):
+            raise ValueError(f"Unsafe zip entry (symlink) rejected: {member.filename}")
+
+        member_path = os.path.realpath(os.path.join(dest_dir, member.filename))
+        if member_path != dest_dir and not member_path.startswith(dest_dir + os.sep):
+            raise ValueError(f"Unsafe zip entry (path traversal) rejected: {member.filename}")
+
+    zip_ref.extractall(dest_dir)
 
 
 def process_image(upsampler, validated_input, image_path, job_id):
@@ -137,7 +165,7 @@ def handler(job):
     result_paths = []
     if zipfile.is_zipfile(data_path):
         with zipfile.ZipFile(data_path, 'r') as zip_ref:
-            zip_ref.extractall(temp_dir)
+            safe_extract(zip_ref, temp_dir)
 
         for file in os.listdir(temp_dir):
             if not file.startswith("__MACOSX") and is_image_file(file):
