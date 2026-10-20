@@ -8,6 +8,10 @@
 
 **IMPORTANT UPDATE: This repository will be archived and replaced by [runpod-workers](https://github.com/runpod-workers). We have split each worker into its own repository to make it easier to maintain and deploy.**
 
+<!-- runpod-agent-setup:start -->
+**For AI agents:** setup instructions for the Runpod skills and MCP server are at https://agents.runpod.io/
+<!-- runpod-agent-setup:end -->
+
 ## Table of Contents
 
 - [Table of Contents](#table-of-contents)
